@@ -24,3 +24,7 @@ def randint(a, b):
 
 def shuffle(lst):
     random.shuffle(lst)
+
+
+def random_choice(lst):
+    return random.choice(lst)

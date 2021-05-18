@@ -1,4 +1,4 @@
-from pipeline import Pipeline, PerturbationModule, TokenizerModule, DetokenizerModule, SplitModuleGenerator, CharsSubModule, AddPunctuationModule, MergeWordHyphenModule, SplitWithCommaModule
+from pipeline import Pipeline, PerturbationModule, TokenizerModule, DetokenizerModule, SplitModuleGenerator, CharsSubModule, AddPunctuationModule, MergeWordHyphenModule, SplitWithCommaModule, SuperPipeline
 
 
 # TODO possibile non segmentare l'intera parola, ma dividerla in pezzettoni
@@ -34,4 +34,21 @@ pipeline.addModule(punctModule)
 pipeline.addModule(commaModule)
 
 pipeline.addModule(DetokenizerModule())
-print(pipeline.run("L’Inter non ha la pancia piena. I nerazzurri superano anche la Roma e trovano la seconda vittoria dopo l’aritmetica dello scudetto: 3-1 a San Siro. Nel primo tempo reti di Brozovic, Vecino e Mkhitaryan. Poco dopo la mezz’ora Sanchez lascia il campo per un problema alla caviglia, entra Lautaro che viene poi sostituito al 77’: battibecco con Conte al momento del cambio. Piccola crepa di un’altra ottima serata per l’Inter, che nella prima metà di secondo tempo deve soffrire per portare a casa i tre punti: l’occasione più importante per la Roma è il palo di Dzeko, nel finale Lukaku chiude la partita in contropiede. Fonseca resta a +2 dal Sassuolo."))
+
+
+pip2 = Pipeline()
+pip2.addModule(TokenizerModule())
+pip2.addModule(DetokenizerModule())
+
+str1 = "L’Inter non ha la pancia piena. I nerazzurri superano anche la Roma e trovano la seconda vittoria dopo l’aritmetica dello scudetto: 3-1 a San Siro. Nel primo tempo reti di Brozovic, Vecino e Mkhitaryan. Poco dopo la mezz’ora Sanchez lascia il campo per un problema alla caviglia, entra Lautaro che viene poi sostituito al 77’: battibecco con Conte al momento del cambio. Piccola crepa di un’altra ottima serata per l’Inter, che nella prima metà di secondo tempo deve soffrire per portare a casa i tre punti: l’occasione più importante per la Roma è il palo di Dzeko, nel finale Lukaku chiude la partita in contropiede. Fonseca resta a +2 dal Sassuolo."
+input = [str1]*4
+
+
+superPip = SuperPipeline()
+superPip.addPipeline(pipeline, 2)
+superPip.addPipeline(pip2, 3)
+
+output = superPip.run(input)
+for section in output:
+    print(section)
+    print("****************************************")

@@ -1,22 +1,29 @@
-from utils import probability_boolean, find_all, randint, shuffle
+from utils import probability_boolean, find_all, randint, shuffle, random_choice
 from itertools import chain
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 
 class SuperPipeline:
-    sub_pipelines = []
+    def __init__(self):
+        self.sub_pipelines = []
+        self.sub_pipelines_weights = []
 
-    def addPipeline(self, pipeline):
+    def addPipeline(self, pipeline, weight=1):
         self.sub_pipelines.append(pipeline)
+        index = len(self.sub_pipelines) - 1
+        self.sub_pipelines_weights.extend([index]*weight)
 
     # Input is a DIVIDED list of strings
     def run(self, input):
-        pass
+        print(self.sub_pipelines)
+        print(self.sub_pipelines_weights)
+        return [self.sub_pipelines[random_choice(self.sub_pipelines_weights)].run(i) for i in input]
 
 
 class Pipeline:
-    modules = []
+    def __init__(self):
+        self.modules = []
 
     def addModule(self, module):
         self.modules.append(module)
@@ -28,9 +35,10 @@ class Pipeline:
 
 
 class PerturbationModule:
-    function = None
-    token_grouping = None
-    probability = None
+    def __init__(self):
+        self.function = None
+        self.token_grouping = None
+        self.probability = None
 
     def group(self, tokens):
         padded = [*tokens, *[""] *
