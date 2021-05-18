@@ -16,8 +16,6 @@ class SuperPipeline:
 
     # Input is a DIVIDED list of strings
     def run(self, input):
-        print(self.sub_pipelines)
-        print(self.sub_pipelines_weights)
         return [self.sub_pipelines[random_choice(self.sub_pipelines_weights)].run(i) for i in input]
 
 

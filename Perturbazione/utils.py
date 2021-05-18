@@ -7,6 +7,8 @@ import random
 def probability_boolean(prob):
     return random.random() < prob
 
+# Trova tuttle le sottosequenze di una sub-stringa in un'altra stringa
+
 
 def find_all(a_str, sub):
     start = 0
