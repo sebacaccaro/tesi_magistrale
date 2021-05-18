@@ -1,8 +1,18 @@
-from utils import probability_boolean, find_all
+from utils import probability_boolean, find_all, randint, shuffle
 from itertools import chain
 from nltk import word_tokenize
-from random import randint, shuffle
 from nltk.tokenize.treebank import TreebankWordDetokenizer
+
+
+class SuperPipeline:
+    sub_pipelines = []
+
+    def addPipeline(self, pipeline):
+        self.sub_pipelines.append(pipeline)
+
+    # Input is a DIVIDED list of strings
+    def run(self, input):
+        pass
 
 
 class Pipeline:
@@ -10,9 +20,6 @@ class Pipeline:
 
     def addModule(self, module):
         self.modules.append(module)
-
-    def feedInput(self, tokens):
-        self.input = tokens
 
     def run(self, input):
         for module in self.modules:
@@ -69,26 +76,6 @@ def SplitModuleGenerator(probability):
         token_grouping=1,
         probability=probability
     )
-
-# TODO si potrebbe complicare andando a scegliere un sequenza di char
-# che non sia la prima, ma va bene anche cosi
-
-
-""" def replaceChars(token, findChar, replaceChars):
-    return token.replace(findChar, replaceChars)
-
-
-def replaceChars_Tokens(tokens, findChar, replaceChar):
-    return [replaceChars(t, findChar, replaceChar) for t in tokens]
-
-
-def CharsSubModule(probability, findChars, replaceChars):
-    return PerturbationModule(
-        perturbation_function=lambda tokens: replaceChars_Tokens(
-            tokens, findChars, replaceChars),
-        token_grouping=1,
-        probability=probability
-    ) """
 
 
 def AddPunctuationModule(probability, punctChar):
