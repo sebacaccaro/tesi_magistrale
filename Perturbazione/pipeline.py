@@ -5,18 +5,43 @@ from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 
 class SuperPipeline:
-    def __init__(self):
+    def __init__(self, stickyness=0, block_size=700, detokenizer=None):
         self.sub_pipelines = []
         self.sub_pipelines_weights = []
+        self.block_size = block_size
+        self.stickyness = stickyness
+        self.detokenizer = detokenizer
 
     def addPipeline(self, pipeline, weight=1):
         self.sub_pipelines.append(pipeline)
         index = len(self.sub_pipelines) - 1
         self.sub_pipelines_weights.extend([index]*weight)
 
-    # Input is a DIVIDED list of strings
+    def splitted(self, input):
+        blocks = []
+        bufferStr = ""
+        for char in input:
+            if len(bufferStr) < self.block_size or (len(bufferStr) >= self.block_size and char != " "):
+                bufferStr += char
+            else:
+                blocks.append(bufferStr)
+                bufferStr = ""
+        blocks.append(bufferStr)
+        return blocks
+
+    # Input is just a long string
+
     def run(self, input):
-        return [self.sub_pipelines[random_choice(self.sub_pipelines_weights)].run(i) for i in input]
+        plain_blocks = self.splitted(input)
+        perturbed_blocks = []
+        current_pipeline = random_choice(self.sub_pipelines_weights)
+        for pb in plain_blocks:
+            if not probability_boolean(self.stickyness):
+                current_pipeline = random_choice(self.sub_pipelines_weights)
+            perturbed = self.sub_pipelines[current_pipeline].run(pb)
+            perturbed_blocks.append(perturbed)
+        perturbed_blocks = list(chain(*perturbed_blocks))
+        return self.detokenizer.apply(perturbed_blocks)
 
 
 class Pipeline:
@@ -25,11 +50,25 @@ class Pipeline:
 
     def addModule(self, module):
         self.modules.append(module)
+        return self
+
+    def feedInput(self, tokens):
+        self.input = tokens
 
     def run(self, input):
         for module in self.modules:
             input = module.apply(input)
         return input
+
+    def concatPipeline(self, other):
+        self.modules = [*self.modules, *other.modules]
+        return self
+
+    def addTokenization(self, tkn_module, dtkn_module=None):
+        self.modules = [tkn_module, *self.modules]
+        if (dtkn_module):
+            self.modules = [*self.modules, dtkn_module]
+        return self
 
 
 class PerturbationModule:
