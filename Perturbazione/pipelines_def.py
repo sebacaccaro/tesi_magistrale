@@ -21,6 +21,8 @@ def segmentation_pipeline(p_mergehyphen, p_splitcomma, p_split, p_punctadd):
     pipeline.addModule(SplitWithCommaModule(p_splitcomma, ","))
     pipeline.addModule(SplitModuleGenerator(p_split))
     pipeline.addModule(AddPunctuationModule(p_punctadd, "."))
+    pipeline.addModule(AddPunctuationModule(p_punctadd/2, ","))
+    pipeline.addModule(AddPunctuationModule(p_punctadd/2, "'"))
     return pipeline
 
 
