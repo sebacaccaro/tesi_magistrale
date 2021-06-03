@@ -6,6 +6,18 @@ with open("./ocr_corrections.json") as f:
     corrections = json.load(f)
 
 
+def map_to_range(value, fromMin, fromMax, toMin, toMax):
+    # Figure out how 'wide' each range is
+    leftSpan = fromMax - fromMin
+    rightSpan = toMax - toMin
+
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(value - fromMin) / float(leftSpan)
+
+    # Convert the 0-1 range into a value in the right range.
+    return toMin + (valueScaled * rightSpan)
+
+
 def invert(dict):
     newDict = {}
     for key, value in tqdm(dict.items(), "Invertendo dizionario"):
@@ -61,12 +73,23 @@ def filterByFrequency(conf_matrix, threshold):
         del(conf_matrix[key])
 
 
+def dict_to_prob(count):
+    maxV = max(count.values())
+    minV = min(count.values())
+    count = {chars: map_to_range(count, minV, maxV, 0, 1)
+             for chars, count in count.items()}
+    return count
+
+
 inverted = invert(corrections)
 confMatrix = extractMatrix(inverted)
 filterByFrequency(confMatrix, 7)
 
-count = {orig_char: sum(sub_dict.values())
-         for orig_char, sub_dict in confMatrix.items()}
+count = dict_to_prob({orig_char: sum(sub_dict.values())
+                      for orig_char, sub_dict in confMatrix.items()})
+
+del(confMatrix[''])
+del(count[''])
 
 output = {
     "subs": confMatrix,

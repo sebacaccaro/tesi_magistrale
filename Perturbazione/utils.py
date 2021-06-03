@@ -30,3 +30,18 @@ def shuffle(lst):
 
 def random_choice(lst):
     return random.choice(lst)
+
+
+def weighted_choice(choice_dict):
+    # L'input è un dizionario dove ogni chiave è associata ad un peso intero
+    min = 0
+    max = sum(choice_dict.values())
+    randNumber = randint(min, max)
+    choice = None
+    keys = iter(list(choice_dict.keys()))
+    while choice == None:
+        current = next(keys)
+        randNumber -= choice_dict[current]
+        if (randNumber <= 0):
+            choice = current
+    return current

@@ -1,7 +1,8 @@
-from utils import probability_boolean, find_all, randint, shuffle, random_choice
+from utils import probability_boolean, find_all, randint, shuffle, random_choice, weighted_choice
 from itertools import chain
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
+from tqdm import tqdm
 
 
 class SuperPipeline:
@@ -35,7 +36,7 @@ class SuperPipeline:
         plain_blocks = self.splitted(input)
         perturbed_blocks = []
         current_pipeline = random_choice(self.sub_pipelines_weights)
-        for pb in plain_blocks:
+        for pb in tqdm(plain_blocks, "Perturbando blocchi"):
             if not probability_boolean(self.stickyness):
                 current_pipeline = random_choice(self.sub_pipelines_weights)
             perturbed = self.sub_pipelines[current_pipeline].run(pb)
@@ -161,14 +162,16 @@ def SplitWithCommaModule(probability, punctChar):
     )
 
 
-def replaceChars(token, subMatrix):
-    appliable = {k: subMatrix[k] for k in subMatrix.keys() if k in token}
+def replaceChars(token, subData):
+    subProb = subData["count"]
+    subMatrix = subData["subs"]
+    appliable = {k: subProb[k] for k in subProb.keys() if k in token}
     subCandidates = list(appliable.keys())
     shuffle(subCandidates)
     tokenBitMask = [0 for char in token]
     for sub in subCandidates:
-        subProb = appliable[sub]["prob"]
-        subWith = appliable[sub]["sub"]
+        subProb = appliable[sub]
+        subWith = weighted_choice(subMatrix[sub])
         for start in find_all(token, sub):
             if sum(tokenBitMask[start:start+len(sub)]) == 0 and probability_boolean(subProb):
                 token = token[:start] + subWith + token[start+len(sub):]
@@ -177,8 +180,8 @@ def replaceChars(token, subMatrix):
     return token
 
 
-def replaceChars_Tokens(tokens, subMatrix):
-    return [replaceChars(t, subMatrix) for t in tokens]
+def replaceChars_Tokens(tokens, subData):
+    return [replaceChars(t, subData) for t in tokens]
 
 
 def CharsSubModule(subMatrix, probability=1):

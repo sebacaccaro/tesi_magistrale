@@ -1,5 +1,6 @@
 from pipelines_def import token_pipeline, segmentation_pipeline, fullPipeline
 from pipeline import Pipeline, SuperPipeline, TokenizerModule, DetokenizerModule
+import json
 
 subMatrix = {
     "n": {"sub": "ii", "prob": 0.5},
@@ -32,7 +33,7 @@ superPip = SuperPipeline(stickyness=0, block_size=300,
                          detokenizer=DetokenizerModule())
 superPip.addPipeline(pip4, 1)
 superPip.addPipeline(pip2, 1)
-print(superPip.run(str1))
+# print(superPip.run(str1))
 #pip2.addTokenization(TokenizerModule(), DetokenizerModule())
 #pip.addTokenization(TokenizerModule(), DetokenizerModule())
 
@@ -44,3 +45,16 @@ print(superPip.run(str1))
 #output = pip3.run(str1)
 # print(output)
 # print(len(str1))
+
+
+with open("./submatrix_extraction/confusionMatrix.json") as f:
+    data = json.load(f)
+
+count = data["count"]
+del(count[''])
+maxV = max(count.values())
+minV = min(count.values())
+count = {chars: map_to_range(count, minV, maxV, 0, 1)
+         for chars, count in count.items()}
+
+print(sorted(count.values()))

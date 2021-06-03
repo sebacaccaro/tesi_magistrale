@@ -4,11 +4,9 @@ from pipeline import Pipeline, PerturbationModule, TokenizerModule, DetokenizerM
 ############### TOKEN LEVEL PIPELINES ################
 # da 0 a n livello di perturbazione crescente
 
-def token_pipeline(p_charsub, charsub_Matrix):
+def token_pipeline(p_charsub, sub_data):
     pipeline = Pipeline()
-    # si potrebbe aggiungere un modulo per droppare dei caratteri
-    # o integrar le sostituazioni nulle nella matrice
-    pipeline.addModule(CharsSubModule(charsub_Matrix, p_charsub))
+    pipeline.addModule(CharsSubModule(sub_data, p_charsub))
     return pipeline
 
 
