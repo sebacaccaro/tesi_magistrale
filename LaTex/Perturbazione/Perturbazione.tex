@@ -1,0 +1,151 @@
+
+\title{Perturbazione di testo}
+\author{
+        Sebastiano Caccaro
+}
+\date{\today}
+
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+
+\begin{document}
+\maketitle
+
+
+\section{Introduzione}
+In questo documento è descritto il funzionamento del perturbatore di testo. Il perturbatore è un funzione che, dato un un determinato testo come input, ne produce una versione perturbata tramite l'introduzione alcuni errori. \\
+Tali errori sono modellati attraverso delle funzioni, chiamate moduli, che vengono composte tra loro per creare una funzione detta pipeline.
+Più formalmente:
+\begin{equation}
+\textit{Pipeline}: m_k \circ m_{k-1} \circ m_{k-2} \circ ... \circ m_0
+\end{equation}
+dove $\{m_0,...,m_k \}$ sono moduli.\\
+Il perturbatore può essere visto come una combinazione di $n$ pipeline, dove ogni pipeline $P_i$ è associata ad peso $w_i$. Il testo in input $x$ viene diviso in una sequenza di blocchi $\{ x_1,...,x_k \}$ dove per ogni blocco viene applicata una sola pipeline $P_i$ con una probabilità
+\begin{equation}
+p_{prt_i} =
+\frac{w_i}
+{{\sum_{j=0}^{n}}w_j}
+\end{equation}
+Inoltre, viene definito il parametro del perturbatore $s \in \{0...1\}$, detto stickyness. Tale parametro comporta che, dato un blocco $x_h$ a cui è applicata la pipeline $P_i$, al blocco $x_{h+1}$ sia applicata la stessa pipeline con probabilità:
+\begin{equation}
+p_{stick_i} =
+s + (1-s)  p_{prt_i}
+\end{equation}
+
+
+\section{Moduli}
+La perturbazione del testo avviene attraverso diverse unità chiamate moduli. Sono definiti tre tipi di moduli:
+\begin{itemize}
+	\item Moduli di tokenizzazione
+	\item Moduli di detokenizzazione
+	\item Moduli di perturbazione
+\end{itemize}
+
+\subsection{Moduli di tokenizzazione}
+I moduli di tokenizzazione sono delle funzioni che hanno lo scopo di scomporre del testo in diversi token. Più formalmente un modulo di tokenizzazione è definito come segue:
+\begin{equation}
+T: x \mapsto \{ t_1,t_2,..., t_n  \}
+\end{equation}
+dove $t_i$ è un token.
+
+\noindent
+\textbf{Esempio}
+\\
+\textit{Input}: Nel mezzo del cammin di nostra vita mi ritrovai per una selva oscura,	ché la diritta via era smarrita.
+\\
+\textit{Output}: \{'Nel', 'mezzo', 'del', 'cammin', 'di', 'nostra', 'vita', 'mi', 'ritrovai', 'per', 'una', 'selva', 'oscura', ',', 'ché', 'la', 'diritta', 'via', 'era', 'smarrita', '.'\}
+
+
+\subsection{Moduli di detokenizzazione}
+I moduli di detokenizzazone sono delle funzioni che hanno lo scopo di mettere insieme una lista ordinata di token in un'unica stringa di testo. Sono definiti come segue:
+\begin{equation}
+D: \{ t_1,t_2,..., t_n  \} \mapsto x
+\end{equation}
+
+\noindent
+\textbf{Esempio}
+\\
+\textit{Input}: \{'Nel', 'mezzo', 'del', 'cammin', 'di', 'nostra', 'vita', 'mi', 'ritrovai', 'per', 'una', 'selva', 'oscura', ',', 'ché', 'la', 'diritta', 'via', 'era', 'smarrita', '.'\}
+\\
+\textit{Output}: Nel mezzo del cammin di nostra vita mi ritrovai per una selva oscura,	ché la diritta via era smarrita.
+
+
+\subsection{Moduli di perturbazione}
+I moduli di perturbazione sono delle funzioni che hanno lo scopo di inserire gli errori all'interno del testo. Un modulo di perturbazione è definito come segue:
+\begin{equation}
+P: \{ t_1,t_2,..., t_n  \} \mapsto \{ t'_1,t'_2,..., t'_k  \}
+\end{equation}
+
+Ogni modulo $P$ è caratterizzato dai seguenti parametri:
+\begin{itemize}
+\item $f: \{ t_1,t_2,..., t_g  \} \mapsto \{ t'_1,t'_2,..., t'_h  \} $. Una funzione che prende in input gruppi di $g$ token e restituisce $h$ token perturbati.
+\item $p$: probabilità che un dato gruppo di token $\{ t_1,t_2,..., t_g  \}$ sia perturbato dalla funzione $f$.
+\end{itemize}
+
+A seconda della funzione $f$, si possono distinguere varie categorie di moduli di perturbazione, che modellano diversi errori. Inoltre, alcuni moduli possono richiedere alcuni parametri aggiuntivi.
+
+\subsubsection{Modulo di split}
+Il modulo di split modella l'errore in cui le lettere di una parola vengono intermezzate da degli spazi. La funzione è definita come:
+\begin{equation}
+\textit{Split}: \{ t_1 \} \mapsto \{ t'_1 \}
+\end{equation}
+Essendo $t_1$ un token, e quindi una sequenza di caratteri, definiamo $t'_1$ come:
+\begin{equation}
+t'_1 = c + '\ ' \forall c \in t_1
+\end{equation}
+\textbf{Esempio}\\
+\textit{Input}: \{\texttt{'cammin'}\}\\
+\textit{Output}: \{\texttt{'c a m m i n'}\}
+
+\subsubsection{Modulo di aggiunta di punteggiatura}
+Il modulo di aggiunta di punteggiatura, modella l'aggiunta di un segno di punteggiatura come il punto, la virgola o un apostrofo fra due token. La funzione è definita come:
+\begin{equation}
+\textit{AddPunct}: \{ t_1 \} \mapsto \{ t_1, \textit{punct} \}
+\end{equation}
+dove \textit{punct} è parametro della funzione \textit{AddPunct}.\\
+\textbf{Esempio}\\
+\textit{Input}: \{\texttt{'cammin'}\}\\
+\textit{Output}: \{\texttt{'cammin',','}\}
+
+\subsubsection{Modulo di unione con trattino}
+Il modulo di unione con trattino modella l'unione di due token attraverso l'uso del carattere '-'. È definito come segue:
+\begin{equation}
+\textit{MergeHypen}: \{ t_1,t_2 \} \mapsto \{ t_1 + \textit{'-'} + t_2 \}
+\end{equation}
+\textbf{Esempio}\\
+\textit{Input}: \{\texttt{'del','cammin'}\}\\
+\textit{Output}: \{\texttt{'del-cammin'}\}
+
+
+\subsubsection{Modulo di divisione con virgola}
+\textbf{Esempio}\\
+\textit{Input}: \{\texttt{'cammin'}\}\\
+\textit{Output}: \{\texttt{'ca,mm,in'}\}
+
+\subsubsection{Modulo di rimpiazzo caratteri}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
