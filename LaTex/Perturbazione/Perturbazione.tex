@@ -8,6 +8,8 @@
 
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage[italian]{babel}
 
 \begin{document}
@@ -22,7 +24,7 @@ Più formalmente:
 \textit{Pipeline}: m_k \circ m_{k-1} \circ m_{k-2} \circ ... \circ m_0
 \end{equation}
 dove $\{m_0,...,m_k \}$ sono moduli.\\
-Il perturbatore può essere visto come una combinazione di $n$ pipeline, dove ogni pipeline $P_i$ è associata ad peso $w_i$. Il testo in input $x$ viene diviso in una sequenza di blocchi $\{ x_1,...,x_k \}$ dove per ogni blocco viene applicata una sola pipeline $P_i$ con una probabilità
+Il perturbatore può essere visto come una combinazione di $n$ pipeline, dove ogni pipeline $P_i$ è associata ad un peso $w_i$. Il testo in input $x$ viene diviso in una sequenza di blocchi $\{ x_1,...,x_k \}$ dove per ogni blocco viene applicata una sola pipeline $P_i$ con una probabilità
 \begin{equation}
 p_{prt_i} =
 \frac{w_i}
@@ -100,7 +102,7 @@ t'_1 = c + '\ ' \forall c \in t_1
 \textit{Output}: \{\texttt{'c a m m i n'}\}
 
 \subsubsection{Modulo di aggiunta di punteggiatura}
-Il modulo di aggiunta di punteggiatura, modella l'aggiunta di un segno di punteggiatura come il punto, la virgola o un apostrofo fra due token. La funzione è definita come:
+Il modulo di aggiunta di punteggiatura modella l'aggiunta di un segno di punteggiatura come il punto, la virgola o un apostrofo fra due token. La funzione è definita come:
 \begin{equation}
 \textit{AddPunct}: \{ t_1 \} \mapsto \{ t_1, \textit{punct} \}
 \end{equation}
@@ -120,13 +122,55 @@ Il modulo di unione con trattino modella l'unione di due token attraverso l'uso 
 
 
 \subsubsection{Modulo di divisione con virgola}
+Il modulo di divisione con virgola modella l'inserimento di una o più virgole all'interno di un token. È definito come segue:
+\begin{equation}
+\textit{SplitComma}: \{ t_1 \} \mapsto \{ f(t_1) \}
+\end{equation}
+Definendo un token $t$ come una sequenza di caratteri $\{c_1,...,c_n\}$, e definendo un numero casuale $x \in \mathbb{N} \wedge 1 \leqslant x < n$, è possibile formalizzare $f$ come:
+\begin{equation}
+f(t) = \begin{cases}
+\{c1,...,c_x\} +\ ',' + f(\{c_{x+1},...,c_n \})&\text{se $x < n$}\\
+\ '' 									&\text{se $x \geqslant n$}
+\end{cases}
+\end{equation}
+
+\noindent
 \textbf{Esempio}\\
 \textit{Input}: \{\texttt{'cammin'}\}\\
 \textit{Output}: \{\texttt{'ca,mm,in'}\}
 
 \subsubsection{Modulo di rimpiazzo caratteri}
+Il modulo di rimpiazzo caratteri modella lo scambio di una sequenza di caratteri con un'altra all'interno dello stesso token. È definito come segue:
+\begin{equation}
+\textit{SubChar}: \{ t_1 \} \mapsto \{ f(t_1) \}
+\end{equation}
+La funzione $f$ è caratterizzata dai seguenti parametri:
+\begin{itemize}
+\item Un insieme di sequenze di caratteri $\{s_1,...,s_n\}$ dove ad ogni sequenza $s_i$ è associata una probabilità $p_i$. Ogni sequenza $s_i$ presente in un token $t$ viene rimpiazzata da un'altra sottosequenza con probabilità $p_i$.
+\item Ad ogni sequenza $s_i$ è associato un insieme di sequenze $\{r_{i1},...,r_{ik}\}$ dove ogni sequenza $s_{ij}$ è associata ad un peso $w_{ij}$.
+\end{itemize}
+Se ad ogni probabilità $p_i$ viene associata una variabile $X_i \sim Ber(p_i)$, e definisco $S$ come l'insieme di tutte le sequenze $s_i$ all'interno di $t$, è possibile definire $f$ come:
 
+\begin{equation}
+f(t,S) = \begin{cases}
+t & \text{se $S = \emptyset$} \\
+f(t,S \setminus \{s_i\}) & \text{se $S \neq \emptyset \wedge X_i = 0$} \\
+f(\{c_1,...,c_g\},S) + sub(\{c_{g+1},...,c_h\}) + f(\{c_{h+1},...,c_n\},S)  
+& \text{se $S \neq \emptyset \wedge X_i = 1$} \\
+\end{cases}
+\end{equation}
 
+dove se $\{c_{g+1},...,c_h\}$ è la sequenza $s_i$, $sub(\{c_{g+1},...,c_h\})$ è una sola fra le sequenze $\{r_{i1},...,r_{ik}\}$  scelta con probabilità
+\begin{equation}
+p_{sub_{ij}} =
+\frac{w_{ij}}
+{{\sum_{h=0}^{k}}w_{ij}}
+\end{equation}
+
+\noindent
+\textbf{Esempio}\\
+\textit{Input}: \{\texttt{'cammin'}\}\\
+\textit{Output}: \{\texttt{'oanimin'}\}
 
 
 
