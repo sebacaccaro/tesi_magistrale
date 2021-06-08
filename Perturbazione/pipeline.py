@@ -2,6 +2,7 @@ from utils import probability_boolean, find_all, randint, shuffle, random_choice
 from itertools import chain
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
+from detokenize import detokenize
 from tqdm import tqdm
 
 
@@ -103,7 +104,7 @@ class TokenizerModule:
 
 class DetokenizerModule:
     def apply(self, input):
-        return TreebankWordDetokenizer().detokenize(input)
+        return detokenize(input)
 
 
 # TODO possibile non segmentare l'intera parola, ma dividerla in pezzettoni
