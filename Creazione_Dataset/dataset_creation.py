@@ -51,7 +51,7 @@ def smartSplit(sentence, max_optimal_size=max_len):
     # .?!;:
     punktMarks = ["?", "!", ";", ":"]
     splitPoints = [str.find(sentence, punktMark) for punktMark in punktMarks]
-    if (all([x == -1 for x in splitPoints]) or all([x >= max_optimal_size for x in splitPoints])):
+    if all([x == -1 or x >= max_optimal_size for x in splitPoints]):
         return numSplit(sentence, max_optimal_size)
     splitPoint = sorted(
         [x for x in splitPoints if x <= max_optimal_size])[-1] + 1
