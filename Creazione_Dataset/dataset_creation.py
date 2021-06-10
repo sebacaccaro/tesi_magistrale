@@ -76,6 +76,8 @@ while len(allsentences) > 0:
     print(stc)
     extracted_sent, rest = smartSplit(stc)
     extracted.append(extracted_sent)
+    if len(extracted) % 10000 == 0:
+        print(stc)
     if(rest):
         allsentences.append(rest)
 
