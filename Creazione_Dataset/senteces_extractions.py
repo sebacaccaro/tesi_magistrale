@@ -16,7 +16,7 @@ def fileToData(filename):
 
 
 ##### MAIN ####
-fileNames = sorted(os.listdir(dataset_folder))
+fileNames = sorted(list(os.listdir(dataset_folder)))
 
 # Leggendo i files
 files = {int(fileName.replace(".json", "")): fileToData(fileName)

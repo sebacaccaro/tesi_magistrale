@@ -820,4 +820,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
-Creazione_Dataset/senteces_extractions.py
+Creazione_Dataset/sentences.json
+Perturbazione/perturbed_output.md
+Creazione_Dataset/extracted.json
