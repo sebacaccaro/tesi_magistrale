@@ -3,6 +3,8 @@ import os
 from tqdm import tqdm
 from itertools import chain
 from nltk.tokenize import sent_tokenize
+import nltk
+nltk.download('punkt')
 
 #### CONFIG ####
 dataset_folder = "../../Dataset/vatpub/"
