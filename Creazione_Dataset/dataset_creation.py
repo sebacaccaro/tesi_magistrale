@@ -72,7 +72,9 @@ while len(allsentences) > 0:
     if len(extracted) % 1000 == 0:
         print(
             f"Frasi da elaborare: {len(allsentences)} -- Frasi Prodotte: {len(extracted)}")
-    extracted_sent, rest = smartSplit(allsentences.pop(0))
+    stc = allsentences.pop(0)
+    print(stc)
+    extracted_sent, rest = smartSplit(stc)
     extracted.append(extracted_sent)
     if(rest):
         allsentences.append(rest)
