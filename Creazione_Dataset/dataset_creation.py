@@ -29,9 +29,10 @@ def fallbackSplit(sentence, max_optimal_size):
 def numSplit(sentence, max_optimal_size):
     """ Divide the string into an optimal size based on numebers """
     splitPositions = [match.span()[0] for match in finditer(
-        r"(?<![a-zA-Z:])[-+]?\d*\.?\d+", sentence)]
+        r"(?<![a-zA-Z:])\d*\.?\d+", sentence)]
     splitPoints = sorted([x for x in splitPositions if x <= max_optimal_size])
-    if len(splitPoints) == 0:
+    print(splitPoints)
+    if len(splitPoints) == 0 or splitPoints[-1] == 0:
         return fallbackSplit(sentence, max_optimal_size)
     splitPoint = splitPoints[-1]
     return sentence[:splitPoint], sentence[splitPoint:]
@@ -48,7 +49,8 @@ def smartSplit(sentence, max_optimal_size=max_len):
     optimal_str (str): optimal string to be added to the dataset
     rest_str (str): rest of the string
     """
-    # .?!;:
+    if(len(sentence) <= max_optimal_size):
+        return sentence, None
     punktMarks = ["?", "!", ";", ":"]
     splitPoints = [str.find(sentence, punktMark) for punktMark in punktMarks]
     if all([x == -1 or x >= max_optimal_size for x in splitPoints]):
