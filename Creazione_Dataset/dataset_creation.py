@@ -31,7 +31,6 @@ def numSplit(sentence, max_optimal_size):
     splitPositions = [match.span()[0] for match in finditer(
         r"(?<![a-zA-Z:])\d*\.?\d+", sentence)]
     splitPoints = sorted([x for x in splitPositions if x <= max_optimal_size])
-    print(splitPoints)
     if len(splitPoints) == 0 or splitPoints[-1] == 0:
         return fallbackSplit(sentence, max_optimal_size)
     splitPoint = splitPoints[-1]
