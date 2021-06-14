@@ -1,0 +1,137 @@
+
+\title{Metodologia di test}
+\author{
+        Sebastiano Caccaro
+}
+
+
+\documentclass[12pt]{article}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{color,soul}
+
+\newcommand{\E}{È}
+
+\begin{document}
+\maketitle
+
+
+\section{Introduzione}
+Questo documento ha lo scopo di definire le metodologie di test per valutare l'efficacia di alcuni dei metodi di OCR post-processing presenti in letteratura. Il documento è così strutturato:
+\begin{itemize}
+\item Nella \autoref{sec:approcci}toref{sec:dataset} è descritto il dataset usato per il training e/o la valutazione dei vari approcci.
+\item Nella \autoref{sec:approcci} viene fornita una breve overview per ognuno degli approcci scelti. Vengono inoltre definite le metologie di allenamento e/o di test per ognuno degli approcci.
+\item Nella \autoref{sec:metriche} sono definite le misure e le metriche attraverso le quali gli approcci scelti verranno valutati.
+\end{itemize}
+
+
+\section{Dataset} \label{sec:dataset}
+Il dataset usato è ricavato da un insieme di documenti proveniente dagli archivi vaticani. I documenti comprendono trascrizioni di discorsi, encicliche, lettere e altri tipi di testo che spaziano dal 6 Luglio 1439 al 22 Aprile 2021.\\
+Ogni documento contiene dei metadati che specificano dettagli come data, lingua, titolo e autore. Inoltre, per ogni documento sono presenti sia il testo originale che lo stesso testo già diviso in paragrafi.\\
+Il testo estratto può essere considerato corretto sia a livello di singolo token, che a livello di segmentazione. \\
+Da questi documenti viene dunque costruito un dataset nelle seguenti fasi:
+\begin{itemize}
+\item Spezzettamento
+\item Perturbazione
+\end{itemize}
+
+\subsection{Frammentazione} \label{sec:spezzettamento}
+La fase di frammentazione consiste nel ricavare da ogni paragrafo uno o più frammenti di testo che andranno a costituire dei data point nel dataset. Le regole per la frammentazione sono quelle descritte in  \cite{nematus}\bibliographystyle{unsrt}:
+\begin{itemize}
+\item Ogni frammento deve avere al più 50 caratteri;
+\item Quando possibile, la frammentazione avviene su segni di punteggiatura che sanciscono la fine di una frase (.?!:;);
+\item Se il frammento in questione risultasse più lungo di 50 caratteri, la frammentazione avviene sui numeri;
+\item Se ancora il frammento risultassi più lungo di 50 caratteri, la frammentazione avviene al $50^o$ carattere.
+\end{itemize}
+Nel frammentare i paragrafi, quando possibile, viene favorita la creazione di frammenti con un numero di caratteri il più vicino possibile a 50.\\
+
+Applicando questo approccio, è stato possibile ottenere 2827879 frammenti distinti.
+
+\subsection{Perturbazione} \label{sec:perturbazione}
+I frammenti fin'ora individuati sono considerati corretti, ovvero non contengono errori. Per testare la capacità dei vari approcci individuati di correggere errori OCR, è necessario associare ad ogni frammento corretto $c$, un frammento $c'$ così definito:
+\begin{equation}
+c' = f_{err}(c)
+\end{equation}
+dove $f_{err}$ è un funzione che introduce degli errori in $c$.
+Per testare l'efficacia di ogni approccio su testi con diversi livelli di intensità di errore, vengono prodotte più versioni dello stesso dataset. Ogni versione del dataset è ottenuta utilizzando una diversa funzione $f_{err}$.\\
+Utilizzando le definizioni di Pipeline e SuperPipeline date in (\hl{Inserire ref qui}) è possibile associare ad ogni versione del dataset una funzione $f_{err}$ corrispondente ad una diversa SuperPipeline.\\
+Sono quindi individuate due categorie di Pipeline:
+\begin{itemize}
+\item \textbf{Di segmentazione}: sono pipeline che introducono unicamente errori che intaccano la segmentazione del testo. Sono composti dai seguenti moduli:
+	\begin{itemize}
+	\item Split
+	\item AddPunct
+	\item MergeHypen
+	\item SplitComma
+	\end{itemize}
+	\textit{Esempio di perturbazione}: \hl{Inserire esempio}
+\item \textbf{Di token}: sono pipeline che introducono unicamente errori che intaccano i singoli token, senza danneggiare la segmentazione. Sono composti dai seguenti moduli:
+	\begin{itemize}
+	\item SubChar
+	\end{itemize}
+	\textit{Esempio di perturbazione}: \hl{Inserire esempio}
+\item \textbf{Miste}: sono pipeline che introducono sia errori a livello di token, che di segmentazione. Sono composte dalla concatenazione di una pipeline di segmentazione concatenata ad una pipeline di token.\\
+	\textit{Esempio di perturbazione}: \hl{Inserire esempio}
+\end{itemize}
+
+Sono quindi definite le seguenti Pipeline, dove ogni ad ogni modulo è associata la sua probabilità:
+\begin{table}[h!]
+\centering
+\begin{tabular}{cccccc}
+\textbf{Nome} & \textbf{Split} & \textbf{AddPunct} & \textbf{MergeHypen} & \textbf{SplitComma} & \textbf{SubChar} \\
+\hline
+s1 	& 0.0025 	& 0.005 	& 0.001 	& 0.001 	& / 		\\	
+s2 	& 0.008 		& 0.025 	& 0.001 	& 0.002 	& /		\\
+s3 	& 0.05 		& 0.1 	& 0.01 	& 0.02 	& / 		\\ \hline
+t1 	& /			& /		& /		& /		& 0.1	\\
+t2 	& /			& /		& /		& /		& 0.3	\\
+t3 	& /			& /		& /		& /		& 0.8	\\
+\end{tabular}
+\end{table}
+\\
+Sono denotate con tx le pipeline di token, e con sx le pipeline di segmentazione. Maggiore è x, maggiore è l'intensità di errore delle pipeline.\\
+\E quindi possibile ricavare le seguenti pipeline miste:
+\begin{itemize}
+\item $m1 = s1 + t1$
+\item $m2 = s2 + t2$
+\item $m3 = s3 + t3$
+\end{itemize}
+
+
+Sono poi definite le seguenti SuperPipeline. Ogni superpipeline è composta da una serie di pipeline, ad ognuna delle quali è associato un peso:
+\begin{table}[h!]
+\centering
+\begin{tabular}{cccccccccc}
+\textbf{Nome} & \textbf{s1} & \textbf{s2} & \textbf{s3} & \textbf{t1} & \textbf{t2} & \textbf{t3} & \textbf{m1} & \textbf{m2} & \textbf{m3}\\
+\hline
+S1	& 6	& 4	& 1	& /	& /	& / & / & / & / \\ 
+S2	& 2	& 8	& 1	& /	& /	& / & / & / & / \\ 
+S1	& 1	& 6	& 4	& /	& /	& / & / & / & / \\  \hline
+T1	& /	& /	& /	& 6	& 4	& 1 & / & / & / \\ 
+T2	& /	& /	& /	& 2	& 8	& 1 & / & / & / \\  
+T3	& /	& /	& /	& 1	& 4	& 4 & / & / & / \\   \hline
+M1	& /	& /	& /	& /	& /	& / & 6 & 4 & 1 \\ 
+M2	& /	& /	& /	& /	& /	& / & 2 & 8 & 1 \\  
+M3	& /	& /	& /	& /	& /	& / & 1 & 6 & 4 \\ 
+\end{tabular}
+\end{table}
+\\
+Sono quindi presenti 9 versioni diverse del dataset, ognuna delle quali è composta da coppie $(c,c')$ dove  
+$c' = f_{err}(c)$, con una diversa funzione $f_{err} \in \{ S1,S2,S3,T1,T2,T3,M1,M2,M3 \} $ a seconda della versione.
+\section{Approcci} \label{sec:approcci}
+
+
+\section{Misure e metriche di valutazione} \label{sec:metriche}
+
+
+\bibliographystyle{unsrt}
+\bibliography{../bibliografia}
+
+
+
+
+
+\end{document}
