@@ -122,10 +122,43 @@ M3	& /	& /	& /	& /	& /	& / & 1 & 6 & 4 \\
 Sono quindi presenti 9 versioni diverse del dataset, ognuna delle quali è composta da coppie $(c,c')$ dove  
 $c' = f_{err}(c)$, con una diversa funzione $f_{err} \in \{ S1,S2,S3,T1,T2,T3,M1,M2,M3 \} $ a seconda della versione.
 \section{Approcci} \label{sec:approcci}
-
+\hl{Prima di completare la parte relativa agli approcci vorrei provare a farli effettivamente funzionare.}
 
 \section{Misure e metriche di valutazione} \label{sec:metriche}
-
+\newcommand{\cz}{$c$}
+\newcommand{\cp}{$c\prime$}
+\newcommand{\cs}{$c\prime\prime$}
+La notazione proposta nelle precedenti sezioni può essere riassunta come segue:
+\begin{itemize}
+\item \cz\ è un frammento considerato corretto appartenente al dataset $D$;
+\item \cp\ è una versione perturbata di \cz, o meglio $f_{err}(c)$;
+\item \cs\ è il candidato di correzione prodotto da uno degli approcci, ovvero $f_{corr}(f_{err}(c))$.
+\end{itemize}
+Sono definite informalmente le seguenti misure:
+\begin{itemize}
+\item \textit{Errori corretti (EC)}: numero di errori presenti in \cp\ che non sono presenti in \cs.
+\item \textit{Errori introdotti (EI)}: numero di errori presenti in \cs\ che non sono presenti né in \cp, né in \cz. 
+\end{itemize}Preso un frammento corretto \cp\ e un frammento \cp\ o \cs\ chiamato $d$, chiamo \textit{matching block} una la sottosequenza di caratteri presente sia in \cp\ che in $d$. Ogni istanza di \textit{matching block} in \cp\ è associata ad una sola istanza in $d$ e viceversa.\\
+Un \textit{errore} è definito come una sottosequenza di $d$ che non appartiene a nessun \textit{matching block}.\\
+\hl{Inserire lista con esempi}
+\\
+Definendo quindi $f_{ec}$ e $f_{ei}$ come:
+\begin{equation}
+	f_{ec}(c,c\prime,c\prime\prime) = \text{Numero di errori corretti dall'algortimo di correzione}
+\end{equation}
+\begin{equation}
+	f_{ei}(c,c\prime,c\prime\prime) = \text{Numero di errori introdotti dall'algortimo di correzione}
+\end{equation}
+posso, per ogni algoritmo di correzione definire \textit{EC} e \textit{EI} come:
+\begin{equation}
+	EC = \sum_{(c,c\prime,c\prime\prime)\in D^+}f_{ec}(c,c\prime,c\prime\prime)
+\end{equation}
+\begin{equation}
+	EI = \sum_{(c,c\prime,c\prime\prime)\in D^+}f_{ei}(c,c\prime,c\prime\prime)
+\end{equation}
+\hl{Inserire in sezione approcci che D+ corrisponde al dataset dove ogni tupla contiene anche la correzione}
+\\
+\E chiaro che l'efficacia di un approccio è maggiore quando massimizza \textit{EC}, minimizzando allo stesso tempo \textit{EI}.
 
 \bibliographystyle{unsrt}
 \bibliography{../bibliografia}
