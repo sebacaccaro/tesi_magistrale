@@ -21,20 +21,20 @@ output_filename = "extracted.json"
 
 def fallbackSplit(sentence, max_optimal_size):
     """ Chop of the sentece string in string of max_optimal_size and the rest """
-    if len(sentence) <= max_optimal_size:
+    if len(sentence["text"]) <= max_optimal_size:
         return sentence, None
-    return sentence[:max_optimal_size], sentence[max_optimal_size:]
+    return {**sentence, "text": sentence["text"][:max_optimal_size]}, {**sentence, "text": sentence["text"][max_optimal_size:], "parPos": sentence["parPos"]+1}
 
 
 def numSplit(sentence, max_optimal_size):
     """ Divide the string into an optimal size based on numebers """
     splitPositions = [match.span()[0] for match in finditer(
-        r"(?<![a-zA-Z:])\d*\.?\d+", sentence)]
+        r"(?<![a-zA-Z:])\d*\.?\d+", sentence["text"])]
     splitPoints = sorted([x for x in splitPositions if x <= max_optimal_size])
     if len(splitPoints) == 0 or splitPoints[-1] == 0:
         return fallbackSplit(sentence, max_optimal_size)
     splitPoint = splitPoints[-1]
-    return sentence[:splitPoint], sentence[splitPoint:]
+    return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
 
 
 def smartSplit(sentence, max_optimal_size=max_len):
@@ -48,22 +48,24 @@ def smartSplit(sentence, max_optimal_size=max_len):
     optimal_str (str): optimal string to be added to the dataset
     rest_str (str): rest of the string
     """
-    if(len(sentence) <= max_optimal_size):
+    if(len(sentence["text"]) <= max_optimal_size):
         return sentence, None
     punktMarks = ["?", "!", ";", ":"]
-    splitPoints = [str.find(sentence, punktMark) for punktMark in punktMarks]
+    splitPoints = [str.find(sentence["text"], punktMark)
+                   for punktMark in punktMarks]
     if all([x == -1 or x >= max_optimal_size for x in splitPoints]):
         return numSplit(sentence, max_optimal_size)
     splitPoint = sorted(
         [x for x in splitPoints if x <= max_optimal_size])[-1] + 1
-    return sentence[:splitPoint], sentence[splitPoint:]
+    return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
 
 
 allsentences = list(chain(*sentences.values()))
 sent_number = len(allsentences)
-extracted = [phr for phr in allsentences if accettable_length(phr)]
+extracted = [phr for phr in allsentences if accettable_length(phr["text"])]
 
-allsentences = [phr for phr in allsentences if not accettable_length(phr)]
+allsentences = [
+    phr for phr in allsentences if not accettable_length(phr["text"])]
 
 
 print(f"Numero totali di frasi nel dataset: {sent_number}")
@@ -78,7 +80,7 @@ while len(allsentences) > 0:
     if(rest):
         allsentences.append(rest)
 
-extracted = [x for x in extracted if accettable_length(x)]
+extracted = [x for x in extracted if accettable_length(x["text"])]
 
 with open(output_filename, "w") as f:
     json.dump(extracted, f, indent=2)

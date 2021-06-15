@@ -17,6 +17,10 @@ def fileToData(filename):
         return json.load(f)
 
 
+def paragraphListEnriched(fileNum, paragraphList):
+    return [{"text": p, "docnum": fileNum, "parId": i, "parPos": 0} for i, p in enumerate(paragraphList)]
+
+
 ##### MAIN ####
 fileNames = sorted(list(os.listdir(dataset_folder)))
 
@@ -29,8 +33,13 @@ files = {fileNumber: file for fileNumber,
 # Tengo solo i campi paragraph_text e li divido in frasi
 files = {fileNumber: file["paragraphs"]
          for fileNumber, file in files.items()}
+
 files = {fileNumber: list(chain(*[sent_tokenize(paragraph["text"]) for paragraph in file]))
          for fileNumber, file in tqdm(files.items(), "Dividendo i paragrafi in frasi")}
+
+files = {fileNumber: paragraphListEnriched(
+    fileNumber, pList) for fileNumber, pList in files.items()}
+
 print(f"Salvando le frasi in {out_file}...")
 with open(out_file, "w") as f:
     json.dump(files, f, indent=2)

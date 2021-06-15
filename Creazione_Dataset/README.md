@@ -13,3 +13,6 @@ E' uno script che prende le frasi estratte in ```sentences.json``` e le suddivid
 ## train_data_generation.py
 E' uno script che prende le frasi estratte da ```extracted.json``` e degli esempi di sequenze di input-output per allenare un modello generato con NEMATUS. Le sequenze corrispondo al formato descritto in [questo paper](https://www.aclweb.org/anthology/L18-1113.pdf). <br>
 Vengono creati i file ```dataset.input``` e ```dataset.output``` dove sono contenuti i campione separati da un newline.
+
+## recompose_text.py
+Dato il numero di un file nel dataset, ne ricompone il testo completo a partire dai frammenti nel datast. Ancora un po' grezzo, ma dimostra che la cosa può essere fatta; il codice verrà ampliato e perfezionato quando ce ne sarà bisogno.
