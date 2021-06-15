@@ -66,6 +66,12 @@ class Pipeline:
         self.modules = [*self.modules, *other.modules]
         return self
 
+    def clone(self):
+        cloned = Pipeline()
+        for module in self.modules:
+            cloned.addModule(module)
+        return cloned
+
     def addTokenization(self, tkn_module, dtkn_module=None):
         self.modules = [tkn_module, *self.modules]
         if (dtkn_module):

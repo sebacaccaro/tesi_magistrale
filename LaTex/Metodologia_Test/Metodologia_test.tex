@@ -17,12 +17,15 @@
 
 \begin{document}
 \maketitle
+\newcommand{\cz}{$c$}
+\newcommand{\cp}{$c\prime$}
+\newcommand{\cs}{$c\prime\prime$}
 
 
 \section{Introduzione}
 Questo documento ha lo scopo di definire le metodologie di test per valutare l'efficacia di alcuni dei metodi di OCR post-processing presenti in letteratura. Il documento è così strutturato:
 \begin{itemize}
-\item Nella \autoref{sec:approcci}toref{sec:dataset} è descritto il dataset usato per il training e/o la valutazione dei vari approcci.
+\item Nella \autoref{sec:approcci} è descritto il dataset usato per il training e/o la valutazione dei vari approcci.
 \item Nella \autoref{sec:approcci} viene fornita una breve overview per ognuno degli approcci scelti. Vengono inoltre definite le metologie di allenamento e/o di test per ognuno degli approcci.
 \item Nella \autoref{sec:metriche} sono definite le misure e le metriche attraverso le quali gli approcci scelti verranno valutati.
 \end{itemize}
@@ -34,7 +37,7 @@ Ogni documento contiene dei metadati che specificano dettagli come data, lingua,
 Il testo estratto può essere considerato corretto sia a livello di singolo token, che a livello di segmentazione. \\
 Da questi documenti viene dunque costruito un dataset nelle seguenti fasi:
 \begin{itemize}
-\item Spezzettamento
+\item Frammentazione
 \item Perturbazione
 \end{itemize}
 
@@ -47,7 +50,6 @@ La fase di frammentazione consiste nel ricavare da ogni paragrafo uno o più fra
 \item Se ancora il frammento risultassi più lungo di 50 caratteri, la frammentazione avviene al $50^o$ carattere.
 \end{itemize}
 Nel frammentare i paragrafi, quando possibile, viene favorita la creazione di frammenti con un numero di caratteri il più vicino possibile a 50.\\
-
 Applicando questo approccio, è stato possibile ottenere 2827879 frammenti distinti.
 
 \subsection{Perturbazione} \label{sec:perturbazione}
@@ -67,17 +69,23 @@ Sono quindi individuate due categorie di Pipeline:
 	\item MergeHypen
 	\item SplitComma
 	\end{itemize}
-	\textit{Esempio di perturbazione}: \hl{Inserire esempio}
+	Esempio di perturbazione:\\
+	\textit{Input}: Adesso io preferisco parlare spontaneamente.\\
+	\textit{Output}: A,des,so io preferisco parlare spontaneamente.
 \item \textbf{Di token}: sono pipeline che introducono unicamente errori che intaccano i singoli token, senza danneggiare la segmentazione. Sono composti dai seguenti moduli:
 	\begin{itemize}
 	\item SubChar
 	\end{itemize}
-	\textit{Esempio di perturbazione}: \hl{Inserire esempio}
+	Esempio di perturbazione:\\
+	\textit{Input}: Adesso io preferisco parlare spontaneamente.\\
+	\textit{Output}: Adczso io prioferisco parlare spontaneamente.
 \item \textbf{Miste}: sono pipeline che introducono sia errori a livello di token, che di segmentazione. Sono composte dalla concatenazione di una pipeline di segmentazione concatenata ad una pipeline di token.\\
-	\textit{Esempio di perturbazione}: \hl{Inserire esempio}
+	Esempio di perturbazione:\\
+	\textit{Input}: Adesso io preferisco parlare spontaneamente.\\
+	\textit{Output}: Adcsso. io prcfcrisc parlare spontaneamente.
 \end{itemize}
 
-Sono quindi definite le seguenti Pipeline, dove ogni ad ogni modulo è associata la sua probabilità:
+Le Pipeline sono definite in \autoref{Tab:pipeline}, dove ogni ad ogni modulo è associata la sua probabilità.
 \begin{table}[h!]
 \centering
 \begin{tabular}{cccccc}
@@ -90,10 +98,13 @@ t1 	& /			& /		& /		& /		& 0.1	\\
 t2 	& /			& /		& /		& /		& 0.3	\\
 t3 	& /			& /		& /		& /		& 0.8	\\
 \end{tabular}
+
+\caption{Definizione di Pipeline}
+\label{Tab:pipeline}
 \end{table}
 \\
 Sono denotate con tx le pipeline di token, e con sx le pipeline di segmentazione. Maggiore è x, maggiore è l'intensità di errore delle pipeline.\\
-\E quindi possibile ricavare le seguenti pipeline miste:
+\E\ quindi possibile ricavare le seguenti pipeline miste:
 \begin{itemize}
 \item $m1 = s1 + t1$
 \item $m2 = s2 + t2$
@@ -119,15 +130,22 @@ M3	& /	& /	& /	& /	& /	& / & 1 & 6 & 4 \\
 \end{tabular}
 \end{table}
 \\
-Sono quindi presenti 9 versioni diverse del dataset, ognuna delle quali è composta da coppie $(c,c')$ dove  
+Sono quindi presenti 9 versioni diverse del dataset, ognuna delle quali è composta da coppie $(c,c\prime)$ dove  
 $c' = f_{err}(c)$, con una diversa funzione $f_{err} \in \{ S1,S2,S3,T1,T2,T3,M1,M2,M3 \} $ a seconda della versione.
 \section{Approcci} \label{sec:approcci}
-\hl{Prima di completare la parte relativa agli approcci vorrei provare a farli effettivamente funzionare.}
+\hl{Non mi e' chiaro se sia necessario inserire una overview generale per ogni approccio, comprendente di dettagli su come formattare i dati in input ecc. Al momento ho solo inserito una descrizione del processo in generale che mi serve per meglio definire le misure.}
+
+Ognuno degli approcci precedenti può essere visto come una funzione $f_{corr}$, che, applicata ad un frammento perturbato \cp\, produce un frammento corretto \cs. Più formalmente:
+\begin{equation}
+	f_{corr}(c\prime) = c\prime\prime
+\end{equation}
+Ai fini della valutazione di ognuno dei metodi usati, ognuno di essi, dato un dataset $D$ formato da coppie (\cz, \cp), produce un dataset $D^+$ così definito:
+\begin{equation}
+	D^+ = \{		(c,c\prime,f_{corr}(c\prime))\ \forall\ (c,c\prime)	 \in D	\}
+\end{equation}
 
 \section{Misure e metriche di valutazione} \label{sec:metriche}
-\newcommand{\cz}{$c$}
-\newcommand{\cp}{$c\prime$}
-\newcommand{\cs}{$c\prime\prime$}
+
 La notazione proposta nelle precedenti sezioni può essere riassunta come segue:
 \begin{itemize}
 \item \cz\ è un frammento considerato corretto appartenente al dataset $D$;
@@ -140,8 +158,21 @@ Sono definite informalmente le seguenti misure:
 \item \textit{Errori introdotti (EI)}: numero di errori presenti in \cs\ che non sono presenti né in \cp, né in \cz. 
 \end{itemize}Preso un frammento corretto \cp\ e un frammento \cp\ o \cs\ chiamato $d$, chiamo \textit{matching block} una la sottosequenza di caratteri presente sia in \cp\ che in $d$. Ogni istanza di \textit{matching block} in \cp\ è associata ad una sola istanza in $d$ e viceversa.\\
 Un \textit{errore} è definito come una sottosequenza di $d$ che non appartiene a nessun \textit{matching block}.\\
-\hl{Inserire lista con esempi}
-\\
+Considerando la frase di partenza "Adesso io preferisco parlare spontaneamente.", sono riportati fra parentesi quadre nella tabella sottostante gli errori, ovvero i caratteri che non appartengono a nessun \textit{matching block}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{cc}
+
+\textbf{Esempio} & \textbf{Numero di errori}\\
+\hline
+A[,]des[,]so io preferisco parlare spontaneamente. & 2 \\
+Ad[dc]so io pr[io]ferisco parlare spontaneamente. & 2 \\
+Ad[c]sso[.] io pr[c]f[c]risc parlare spontaneamente. & 3\\
+\end{tabular}
+\end{table}
+
+\noindent
 Definendo quindi $f_{ec}$ e $f_{ei}$ come:
 \begin{equation}
 	f_{ec}(c,c\prime,c\prime\prime) = \text{Numero di errori corretti dall'algortimo di correzione}
@@ -156,9 +187,7 @@ posso, per ogni algoritmo di correzione definire \textit{EC} e \textit{EI} come:
 \begin{equation}
 	EI = \sum_{(c,c\prime,c\prime\prime)\in D^+}f_{ei}(c,c\prime,c\prime\prime)
 \end{equation}
-\hl{Inserire in sezione approcci che D+ corrisponde al dataset dove ogni tupla contiene anche la correzione}
-\\
-\E chiaro che l'efficacia di un approccio è maggiore quando massimizza \textit{EC}, minimizzando allo stesso tempo \textit{EI}.
+\E\ chiaro che l'efficacia di un approccio è maggiore quando massimizza \textit{EC}, minimizzando allo stesso tempo \textit{EI}.
 
 \bibliographystyle{unsrt}
 \bibliography{../bibliografia}

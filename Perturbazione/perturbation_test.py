@@ -81,6 +81,10 @@ hardTknPipeline = token_pipeline(
     sub_data=subData
 )
 
+eTkn = easyTknPipeline.clone()
+mTkn = mediumTknPipeline.clone()
+hTkn = hardTknPipeline.clone()
+
 
 easyTknPipeline.addTokenization(TokenizerModule())
 mediumTknPipeline.addTokenization(TokenizerModule())
@@ -104,6 +108,7 @@ tokenization_error_super_3 = SuperPipeline(
     detokenizer=DetokenizerModule()
 )
 
+
 tokenization_error_super_1.addPipeline(easyTknPipeline, weight=6)
 tokenization_error_super_1.addPipeline(mediumTknPipeline, weight=4)
 tokenization_error_super_1.addPipeline(hardTknPipeline, weight=1)
@@ -117,7 +122,43 @@ tokenization_error_super_3.addPipeline(mediumTknPipeline, weight=6)
 tokenization_error_super_3.addPipeline(hardTknPipeline, weight=4)
 
 
-output = tokenization_error_super_2.run(inputText)
+mixed_error_super_1 = SuperPipeline(
+    stickyness=0.8,
+    block_size=800,
+    detokenizer=DetokenizerModule()
+)
+
+mixed_error_super_2 = SuperPipeline(
+    stickyness=0.8,
+    block_size=800,
+    detokenizer=DetokenizerModule()
+)
+
+mixed_error_super_3 = SuperPipeline(
+    stickyness=0.8,
+    block_size=800,
+    detokenizer=DetokenizerModule()
+)
+
+easyMixedPipeline = easySegPipeline.clone().concatPipeline(eTkn)
+mediumMixedPipeline = mediumSegPipeline.clone().concatPipeline(mTkn)
+hardMixedPipeline = hardSegPipeline.clone().concatPipeline(hTkn)
+
+mixed_error_super_1.addPipeline(easyMixedPipeline, weight=6)
+mixed_error_super_1.addPipeline(mediumMixedPipeline, weight=4)
+mixed_error_super_1.addPipeline(hardMixedPipeline, weight=1)
+
+mixed_error_super_2.addPipeline(easyMixedPipeline, weight=2)
+mixed_error_super_2.addPipeline(mediumMixedPipeline, weight=8)
+mixed_error_super_2.addPipeline(hardMixedPipeline, weight=1)
+
+mixed_error_super_3.addPipeline(easyMixedPipeline, weight=1)
+mixed_error_super_3.addPipeline(mediumMixedPipeline, weight=6)
+mixed_error_super_3.addPipeline(hardMixedPipeline, weight=4)
+
+
+output = mixed_error_super_2.run(inputText)
+print(output)
 
 with open("perturbed_output.md", "w") as f:
     f.write(output)
