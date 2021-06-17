@@ -31,13 +31,16 @@ class SuperPipeline:
         blocks.append(bufferStr)
         return blocks
 
+    def perturbedList(self, inputList):
+        return [self.run(x) for x in inputList]
+
     # Input is just a long string
 
     def run(self, input):
         plain_blocks = self.splitted(input)
         perturbed_blocks = []
         current_pipeline = random_choice(self.sub_pipelines_weights)
-        for pb in tqdm(plain_blocks, "Perturbando blocchi"):
+        for pb in plain_blocks:
             if not probability_boolean(self.stickyness):
                 current_pipeline = random_choice(self.sub_pipelines_weights)
             perturbed = self.sub_pipelines[current_pipeline].run(pb)
@@ -86,10 +89,15 @@ class PerturbationModule:
         self.probability = None
 
     def group(self, tokens):
-        padded = [*tokens, *[""] *
-                  (self.token_grouping - (len(tokens) % self.token_grouping))]
-        grouped = [padded[i: i+self.token_grouping]
-                   for i in range(0, len(padded)-self.token_grouping, self.token_grouping)]
+        grouped = []
+        current = []
+        for t in tokens:
+            if len(current) == self.token_grouping:
+                grouped.append(current)
+                current = []
+            current.append(t)
+        if len(current) > 0:
+            grouped.append(current)
         return grouped
 
     def __init__(self, perturbation_function, token_grouping, probability):
@@ -99,7 +107,7 @@ class PerturbationModule:
 
     def apply(self, tokens):
         perturbed_list = [self.perturbation_function(t) if probability_boolean(
-            self.probability) else t for t in self.group(tokens)]
+            self.probability) else t for t in self.group(tokens) if len(t) == self.token_grouping]
         return list(chain.from_iterable(perturbed_list))
 
 
