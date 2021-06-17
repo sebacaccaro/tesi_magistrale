@@ -2,6 +2,7 @@ from gensim import models
 from gensim.models import Word2Vec
 from nltk import word_tokenize
 from tqdm import tqdm
+from gensim.utils import effective_n_jobs
 import json
 import os
 
@@ -15,7 +16,7 @@ def perturbed_iterator(dataset, setting):
 
 def make_model(dataset, setting):
     pert_sent = list(perturbed_iterator(dataset, setting))
-    model = Word2Vec(pert_sent)
+    model = Word2Vec(pert_sent, workers=effective_n_jobs(-1))
     model.save(f'word2vec_models/{setting}.bin')
 
 
