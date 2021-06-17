@@ -22,7 +22,6 @@ with open("extracted.json")as f:
 
 dataset = [{**d, "perturbed": {}} for d in dataset]
 
-sup_pipelines = {"M2": sup_pipelines["M2"]}
 
 i = 0
 for sup_name, sup in sup_pipelines.items():

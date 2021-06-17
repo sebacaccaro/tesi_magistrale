@@ -826,3 +826,5 @@ Creazione_Dataset/extracted.json
 Creazione_Dataset/dataset.input
 Creazione_Dataset/dataset.output
 Creazione_Dataset/Nematus/nematus/
+Creazione_Dataset/dataset.json
+Metodi_correzione/project_gender_politics/word2vec_models/*.bin
