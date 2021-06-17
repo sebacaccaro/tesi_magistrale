@@ -1,9 +1,9 @@
+from perturbation_superpipelines import sup_pipelines
 from tqdm.utils import _supports_unicode
 from tqdm import tqdm
 import json
 import sys
 sys.path.insert(0, "../Perturbazione/")
-from perturbation_superpipelines import sup_pipelines
 
 
 def perturbed_sample(sample, perturbed, sup_name):
@@ -20,7 +20,7 @@ print("Caricando le frasi estratte...")
 with open("extracted.json")as f:
     dataset = json.load(f)
 
-dataset = [{**d, "perturbed": {}} for d in dataset][:10]
+dataset = [{**d, "perturbed": {}} for d in dataset]
 
 sup_pipelines = {"M2": sup_pipelines["M2"]}
 
