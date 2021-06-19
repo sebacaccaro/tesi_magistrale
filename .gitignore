@@ -831,3 +831,4 @@ Metodi_correzione/project_gender_politics/word2vec_models/*.bin
 Metodi_correzione/project_gender_politics/word2vec_models/*.npy
 Metodi_correzione/project_gender_politics/fasttext_models/*.bin
 Metodi_correzione/project_gender_politics/fasttext_models/*.npy
+Metodi_correzione/project_gender_politics/corrections/*.json
