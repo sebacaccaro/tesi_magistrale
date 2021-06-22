@@ -41,8 +41,7 @@ if len(doneModels) > 0:
     print(f"Saltando modelli {doneModels} perchè già presenti")
 
 for setting in tqdm(pertubation_settings_w2v, desc="Modellando word2vec"):
-    #make_model_word2vec(dataset, setting)
-    pass
+    make_model_word2vec(dataset, setting)
 
 print("Creazione modelli FastText")
 doneModels = (list(os.listdir("./fasttext_models")))
