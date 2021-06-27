@@ -107,7 +107,7 @@ class PerturbationModule:
 
     def apply(self, tokens):
         perturbed_list = [self.perturbation_function(t) if probability_boolean(
-            self.probability) else t for t in self.group(tokens) if len(t) == self.token_grouping]
+            self.probability) and len(t) == self.token_grouping else t for t in self.group(tokens)]
         return list(chain.from_iterable(perturbed_list))
 
 
@@ -121,8 +121,6 @@ class DetokenizerModule:
         return detokenize(input)
 
 
-# TODO possibile non segmentare l'intera parola, ma dividerla in pezzettoni
-# e segmentarne solo alcuni
 def split(token):
     return " ".join([char for char in token])
 

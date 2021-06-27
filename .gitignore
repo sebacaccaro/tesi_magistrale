@@ -834,3 +834,5 @@ Metodi_correzione/project_gender_politics/fasttext_models/*.npy
 Metodi_correzione/project_gender_politics/corrections/*.json
 Valutazione/valutazione.json
 Valutazione/dataset_valutati/*.json
+Creazione_Dataset/dataset_reduced.json
+Perturbazione/outtest.json
