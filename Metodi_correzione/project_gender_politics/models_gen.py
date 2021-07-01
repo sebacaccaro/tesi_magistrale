@@ -6,6 +6,17 @@ from gensim.utils import effective_n_jobs
 import json
 import os
 
+# Models config
+min_count = 5,
+window = 5,
+vector_size = 100,
+sample = 1e-4,
+negative = 20,
+epochs = 50,
+min_alpha = 0.0001,
+alpha = 0.025
+workers = effective_n_jobs(-1)
+
 
 def perturbed_iterator(dataset, setting):
     for sample in dataset:
@@ -16,13 +27,27 @@ def perturbed_iterator(dataset, setting):
 
 def make_model_word2vec(dataset, setting):
     pert_sent = list(perturbed_iterator(dataset, setting))
-    model = Word2Vec(pert_sent, workers=effective_n_jobs(-1))
+    model = Word2Vec(pert_sent, min_count=min_count,
+                     window=window,
+                     vector_size=vector_size,
+                     sample=sample,
+                     alpha=alpha,
+                     negative=negative,
+                     workers=workers,
+                     min_alpha=min_alpha)
     model.save(f'word2vec_models/{setting}.bin')
 
 
 def make_model_fasttext(dataset, setting):
     pert_sent = list(perturbed_iterator(dataset, setting))
-    model = FastText(pert_sent, workers=effective_n_jobs(-1))
+    model = FastText(pert_sent, min_count=min_count,
+                     window=window,
+                     vector_size=vector_size,
+                     sample=sample,
+                     alpha=alpha,
+                     negative=negative,
+                     workers=workers,
+                     min_alpha=min_alpha)
     model.save(f'fasttext_models/{setting}.bin')
 
 
