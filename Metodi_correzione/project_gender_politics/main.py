@@ -19,7 +19,7 @@ def writeOutput(output, setting, suffix=""):
         json.dump(output, f, indent=2)
 
 
-with open('lexicon.txt') as f:
+with open('../project_gender_politics/lexicon.txt') as f:
     lexicon = set(f.read().splitlines())
 
 fst_models = [m[:-4]
