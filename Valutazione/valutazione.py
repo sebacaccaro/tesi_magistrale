@@ -119,15 +119,16 @@ def correctionScore(sample):
 
 def dataset_stats(dataset):
     dataset = [align(datapoint)
-               for datapoint in tqdm(dataset, desc="    > Allineando Frasi")]
+               for datapoint in tqdm(dataset[:10000], desc="    > Allineando Frasi")]
     dataset = [{
-        "orginal": x[0],
+        "orginal--": x[0],
         "perturbed": x[1],
         "corrected": x[2],
         "alignedSuccess": x[3]
     } for x in dataset]
-    dataset = [correctionScore(sample) for sample in tqdm(
-        dataset, desc=" > Valutando Correzioni")]
+    with open("dataset_aligned.json", "w") as f:
+        json.dump(dataset, f, indent=2)
+    exit()
     stats = {
         "perturbation_errors": sum([x["perturbation_errors"] for x in dataset]),
         "corrected_errors": sum([x["corrected_errors"] for x in dataset]),
@@ -151,7 +152,7 @@ def dataset_name(filename):
 def evaluate_project(project_foler, corr_name):
     print(f"Valutando {corr_name}...")
     files = os.listdir(project_foler)
-    files = [f for f in files if ".json" in f and "errors_" not in f]
+    files = [f for f in files if ".json" in f and "errors_" not in f and "M2" in f]
     stats = {dataset_name(f): fileNameToStats(f, project_foler) for f in files}
     return stats
 
