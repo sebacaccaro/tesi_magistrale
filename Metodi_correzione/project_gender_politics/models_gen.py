@@ -7,13 +7,13 @@ import json
 import os
 
 # Models config
-min_count = 5,
-window = 5,
-vector_size = 100,
-sample = 1e-4,
-negative = 20,
-epochs = 50,
-min_alpha = 0.0001,
+min_count = 5
+window = 5
+vector_size = 100
+sample = 1e-4
+negative = 20
+epochs = 50
+min_alpha = 0.0001
 alpha = 0.025
 workers = effective_n_jobs(-1)
 
