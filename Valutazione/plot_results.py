@@ -2,7 +2,7 @@ import json
 import matplotlib.pyplot as plt
 
 fig_size = plt.rcParams["figure.figsize"]
-fig_size[0] = 6
+fig_size[0] = 7
 fig_size[1] = 10
 
 with open("./valutazione.json") as f:
@@ -60,7 +60,7 @@ def add_value_labels(ax, spacing=5):
             va = 'top'
 
         # Use Y value as label and format number with one decimal place
-        label = "{:.1f}".format(y_value)
+        label = "{:.3f}".format(y_value)
 
         # Create annotation
         ax.annotate(
