@@ -1,0 +1,117 @@
+
+\title{Valutazione test}
+\author{
+        Sebastiano Caccaro
+}
+
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[italian]{babel}
+\usepackage{color,soul}
+\usepackage{float}
+
+\begin{document}
+\maketitle
+
+
+\abstract{In questo documento esposti i risultati dei testi ottenuti con diversi livelli e tecniche di perturbazione. Sono inoltre usati diversi metodi di correzione o più versioni dello stesso metodo.}
+
+
+\section{Metodi}
+In questa sezione sono descritte le configurazioni di ogni test eseguito in termini di dataset e di metodo di correzione. Ogni codice è inoltre caratterizzato da un identificativo univoco. Ogni identificativo è composto come segue:
+\begin{center}
+\texttt{xxxyyz}
+\end{center}
+dove:
+\begin{itemize}
+\item xxx è una stringa di tre lettere che individua il metodo di correzione utilizzato.
+\item yy è un numero che indica una determinata configurazione dei parametri del metodo utilizzato.
+\item z è una lettera che indica un diverso metodo di perturbazione utilizzato nel dataset.
+\end{itemize}
+
+\section{Definizioni configurazioni}
+\subsection{Metodi di correzione}
+I metodi di correzione usati sono i seguenti:
+\begin{itemize}
+	\newcommand{\pgp}{pgp}
+	\newcommand{\pgpfull}{Project-gender-politics}
+	\item \textbf{\pgpfull\ (pgp)}: metodo sviluppato da Francesco Periti. \hl{Nome lasciato cosi per mancanza di alternative}. Sono presenti le seguenti configurazioni:
+	\begin{itemize}
+		\item \texttt{00}: ottenuta allenando i modelli word2vec e gensim con i parametri di default.
+		\item \texttt{01}: ottenuta allenando i modelli word2vec e gensim con i seguenti parametri:
+		\begin{itemize}
+			\item min\_count = 5
+			\item window = 5
+			\item vector\_size = 100
+			\item sample = 1e-4
+			\item negative = 20
+			\item epochs = 50
+			\item min\_alpha = 0.0001
+			\item alpha = 0.025
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+
+	
+\subsection{Dataset}
+	
+I tipi di dataset utilizzati sono i seguenti:
+\begin{itemize}
+\item \textbf{a}: gli errori di tokenizzazione sono introdotti attraverso il modulo \textit{CharSub}.
+\item \textbf{b}: gli errori di tokenizzazione sono introdotti attraverso il modulo \textit{TokenSub}.
+\end{itemize}
+
+
+\section{Metriche}
+
+
+\section{Risultati}
+I risultati per la metrica x... sono.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccccccccc}
+  & \textbf{T1} & \textbf{T2} & \textbf{T3} & \textbf{S1} & \textbf{S2} & \textbf{S3} & \textbf{M1} & \textbf{M2} & \textbf{M3}\\ \hline 
+pgp00a & 0.139 & 0.150 & 0.160 & 0.108 & 0.122 & 0.132 & 0.145 & 0.154 & 0.153\\ 
+\end{tabular}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

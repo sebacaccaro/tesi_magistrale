@@ -1,0 +1,58 @@
+{
+  "pgp00a": {
+    "T1": {
+      "perturbation_errors": 3515947,
+      "corrected_errors": 488769,
+      "introduced_errors": 3553467,
+      "total_samples": 2827879
+    },
+    "T2": {
+      "perturbation_errors": 4283435,
+      "corrected_errors": 641869,
+      "introduced_errors": 3531861,
+      "total_samples": 2827879
+    },
+    "T3": {
+      "perturbation_errors": 5908189,
+      "corrected_errors": 944687,
+      "introduced_errors": 3514597,
+      "total_samples": 2827879
+    },
+    "S1": {
+      "perturbation_errors": 2737887,
+      "corrected_errors": 295329,
+      "introduced_errors": 3408412,
+      "total_samples": 2827879
+    },
+    "S2": {
+      "perturbation_errors": 3236166,
+      "corrected_errors": 395927,
+      "introduced_errors": 3370694,
+      "total_samples": 2827879
+    },
+    "S3": {
+      "perturbation_errors": 5259189,
+      "corrected_errors": 694965,
+      "introduced_errors": 3167030,
+      "total_samples": 2827879
+    },
+    "M1": {
+      "perturbation_errors": 5048401,
+      "corrected_errors": 732584,
+      "introduced_errors": 3414963,
+      "total_samples": 2827879
+    },
+    "M2": {
+      "perturbation_errors": 6279564,
+      "corrected_errors": 970009,
+      "introduced_errors": 3348014,
+      "total_samples": 2827879
+    },
+    "M3": {
+      "perturbation_errors": 9564115,
+      "corrected_errors": 1463823,
+      "introduced_errors": 3228713,
+      "total_samples": 2827879
+    }
+  }
+}
