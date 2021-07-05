@@ -204,3 +204,39 @@ def CharsSubModule(subMatrix, probability=1):
         token_grouping=1,
         probability=probability
     )
+
+
+def generate_alternatives_for(token: str, subData: dict, alternativesDict: dict, tokenAlternatives: int):
+    altList = []
+    i = 0
+    while(len(altList) < tokenAlternatives and i < 50):
+        i += 1
+        t = replaceChars(token, subData)
+        if t not in altList:
+            altList.append(t)
+    alternativesDict[token] = altList
+    return altList
+
+
+def replaceTokens(token: str, subData, alternativesDict: dict, tokenAlternatives: int):
+    # Per ogni token, genero i 5 possibili misspellings se non già presenti nel dict
+    # In caso devo sostituire, vado a pescare nel dict
+    alternatives = alternativesDict.get(token, None)
+    if not alternatives:
+        alternatives = generate_alternatives_for(
+            token, subData, alternativesDict, tokenAlternatives)
+    alt_token = random_choice(alternatives)
+    return alt_token
+
+
+def replace_tokens(tokens, subData, alternativesDict, tokenAlternatives: int):
+    return [replaceTokens(t, subData, alternativesDict, tokenAlternatives) for t in tokens]
+
+
+def TokenSubModule(subMatrix, tokenAlternatives=5, alternativesDict={}, probability=1):
+    return PerturbationModule(
+        perturbation_function=lambda tokens: replace_tokens(
+            tokens, subMatrix, alternativesDict, tokenAlternatives),
+        token_grouping=1,
+        probability=probability
+    )

@@ -1,4 +1,4 @@
-from pipeline import Pipeline, PerturbationModule, TokenizerModule, DetokenizerModule, SplitModuleGenerator, CharsSubModule, AddPunctuationModule, MergeWordHyphenModule, SplitWithCommaModule, SuperPipeline
+from pipeline import Pipeline, PerturbationModule, TokenizerModule, DetokenizerModule, SplitModuleGenerator, CharsSubModule, AddPunctuationModule, MergeWordHyphenModule, SplitWithCommaModule, SuperPipeline, TokenSubModule
 
 
 ############### TOKEN LEVEL PIPELINES ################
@@ -7,6 +7,12 @@ from pipeline import Pipeline, PerturbationModule, TokenizerModule, DetokenizerM
 def token_pipeline(p_charsub, sub_data):
     pipeline = Pipeline()
     pipeline.addModule(CharsSubModule(sub_data, p_charsub))
+    return pipeline
+
+
+def token_pipeline_token_version(p_tokensub, sub_data, altDict):
+    pipeline = Pipeline()
+    pipeline.addModule(TokenSubModule(sub_data, 5, altDict, p_tokensub))
     return pipeline
 
 

@@ -1,9 +1,14 @@
 import json
 from pipeline import DetokenizerModule, SuperPipeline, TokenizerModule
-from pipelines_def import segmentation_pipeline, token_pipeline
+from pipelines_def import segmentation_pipeline, token_pipeline, token_pipeline_token_version
+
+tokenSub_activated = True
 
 with open("../Perturbazione/submatrix_extraction/confusionMatrix.json") as f:
     subData = json.load(f)
+
+
+altDict = {}
 
 
 easySegPipeline = segmentation_pipeline(
@@ -77,6 +82,25 @@ hardTknPipeline = token_pipeline(
     p_charsub=0.8,
     sub_data=subData
 )
+
+if tokenSub_activated:
+    easyTknPipeline = token_pipeline_token_version(
+        p_tokensub=0.1,
+        sub_data=subData,
+        altDict=altDict
+    )
+
+    mediumTknPipeline = token_pipeline_token_version(
+        p_tokensub=0.3,
+        sub_data=subData,
+        altDict=altDict
+    )
+
+    hardTknPipeline = token_pipeline_token_version(
+        p_tokensub=0.8,
+        sub_data=subData,
+        altDict=altDict
+    )
 
 eTkn = easyTknPipeline.clone()
 mTkn = mediumTknPipeline.clone()

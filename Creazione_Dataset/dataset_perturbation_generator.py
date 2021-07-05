@@ -30,5 +30,5 @@ for sup_name, sup in sup_pipelines.items():
     dataset = [perturbed_sample(s, sup.run(s["text"]), sup_name)
                for s in tqdm(dataset, desc=desc)]
 
-with open("dataset.json", "w") as f:
+with open("dataset_v2.json", "w") as f:
     json.dump(dataset, f, indent=2)
