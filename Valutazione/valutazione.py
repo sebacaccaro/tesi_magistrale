@@ -4,7 +4,8 @@ import json
 from Levenshtein import matching_blocks, editops
 
 corrections_folders = {
-    "project_gender_politcs": "../Metodi_correzione/project_gender_politics/corrections/"}
+    "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/",
+    "pgp02a": "../Metodi_correzione/project_gender_politics_advanced/corrections/"}
 
 
 def diffAlign(s1, s2):
