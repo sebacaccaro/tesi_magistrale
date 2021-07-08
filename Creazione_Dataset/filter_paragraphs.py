@@ -1,0 +1,25 @@
+import json
+from tqdm import tqdm
+
+
+def isFirstParagraph(fragment):
+    return fragment["parId"] == 0
+
+
+def isLastParagraph(fragment, maxes):
+    return fragment["parId"] == maxes[fragment["docnum"]]
+
+
+with open("dataset.json") as f:
+    dataset = json.load(f)
+
+docs = set([x["docnum"] for x in tqdm(dataset)])
+maxes = {docnum:
+         max([x["parId"] for x in dataset if x["docnum"] == docnum])
+         for docnum in tqdm(docs)}
+
+dataset = [f for f in tqdm(dataset) if not (
+    isFirstParagraph(f) or isLastParagraph(f, maxes))]
+
+with open("dataset_v2f.json", "w") as f:
+    json.dump(dataset, f, indent=2)
