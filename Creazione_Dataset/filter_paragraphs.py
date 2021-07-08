@@ -10,7 +10,7 @@ def isLastParagraph(fragment, maxes):
     return fragment["parId"] == maxes[fragment["docnum"]]
 
 
-with open("dataset.json") as f:
+with open("dataset_v2.json") as f:
     dataset = json.load(f)
 
 docs = set([x["docnum"] for x in tqdm(dataset)])
