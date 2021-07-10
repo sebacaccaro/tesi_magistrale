@@ -166,5 +166,61 @@
       "introduced_errors": 3436714,
       "total_samples": 2827879
     }
+  },
+  "pgp01b": {
+    "T1": {
+      "perturbation_errors": 5300732,
+      "corrected_errors": 958504,
+      "introduced_errors": 3469825,
+      "total_samples": 2784821
+    },
+    "T3": {
+      "perturbation_errors": 9473276,
+      "corrected_errors": 2125303,
+      "introduced_errors": 3384671,
+      "total_samples": 2784821
+    },
+    "M3": {
+      "perturbation_errors": 12587655,
+      "corrected_errors": 2542908,
+      "introduced_errors": 3106248,
+      "total_samples": 2784821
+    },
+    "S1": {
+      "perturbation_errors": 2702764,
+      "corrected_errors": 294649,
+      "introduced_errors": 3239614,
+      "total_samples": 2784821
+    },
+    "M2": {
+      "perturbation_errors": 8446369,
+      "corrected_errors": 1706845,
+      "introduced_errors": 3233075,
+      "total_samples": 2784821
+    },
+    "M1": {
+      "perturbation_errors": 6675453,
+      "corrected_errors": 1187953,
+      "introduced_errors": 3310419,
+      "total_samples": 2784821
+    },
+    "S2": {
+      "perturbation_errors": 3197848,
+      "corrected_errors": 394464,
+      "introduced_errors": 3169465,
+      "total_samples": 2784821
+    },
+    "S3": {
+      "perturbation_errors": 5191293,
+      "corrected_errors": 698575,
+      "introduced_errors": 3012730,
+      "total_samples": 2784821
+    },
+    "T2": {
+      "perturbation_errors": 6653981,
+      "corrected_errors": 1409795,
+      "introduced_errors": 3405074,
+      "total_samples": 2784821
+    }
   }
 }
