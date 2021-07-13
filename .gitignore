@@ -846,4 +846,6 @@ Creazione_Dataset/dataset_v2.json
 Creazione_Dataset/dataset_v2f.json
 Creazione_Dataset/create_reduced.py
 Creazione_Dataset/dataset_v2f_reduced.json
-Metodi_correzione/finnish/dataset.txt
+Metodi_correzione/openNMT/targets/*.tgt
+Metodi_correzione/openNMT/*.src
+
