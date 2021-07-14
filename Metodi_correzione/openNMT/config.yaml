@@ -14,3 +14,9 @@ data:
   valid:
     path_src: test/original.src
     path_tgt: test/M3.tgt
+
+src_seq_length: 110
+tgt_seq_length: 110
+
+# silently ignore empty lines in the data
+skip_empty_level: silent
