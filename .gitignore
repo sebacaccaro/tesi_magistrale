@@ -850,3 +850,4 @@ Metodi_correzione/openNMT/train/*.tgt
 Metodi_correzione/openNMT/train/*.src
 Metodi_correzione/openNMT/test/*.tgt
 Metodi_correzione/openNMT/test/*.src
+Metodi_correzione/openNMT/test/*.txt

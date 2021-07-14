@@ -5,7 +5,7 @@ from random import shuffle
 validation_size = 5000
 
 print("Leggendo il dataset")
-with open('../../Creazione_Dataset/dataset_reduced.json') as data_file:
+with open('../../Creazione_Dataset/dataset.json') as data_file:
     dataset = json.load(data_file)
 
 print("Mescolando il dataset")

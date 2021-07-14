@@ -2,7 +2,7 @@
 save_data: data/run/correction
 ## Where the vocab(s) will be written
 src_vocab: data/run/correction.vocab.src
-tgt_vocab: data/run/correction.vocab.tgt
+#tgt_vocab: data/run/correction.vocab.tgt
 # Prevent overwriting existing files in the folder
 overwrite: False
 
@@ -29,8 +29,8 @@ save_checkpoint_steps: 500
 train_steps: 1000
 valid_steps: 500
 
+share_vocab: true
 share_embeddings: true
-share_decoder_embeddings: true
 word_vec_size: 160
 enc_rnn_size: 1000
 dec_rnn_size: 1000
