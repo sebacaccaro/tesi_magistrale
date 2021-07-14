@@ -24,7 +24,7 @@ tgt_seq_length: 110
 # silently ignore empty lines in the data
 skip_empty_level: silent
 
-save_model: toy-ende/run/model
+save_model: data/run/model
 save_checkpoint_steps: 500
 train_steps: 1000
 valid_steps: 500
