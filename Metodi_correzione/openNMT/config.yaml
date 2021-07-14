@@ -33,5 +33,3 @@ share_vocab: true
 share_embeddings: true
 word_vec_size: 160
 rnn_size: 1000
-encoder_type: transformer
-decoder_type: transformer

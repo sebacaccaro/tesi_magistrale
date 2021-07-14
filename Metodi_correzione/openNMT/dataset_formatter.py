@@ -18,7 +18,7 @@ dataset = dataset[validation_size:]
 #function that takes a string a sub the spaces with #
 def sub_spaces(string):
     string = string.replace(" ", "#")
-    string = " ".join([c + " " for c in string]).strip()
+    string = " ".join([c for c in string]).strip()
     return string
 
 
