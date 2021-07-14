@@ -32,6 +32,5 @@ report_every: 100
 
 share_vocab: true
 share_embeddings: true
-share_decoder_embeddings: true
 word_vec_size: 160
 rnn_size: 1000
