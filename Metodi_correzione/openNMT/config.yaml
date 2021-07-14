@@ -11,10 +11,12 @@ data:
   train:
     path_src: train/original.src
     path_tgt: train/M3.tgt
+    transforms: [filtertoolong]
     weight: 1
   valid:
     path_src: test/original.src
     path_tgt: test/M3.tgt
+    transforms: [filtertoolong]
 
 src_seq_length: 110
 tgt_seq_length: 110
