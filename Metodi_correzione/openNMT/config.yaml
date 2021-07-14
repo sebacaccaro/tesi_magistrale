@@ -28,9 +28,10 @@ save_model: data/run/model
 save_checkpoint_steps: 500
 train_steps: 1000
 valid_steps: 500
-report_every: 100
 
 share_vocab: true
 share_embeddings: true
 word_vec_size: 160
 rnn_size: 1000
+encoder_type: transformer
+decoder_type: transformer
