@@ -28,3 +28,9 @@ save_model: data/run/model
 save_checkpoint_steps: 500
 train_steps: 1000
 valid_steps: 500
+
+share_embeddings: true
+share_decoder_embeddings: true
+word_vec_size: 160
+enc_rnn_size: 1000
+dec_rnn_size: 1000
