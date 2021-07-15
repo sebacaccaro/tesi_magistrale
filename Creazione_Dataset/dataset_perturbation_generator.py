@@ -1,10 +1,10 @@
-from perturbation_superpipelines import sup_pipelines
 from tqdm.utils import _supports_unicode
 from tqdm import tqdm
 import json
 import sys
 import nltk
 sys.path.insert(0, "../Perturbazione/")
+from perturbation_superpipelines import sup_pipelines
 
 nltk.download('punkt')
 
