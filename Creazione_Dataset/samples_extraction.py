@@ -11,7 +11,7 @@ doc_min = 0
 doc_max = max(sentences.keys())
 
 min_len = 8  # Minum accetable length for a sentence
-max_len = 50  # Maximum accetable length for a sentence
+max_len = 30  # Maximum accetable length for a sentence
 def accettable_length(sent): return min_len <= len(sent) <= max_len
 
 

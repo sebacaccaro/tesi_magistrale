@@ -18,8 +18,8 @@ data:
     path_tgt: test/original.src
     transforms: [filtertoolong]
 
-src_seq_length: 110
-tgt_seq_length: 110
+src_seq_length: 70
+tgt_seq_length: 70
 
 # silently ignore empty lines in the data
 skip_empty_level: silent

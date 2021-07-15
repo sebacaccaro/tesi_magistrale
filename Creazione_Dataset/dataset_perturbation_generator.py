@@ -1,12 +1,13 @@
+from perturbation_superpipelines import sup_pipelines
 from tqdm.utils import _supports_unicode
 from tqdm import tqdm
 import json
 import sys
 import nltk
 sys.path.insert(0, "../Perturbazione/")
-from perturbation_superpipelines import sup_pipelines
 
 nltk.download('punkt')
+
 
 def perturbed_sample(sample, perturbed, sup_name):
     return {
@@ -24,7 +25,7 @@ with open("extracted.json")as f:
 
 dataset = [{**d, "perturbed": {}} for d in dataset]
 
-
+sup_pipelines = {"M3": sup_pipelines["M3"]}
 i = 0
 for sup_name, sup in sup_pipelines.items():
     desc = f"Perturbando con {sup_name} ({i}/{len(sup_pipelines)})"
