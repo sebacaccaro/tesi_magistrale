@@ -851,3 +851,6 @@ Metodi_correzione/openNMT/train/*.src
 Metodi_correzione/openNMT/test/*.tgt
 Metodi_correzione/openNMT/test/*.src
 Metodi_correzione/openNMT/test/*.txt
+Metodi_correzione/bert/tester/model/pytorch_model.bin
+Metodi_correzione/bert/tester/model/config.json
+Metodi_correzione/bert/tester/model/vocab.txt
