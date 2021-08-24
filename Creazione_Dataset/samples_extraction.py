@@ -26,13 +26,26 @@ def fallbackSplit(sentence, max_optimal_size):
     return {**sentence, "text": sentence["text"][:max_optimal_size]}, {**sentence, "text": sentence["text"][max_optimal_size:], "parPos": sentence["parPos"]+1}
 
 
+def spaceSplit(sentence, max_optimal_size=max_len):
+    if(len(sentence["text"]) <= max_optimal_size):
+        return sentence, None
+    punktMarks = [" "]
+    splitPoints = [str.find(sentence["text"], punktMark)
+                   for punktMark in punktMarks]
+    if all([x == -1 or x >= max_optimal_size for x in splitPoints]):
+        return fallbackSplit(sentence, max_optimal_size)
+    splitPoint = sorted(
+        [x for x in splitPoints if x <= max_optimal_size])[-1] + 1
+    return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
+
+
 def numSplit(sentence, max_optimal_size):
     """ Divide the string into an optimal size based on numebers """
     splitPositions = [match.span()[0] for match in finditer(
         r"(?<![a-zA-Z:])\d*\.?\d+", sentence["text"])]
     splitPoints = sorted([x for x in splitPositions if x <= max_optimal_size])
     if len(splitPoints) == 0 or splitPoints[-1] == 0:
-        return fallbackSplit(sentence, max_optimal_size)
+        return spaceSplit(sentence, max_optimal_size)
     splitPoint = splitPoints[-1]
     return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
 
