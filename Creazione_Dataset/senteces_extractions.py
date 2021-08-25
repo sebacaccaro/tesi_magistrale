@@ -34,7 +34,7 @@ files = {fileNumber: file for fileNumber,
 files = {fileNumber: file["paragraphs"]
          for fileNumber, file in files.items()}
 
-files = {fileNumber: list(chain(*[sent_tokenize(paragraph["text"]) for paragraph in file]))
+files = {fileNumber: [sent_tokenize(paragraph["text"]) for paragraph in file]
          for fileNumber, file in tqdm(files.items(), "Dividendo i paragrafi in frasi")}
 
 files = {fileNumber: paragraphListEnriched(
