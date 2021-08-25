@@ -19,6 +19,16 @@ output_filename = "extracted.json"
 ######################
 
 
+def find_all(a_str, sub):
+    start = 0
+    while True:
+        start = a_str.find(sub, start)
+        if start == -1:
+            return
+        yield start
+        start += len(sub)
+
+
 def fallbackSplit(sentence, max_optimal_size):
     """ Chop of the sentece string in string of max_optimal_size and the rest """
     if len(sentence["text"]) <= max_optimal_size:
@@ -30,24 +40,25 @@ def spaceSplit(sentence, max_optimal_size=max_len):
     if(len(sentence["text"]) <= max_optimal_size):
         return sentence, None
     punktMarks = [" "]
-    splitPoints = [str.find(sentence["text"], punktMark)
+    splitPoints = [find_all(sentence["text"], punktMark)
                    for punktMark in punktMarks]
+    splitPoints = list(chain(*splitPoints))
     if all([x == -1 or x >= max_optimal_size for x in splitPoints]):
-        return fallbackSplit(sentence, max_optimal_size)
+        return numSplit(sentence, max_optimal_size)
     splitPoint = sorted(
         [x for x in splitPoints if x <= max_optimal_size])[-1] + 1
     return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
 
 
-def numSplit(sentence, max_optimal_size):
-    """ Divide the string into an optimal size based on numebers """
+""" def numSplit(sentence, max_optimal_size):
     splitPositions = [match.span()[0] for match in finditer(
         r"(?<![a-zA-Z:])\d*\.?\d+", sentence["text"])]
     splitPoints = sorted([x for x in splitPositions if x <= max_optimal_size])
     if len(splitPoints) == 0 or splitPoints[-1] == 0:
-        return spaceSplit(sentence, max_optimal_size)
+        return fallbackSplit(sentence, max_optimal_size)
     splitPoint = splitPoints[-1]
     return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
+ """
 
 
 def smartSplit(sentence, max_optimal_size=max_len):
@@ -64,10 +75,11 @@ def smartSplit(sentence, max_optimal_size=max_len):
     if(len(sentence["text"]) <= max_optimal_size):
         return sentence, None
     punktMarks = ["?", "!", ";", ":"]
-    splitPoints = [str.find(sentence["text"], punktMark)
+    splitPoints = [find_all(sentence["text"], punktMark)
                    for punktMark in punktMarks]
+    splitPoints = list(chain(*splitPoints))
     if all([x == -1 or x >= max_optimal_size for x in splitPoints]):
-        return numSplit(sentence, max_optimal_size)
+        return spaceSplit(sentence, max_optimal_size)
     splitPoint = sorted(
         [x for x in splitPoints if x <= max_optimal_size])[-1] + 1
     return {**sentence, "text": sentence["text"][:splitPoint]}, {**sentence, "text": sentence["text"][splitPoint:], "parPos": sentence["parPos"]+1}
