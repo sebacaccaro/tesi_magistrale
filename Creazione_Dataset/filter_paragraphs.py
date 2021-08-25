@@ -21,7 +21,7 @@ for fragment in dataset:
         maxes[fragment["docnum"]] = []
     maxes[fragment["docnum"]].append(fragment["parId"])
 
-maxes = {docnum: max(maxList) for docnum, maxList in maxes.items()}
+maxes = {docnum: max(maxList) for docnum, maxList in tqdm(maxes.items())}
 
 dataset = [f for f in tqdm(dataset) if not (
     isFirstParagraph(f) or isLastParagraph(f, maxes))]
