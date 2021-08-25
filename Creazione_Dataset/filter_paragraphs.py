@@ -14,9 +14,14 @@ with open("dataset_v2.json") as f:
     dataset = json.load(f)
 
 docs = set([x["docnum"] for x in tqdm(dataset)])
-maxes = {docnum:
-         max([x["parId"] for x in dataset if x["docnum"] == docnum])
-         for docnum in tqdm(docs)}
+maxes = {}
+
+for fragment in dataset:
+    if fragment["docnum"] not in maxes:
+        maxes[fragment["docnum"]] = []
+    maxes[fragment["docnum"]].append(fragment["parId"])
+
+maxes = {docnum: max(maxList) for docnum, maxList in maxes.items()}
 
 dataset = [f for f in tqdm(dataset) if not (
     isFirstParagraph(f) or isLastParagraph(f, maxes))]
