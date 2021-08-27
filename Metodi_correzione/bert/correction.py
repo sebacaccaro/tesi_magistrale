@@ -9,7 +9,7 @@ filler = Filler()
 corrector = Corrector("lexicon.txt", filler)
 
 
-with open("../../Creazione_Dataset/dataset_v2f.json") as f:
+with open("../../Creazione_Dataset/dataset_v2f_reduced.json") as f:
     dataset = json.load(f)
 
 
