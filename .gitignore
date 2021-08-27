@@ -837,6 +837,7 @@ Metodi_correzione/project_gender_politics_advanced/word2vec_models/*.npy
 Metodi_correzione/project_gender_politics_advanced/fasttext_models/*.bin
 Metodi_correzione/project_gender_politics_advanced/fasttext_models/*.npy
 Metodi_correzione/project_gender_politics_advanced/corrections/*.json
+Metodi_correzione/bert/corrections/*.json
 Valutazione/valutazione.json
 Valutazione/dataset_valutati/*.json
 Creazione_Dataset/dataset_reduced.json
@@ -854,3 +855,4 @@ Metodi_correzione/openNMT/test/*.txt
 Metodi_correzione/bert/tester/model/pytorch_model.bin
 Metodi_correzione/bert/tester/model/config.json
 Metodi_correzione/bert/tester/model/vocab.txt
+Metodi_correzione/bert/correction_output.json

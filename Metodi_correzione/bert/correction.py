@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+from nltk import data
+from bert_filler import Filler
+from corrector import Corrector
+import json
+from tqdm import tqdm
+
+filler = Filler()
+corrector = Corrector("lexicon.txt", filler)
+
+
+with open("../../Creazione_Dataset/dataset_v2f.json") as f:
+    dataset = json.load(f)
+
+
+def evalCorrection(dataset, pertMode):
+    dataset = [{
+        **datapoint,
+        "text": datapoint["text"],
+        "perturbed": datapoint["perturbed"][pertMode],
+        "corrected": corrector.correct(datapoint["perturbed"][pertMode])
+    } for datapoint in tqdm(dataset, desc=f"Correcting {pertMode}")
+    ]
+    with open(f"corrections/{pertMode}.json", "w") as f:
+        json.dump(dataset, f, indent=2)
+
+
+for pertMode in ["T1", "T2", "T3"]:
+    evalCorrection(dataset, pertMode)
