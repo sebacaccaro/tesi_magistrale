@@ -60,7 +60,7 @@ class Corrector:
             return True
         return False
 
-    def isCorrectionCloseEnough(original, correction):
+    def isCorrectionCloseEnough(self, original, correction):
         editDistance = distance(original, correction)
         if len(original) > 10:
             if editDistance < 5:
