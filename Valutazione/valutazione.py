@@ -4,9 +4,11 @@ import json
 from Levenshtein import matching_blocks, editops
 
 corrections_folders = {
-    "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/",
+    "bert1": "../Metodi_correzione/bert/corrections/v1",
+    "bert2": "../Metodi_correzione/bert/corrections/v2"
+    """ "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/",
     "pgp02a": "../Metodi_correzione/project_gender_politics_advanced/corrections/",
-    "pgp01b": "../Metodi_correzione/project_gender_politics_2/corrections/"}
+    "pgp01b": "../Metodi_correzione/project_gender_politics_2/corrections/" """}
 
 
 def diffAlign(s1, s2):
@@ -47,7 +49,8 @@ def diffAlign(s1, s2):
 
 
 def align(datapoint):
-    s1, s2 = diffAlign(datapoint["text"], str.strip(datapoint["perturbed"]))
+    s1, s2 = diffAlign(
+        str.strip(datapoint["text"]), str.strip(datapoint["perturbed"]))
     s1f, s2f = s1, s2
     s2, s3 = diffAlign(s2, str.strip(datapoint["corrected"]))
     s1, s3 = diffAlign(s1, s3)
