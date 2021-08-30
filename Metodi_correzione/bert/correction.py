@@ -25,5 +25,5 @@ def evalCorrection(dataset, pertMode):
         json.dump(dataset, f, indent=2)
 
 
-for pertMode in ["T1", "T2", "T3"]:
+for pertMode in ["T1", "T2", "T3", "S1", "S2", "S3", "M1", "M2", "M3"]:
     evalCorrection(dataset, pertMode)
