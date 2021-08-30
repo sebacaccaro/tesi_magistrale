@@ -6,9 +6,10 @@ from Levenshtein import matching_blocks, editops
 corrections_folders = {
     "bert1": "../Metodi_correzione/bert/corrections/v1/",
     "bert2": "../Metodi_correzione/bert/corrections/v2/"
-    """ "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/",
-    "pgp02a": "../Metodi_correzione/project_gender_politics_advanced/corrections/",
-    "pgp01b": "../Metodi_correzione/project_gender_politics_2/corrections/" """}
+    # "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/",
+    # "pgp02a": "../Metodi_correzione/project_gender_politics_advanced/corrections/",
+    # "pgp01b": "../Metodi_correzione/project_gender_politics_2/corrections/" """
+}
 
 
 def diffAlign(s1, s2):
