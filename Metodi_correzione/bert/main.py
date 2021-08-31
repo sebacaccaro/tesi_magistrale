@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from bert_filler import Filler
-from corrector import TokenCorrector
+from tokencorrector import TokenCorrector
 import json
 from tqdm import tqdm
 

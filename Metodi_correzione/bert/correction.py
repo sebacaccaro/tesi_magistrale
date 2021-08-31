@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from nltk import data
 from bert_filler import Filler
-from corrector import TokenCorrector
+from tokencorrector import TokenCorrector
 import json
 from tqdm import tqdm
 
