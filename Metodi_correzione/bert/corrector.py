@@ -32,7 +32,7 @@ def mod_tokenize(sentence):
     return modTokens
 
 
-class Corrector:
+class TokenCorrector:
 
     def __init__(self, dict_path: str, bert_filler: Filler) -> None:
         self.log = False

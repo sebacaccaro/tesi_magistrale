@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from bert_filler import Filler
-from corrector import Corrector
+from corrector import TokenCorrector
 import json
 from tqdm import tqdm
 
 filler = Filler()
-corrector = Corrector("lexicon.txt", filler)
+corrector = TokenCorrector("lexicon.txt", filler)
 
 
 with open("../../Creazione_Dataset/dataset_v2f_reduced.json") as f:
