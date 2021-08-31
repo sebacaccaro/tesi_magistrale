@@ -4,18 +4,12 @@ from nltk import word_tokenize
 import string
 import re
 from Levenshtein import distance
+from utils import cleanOutput
 
 
 def detokenize(input: list):
     output = TreebankWordDetokenizer().detokenize(input)
-    output = output.replace(" , ", ", ")
-    output = output.replace(" ' ", "'")
-    output = output.replace("' ", "'")
-    output = output.replace(" ’ ", "’")
-    output = output.replace(" ’", "’")
-    output = output.replace(" . ", ". ")
-    output = output.replace(" : ", ": ")
-    output = output.replace(" ; ", "; ")
+    output = cleanOutput(output)
     return output
 
 
@@ -34,13 +28,10 @@ def mod_tokenize(sentence):
 
 class TokenCorrector:
 
-    def __init__(self, dict_path: str, bert_filler: Filler) -> None:
+    def __init__(self, bert_filler: Filler, vocabulary: set) -> None:
         self.log = False
         self.filler = bert_filler
-        self.vocabulary = set()
-        with open(dict_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                self.vocabulary.add(line.strip())
+        self.vocabulary = vocabulary
         for punct in string.punctuation:
             self.vocabulary.add(punct)
 

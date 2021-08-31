@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
+from pipelineCorrector import PipelineCorrector
+from splitcorrector import SplitCorrector
 from nltk import data
 from bert_filler import Filler
 from tokencorrector import TokenCorrector
 import json
 from tqdm import tqdm
 
-filler = Filler()
-corrector = TokenCorrector("lexicon.txt", filler)
 
+pipelineCorrector = PipelineCorrector()
+
+vocabulary = set()
+with open("lexicon.txt", 'r', encoding='utf-8') as f:
+    for line in f:
+        vocabulary.add(line.strip())
+filler = Filler()
+splitCorrector = SplitCorrector(vocabulary)
+tokenCorrector = TokenCorrector(filler, vocabulary)
+
+pipelineCorrector.addCorrector(splitCorrector)
+pipelineCorrector.addCorrector(tokenCorrector)
 
 with open("../../Creazione_Dataset/dataset_v2f_reduced.json") as f:
     dataset = json.load(f)
@@ -18,7 +30,7 @@ def evalCorrection(dataset, pertMode):
         **datapoint,
         "text": datapoint["text"],
         "perturbed": datapoint["perturbed"][pertMode],
-        "corrected": corrector.correct(datapoint["perturbed"][pertMode])
+        "corrected": pipelineCorrector.correct(datapoint["perturbed"][pertMode])
     } for datapoint in tqdm(dataset, desc=f"Correcting {pertMode}")
     ]
     with open(f"corrections/{pertMode}.json", "w") as f:
