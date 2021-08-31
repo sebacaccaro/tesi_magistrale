@@ -49,6 +49,18 @@ class SplitCorrector:
             return self.__replace_match(sentence, match, segment, offset)
         return None
 
+    def __fix_with_filler(self):
+        """ 
+        Ci sono vari casi a considerare:
+        - La parola viene identificata e corretta perchè è semplicemente una parola spezzettata
+            Ex. d i l e t t i membri, d e l l a vostra Associazione
+        - La regex comprende due parole. Bert potrebbe indovinarne una. Si potrebbe pensare di fare
+          una sottrazione e vedere se il restante è una parola buona.
+            Ex. coinvolsero ogni uomo e o g n i donna, procurando.
+        - No clue > Sad
+        """
+        pass
+
     def __fix_match(self, sentence, match, offset):
         return self.__fix_with_vocab(sentence, match, offset) or sentence
 
