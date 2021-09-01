@@ -88,13 +88,3 @@ class SplitCorrector:
                 sentence = self.__fix_match(original_sentence, match, offset)
                 offset = len(sentence)-len(original_sentence)
         return sentence
-
-
-vocabulary = set()
-with open("lexicon.txt", 'r', encoding='utf-8') as f:
-    for line in f:
-        vocabulary.add(line.strip())
-
-filler = Filler()
-
-splc = SplitCorrector(vocabulary, filler)

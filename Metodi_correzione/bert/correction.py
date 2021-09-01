@@ -15,7 +15,7 @@ with open("lexicon.txt", 'r', encoding='utf-8') as f:
     for line in f:
         vocabulary.add(line.strip())
 filler = Filler()
-splitCorrector = SplitCorrector(vocabulary)
+splitCorrector = SplitCorrector(vocabulary, filler)
 tokenCorrector = TokenCorrector(filler, vocabulary)
 
 pipelineCorrector.addCorrector(splitCorrector)
