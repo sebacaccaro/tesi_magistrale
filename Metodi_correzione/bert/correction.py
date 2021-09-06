@@ -21,6 +21,7 @@ tokenCorrector = TokenCorrector(filler, vocabulary)
 pipelineCorrector.addCorrector(splitCorrector)
 pipelineCorrector.addCorrector(tokenCorrector)
 pipelineCorrector.addCorrector(tokenCorrector)
+pipelineCorrector.addCorrector(tokenCorrector)
 
 with open("../../Creazione_Dataset/dataset_v2f_reduced.json") as f:
     dataset = json.load(f)
