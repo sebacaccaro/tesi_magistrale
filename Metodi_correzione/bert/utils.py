@@ -1,12 +1,22 @@
 import re
 
+# List taken from https://gist.github.com/goodmami/98b0a6e2237ced0025dd
+# The list has been filtered to remove double quotes and other chars
+QUOTES = (
+    '\u0022'  # "
+    '\u0027'  # '
+    '\u2018'  # ‘
+    '\u2019'  # ’
+    '\u201b'  # ‛
+    '\uff07'  # ＇
+)
+
 
 def cleanOutput(output: str):
+    for quote in QUOTES:
+        output = output.replace(f" {quote} ", f"{quote}")
+        output = output.replace(f"{quote} ", f"{quote}")
     output = output.replace(" , ", ", ")
-    output = output.replace(" ' ", "'")
-    output = output.replace("' ", "'")
-    output = output.replace(" ’ ", "’")
-    output = output.replace(" ’", "’")
     output = output.replace(" . ", ". ")
     output = output.replace(" .", ".")
     output = output.replace(" : ", ": ")
@@ -36,15 +46,3 @@ def string_subtract(big_str: str, sml_str: str):
     if (big_str[len(big_str)-len(sml_str):] == sml_str):
         return big_str[:len(big_str)-len(sml_str)], sml_str
     return None, None
-
-
-# List taken from https://gist.github.com/goodmami/98b0a6e2237ced0025dd
-# The list has been filtered to remove double quotes and other chars
-QUOTES = (
-    '\u0022'  # "
-    '\u0027'  # '
-    '\u2018'  # ‘
-    '\u2019'  # ’
-    '\u201b'  # ‛
-    '\uff07'  # ＇
-)
