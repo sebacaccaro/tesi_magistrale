@@ -1,10 +1,11 @@
+from typing import List
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 from bert_filler import Filler
 from nltk import word_tokenize
 import string
 import re
 from Levenshtein import distance
-from utils import cleanOutput
+from utils import cleanOutput, QUOTES
 
 
 def detokenize(input: list):
@@ -13,13 +14,21 @@ def detokenize(input: list):
     return output
 
 
+def findQuote(word: str, quotes: list):
+    for quote in quotes:
+        if quote in word:
+            return quote
+    return None
+
+
 def mod_tokenize(sentence):
     tokens = word_tokenize(sentence)
     modTokens = []
     for token in tokens:
-        if "'" in token:
+        quote = findQuote(token, QUOTES)
+        if quote:
             divided = [str.strip(t)
-                       for t in re.split("(')",  token) if t != '']
+                       for t in re.split(f"({quote})",  token) if t != '']
             modTokens.extend(divided)
         else:
             modTokens.append(token)
@@ -43,10 +52,11 @@ class TokenCorrector:
             return False
         if words[index].lower() not in self.vocabulary:
             # Checking if error word is a word with apostrophe
-            if index + 1 < len(words) and words[index+1] == "'":
+            if index + 1 < len(words) and words[index+1] in QUOTES:
                 word = words[index]
                 possibleFull = [
                     word.lower() + c for c in ["a", "e", "i", "o", "u"]]
+                # TODO cercare di correggere anche per gli altri apostrofi
                 return not any([p in self.vocabulary for p in possibleFull])
             return True
         return False
