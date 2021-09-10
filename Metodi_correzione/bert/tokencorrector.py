@@ -56,7 +56,6 @@ class TokenCorrector:
                 word = words[index]
                 possibleFull = [
                     word.lower() + c for c in ["a", "e", "i", "o", "u"]]
-                # TODO cercare di correggere anche per gli altri apostrofi
                 return not any([p in self.vocabulary for p in possibleFull])
             return True
         return False
