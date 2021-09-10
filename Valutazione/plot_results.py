@@ -175,6 +175,8 @@ if __name__ == "__main__":
 
     val = calculateVals(val)
 
+    print(val)
+
     #gp = val["project_gender_politcs"]
     gp = val
 
