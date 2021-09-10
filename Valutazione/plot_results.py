@@ -175,9 +175,9 @@ if __name__ == "__main__":
 
     val = calculateVals(val)
 
-    print(val)
+    with open("tab_values.json", "w") as f:
+        json.dump(val, f, indent=2)
 
-    #gp = val["project_gender_politcs"]
     gp = val
 
     figure, axes = plt.subplots(nrows=3, ncols=1)
