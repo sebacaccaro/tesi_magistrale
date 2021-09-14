@@ -4,9 +4,8 @@ import json
 from Levenshtein import matching_blocks, editops
 
 corrections_folders = {
-    "bert1": "../Metodi_correzione/bert/corrections/v1/",
-    "bert2": "../Metodi_correzione/bert/corrections/v2/",
-    "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/",
+    "bert1": "../Metodi_correzione/bert/corrections/v_100/",
+    "pgp01a": "../Metodi_correzione/project_gender_politics/corrections/v_100/"
     # "pgp02a": "../Metodi_correzione/project_gender_politics_advanced/corrections/",
     # "pgp01b": "../Metodi_correzione/project_gender_politics_2/corrections/" """
 }
@@ -117,9 +116,9 @@ def errorScore(c, cp, cpp):
 
 
 def correctionScore(sample):
-    c = sample["orginal"]
-    cp = sample["perturbed"]
-    cpp = sample["corrected"]
+    c = sample["orginal_aligned"]
+    cp = sample["perturbed_aligned"]
+    cpp = sample["corrected_aligned"]
     return standardScore(c, cp, cpp) if sample["alignedSuccess"] else errorScore(c, cp, cpp)
 
 
@@ -127,9 +126,9 @@ def dataset_stats(dataset):
     dataset = [{"stats": align(datapoint), **datapoint}
                for datapoint in tqdm(dataset, desc="    > Allineando Frasi")]
     dataset = [{
-        "orginal": x["stats"][0],
-        "perturbed": x["stats"][1],
-        "corrected": x["stats"][2],
+        "orginal_aligned": x["stats"][0],
+        "perturbed_aligned": x["stats"][1],
+        "corrected_aligned": x["stats"][2],
         "alignedSuccess": x["stats"][3],
         **x
     } for x in dataset]
