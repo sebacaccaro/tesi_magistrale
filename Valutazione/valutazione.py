@@ -124,13 +124,14 @@ def correctionScore(sample):
 
 
 def dataset_stats(dataset):
-    dataset = [align(datapoint)
+    dataset = [{"stats": align(datapoint), **datapoint}
                for datapoint in tqdm(dataset, desc="    > Allineando Frasi")]
     dataset = [{
-        "orginal": x[0],
-        "perturbed": x[1],
-        "corrected": x[2],
-        "alignedSuccess": x[3]
+        "orginal": x["stats"][0],
+        "perturbed": x["stats"][1],
+        "corrected": x["stats"][2],
+        "alignedSuccess": x["stats"][3],
+        **x
     } for x in dataset]
     dataset = [correctionScore(sample) for sample in tqdm(
         dataset, desc=" > Valutando Correzioni")]
