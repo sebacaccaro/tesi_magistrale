@@ -21,7 +21,7 @@ def calculateVals(vals):
 
 
 def plottable_sub_dict(dict_to_plot: dict, stat_to_plot: str) -> dict:
-    return {key: value[stat_to_plot] for key, value in dict_to_plot.items()}
+    return {key: value[stat_to_plot] for key, value in sorted(dict_to_plot.items())}
 
 
 def plottable_dict(dict_to_plot: dict, stat_to_plot: str) -> dict:
@@ -180,7 +180,8 @@ if __name__ == "__main__":
 
     gp = val
 
-    figure, axes = plt.subplots(nrows=3, ncols=1)
+    figure, axes = plt.subplots(nrows=4, ncols=1)
+    axes[3].axhline(0, color='black', linewidth=1)
 
     plot_dict(axes[0], plottable_dict(gp, "corrected_per_perturbation"),
               "Errori corretti per errore di perturbazione introdotto")
@@ -188,6 +189,8 @@ if __name__ == "__main__":
               "Errori introdotti per frase")
     plot_dict(axes[2], plottable_dict(gp, "introduced_per_corrected"),
               "Errori introdotti per errore corretto")
+    plot_dict(axes[3], plottable_dict(gp, "lev_reduction"),
+              "Riduzione della distanza di Levenshtein")
     plt.subplots_adjust(top=0.95,
                         bottom=0.045,
                         left=0.1,

@@ -129,7 +129,8 @@ def calculate_distance(original: str, perturbed: str, corrected: str) -> int:
     original = str.strip(original)
     perturbed = str.strip(perturbed)
     corrected = str.strip(corrected)
-    return distance(original, perturbed) - distance(perturbed, corrected)
+    # return distance(original, perturbed) - distance(perturbed, corrected)
+    return distance(perturbed, corrected)
 
 
 def dataset_stats(dataset):
