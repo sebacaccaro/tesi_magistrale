@@ -124,13 +124,22 @@ def correctionScore(sample):
 
 def calculate_distance(original: str, perturbed: str, corrected: str) -> int:
     """ 
+    Returns tLev-distance between original-corrected
+    """
+    original = str.strip(original)
+    perturbed = str.strip(perturbed)
+    corrected = str.strip(corrected)
+    return distance(original, corrected)
+
+
+def calculate_distance_reduction(original: str, perturbed: str, corrected: str) -> int:
+    """ 
     Returns the net reduction in Lev-distance between orginal-perturbed and perturbed-corrected
     """
     original = str.strip(original)
     perturbed = str.strip(perturbed)
     corrected = str.strip(corrected)
-    # return distance(original, perturbed) - distance(perturbed, corrected)
-    return distance(perturbed, corrected)
+    return distance(original, perturbed) - distance(original, corrected)
 
 
 def dataset_stats(dataset):
@@ -143,11 +152,13 @@ def dataset_stats(dataset):
         "corrected_aligned": x["stats"][2],
         "alignedSuccess": x["stats"][3],
         # Levenstein Distances
-        "distance": calculate_distance(x["text"], x["perturbed"], x["corrected"]),
-        **x
+        "distance_red": calculate_distance_reduction(x["text"], x["perturbed"], x["corrected"]),
+        "distance": calculate_distance(x["text"], x["perturbed"], x["corrected"])
+        ** x
     } for x in dataset]
     # Summing up lev net distance
-    total_lev_reduction = sum([x["distance"] for x in dataset])
+    total_lev_reduction = sum([x["distance_red"] for x in dataset])
+    total_distance = sum([x["distance"] for x in dataset])
     dataset = [correctionScore(sample) for sample in tqdm(
         dataset, desc=" > Valutando Correzioni")]
     stats = {
@@ -155,6 +166,7 @@ def dataset_stats(dataset):
         "corrected_errors": sum([x["corrected_errors"] for x in dataset]),
         "introduced_errors": sum([x["introduced_errors"] for x in dataset]),
         "lev_reduction": total_lev_reduction,
+        "total_distance": total_distance,
         "total_samples": len(dataset)
     }
     return stats
