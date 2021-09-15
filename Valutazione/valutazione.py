@@ -1,7 +1,7 @@
 import os
 from tqdm import tqdm
 import json
-from Levenshtein import matching_blocks, editops
+from Levenshtein import matching_blocks, editops, distance
 
 corrections_folders = {
     "bert1": "../Metodi_correzione/bert/corrections/v_100/",
@@ -116,28 +116,44 @@ def errorScore(c, cp, cpp):
 
 
 def correctionScore(sample):
-    c = sample["orginal_aligned"]
+    c = sample["original_aligned"]
     cp = sample["perturbed_aligned"]
     cpp = sample["corrected_aligned"]
     return standardScore(c, cp, cpp) if sample["alignedSuccess"] else errorScore(c, cp, cpp)
+
+
+def calculate_distance(original: str, perturbed: str, corrected: str) -> int:
+    """ 
+    Returns the net reduction in Lev-distance between orginal-perturbed and perturbed-corrected
+    """
+    original = str.strip(original)
+    perturbed = str.strip(perturbed)
+    corrected = str.strip(corrected)
+    return distance(original, perturbed) - distance(perturbed, corrected)
 
 
 def dataset_stats(dataset):
     dataset = [{"stats": align(datapoint), **datapoint}
                for datapoint in tqdm(dataset, desc="    > Allineando Frasi")]
     dataset = [{
-        "orginal_aligned": x["stats"][0],
+        # Allineamento
+        "original_aligned": x["stats"][0],
         "perturbed_aligned": x["stats"][1],
         "corrected_aligned": x["stats"][2],
         "alignedSuccess": x["stats"][3],
+        # Levenstein Distances
+        "distance": calculate_distance(x["text"], x["perturbed"], x["corrected"]),
         **x
     } for x in dataset]
+    # Summing up lev net distance
+    total_lev_reduction = sum([x["distance"] for x in dataset])
     dataset = [correctionScore(sample) for sample in tqdm(
         dataset, desc=" > Valutando Correzioni")]
     stats = {
         "perturbation_errors": sum([x["perturbation_errors"] for x in dataset]),
         "corrected_errors": sum([x["corrected_errors"] for x in dataset]),
         "introduced_errors": sum([x["introduced_errors"] for x in dataset]),
+        "lev_reduction": total_lev_reduction,
         "total_samples": len(dataset)
     }
     return stats
