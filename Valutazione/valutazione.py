@@ -153,8 +153,8 @@ def dataset_stats(dataset):
         "alignedSuccess": x["stats"][3],
         # Levenstein Distances
         "distance_red": calculate_distance_reduction(x["text"], x["perturbed"], x["corrected"]),
-        "distance": calculate_distance(x["text"], x["perturbed"], x["corrected"])
-        ** x
+        "distance": calculate_distance(x["text"], x["perturbed"], x["corrected"]),
+        **x
     } for x in dataset]
     # Summing up lev net distance
     total_lev_reduction = sum([x["distance_red"] for x in dataset])
