@@ -4,8 +4,8 @@ with open("./tab_values.json") as f:
     vals = json.load(f)
 
 
-bert = vals["Bert"]
-pgp = vals["Pgp"]
+bert = vals["Bert@100"]
+pgp = vals["Pgp@100"]
 
 for key in bert.keys():
     bert_cpp = str(round(bert[key]["corrected_per_perturbation"], 2))

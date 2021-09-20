@@ -180,17 +180,32 @@ if __name__ == "__main__":
 
     gp = val
 
-    figure, axes = plt.subplots(nrows=4, ncols=1)
-    axes[3].axhline(0, color='black', linewidth=1)
+    figure, axes = plt.subplots(nrows=5, ncols=1)
 
-    plot_dict(axes[0], plottable_dict(gp, "corrected_per_perturbation"),
+    axNum = 0
+
+    plot_dict(axes[axNum], plottable_dict(gp, "corrected_per_perturbation"),
               "Errori corretti per errore di perturbazione introdotto")
-    plot_dict(axes[1], plottable_dict(gp, "introduced_per_sample"),
+    axNum += 1
+
+    plot_dict(axes[axNum], plottable_dict(gp, "introduced_per_sample"),
               "Errori introdotti per frase")
-    plot_dict(axes[2], plottable_dict(gp, "introduced_per_corrected"),
+    axNum += 1
+
+    plot_dict(axes[axNum], plottable_dict(gp, "introduced_per_corrected"),
               "Errori introdotti per errore corretto")
-    plot_dict(axes[3], plottable_dict(gp, "lev_reduction"),
+    axNum += 1
+
+    plot_dict(axes[axNum], plottable_dict(gp, "lev_reduction"),
               "Riduzione della distanza di Levenshtein")
+    axes[axNum].axhline(0, color='black', linewidth=1)
+    axNum += 1
+
+    plot_dict(axes[axNum], plottable_dict(gp, "total_distance"),
+              "Distanza di Levenshtein totale")
+    axes[axNum].axhline(0, color='black', linewidth=1)
+    axNum += 1
+
     plt.subplots_adjust(top=0.95,
                         bottom=0.045,
                         left=0.1,
