@@ -860,3 +860,7 @@ Prove_stronzate/
 Valutazione/tab_values.json
 Valutazione/valutazione_tot.json
 Metodi_correzione/bert/fine_tuning/train_set.json
+Metodi_correzione/bert/fine_tuning/fine_tuned/placeholder.md
+Metodi_correzione/bert/fine_tuning/fine_tuned/vocab.txt
+Metodi_correzione/bert/fine_tuning/fine_tuned/config.json
+Metodi_correzione/bert/fine_tuning/fine_tuned/pytorch_model.bin
