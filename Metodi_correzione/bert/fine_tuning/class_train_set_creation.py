@@ -161,7 +161,6 @@ def produce_variations(sentence: str):
     return guesses
 
 
-dataset_list = dataset_list[:5]
 dataset_list = [
     produce_variations(x)
     for x in tqdm(dataset_list, desc="Producendo variazioni")
