@@ -17,6 +17,7 @@ from bert_filler import Filler
 VOCAB_FILE = "../lexicon.txt"
 FINAL_DATASET_FILE = "../../../Creazione_Dataset/dataset_v2f.json"
 OUTPUT_FILE = "class_dataset.json"
+MIN_LEN = 70
 
 DATASET_COMPOSITION = {
     "text": 8000,
@@ -71,7 +72,8 @@ dataset_new = {key: [] for key in dataset[0].keys()}
 for i in range(len(dataset)):
     element = dataset.pop()
     for key in dataset_new.keys():
-        dataset_new[key].append(element[key])
+        if len(element[key]) >= MIN_LEN:
+            dataset_new[key].append(element[key])
 
 for key in dataset_new.keys():
     shuffle(dataset_new[key])
