@@ -7,7 +7,6 @@ from tokencorrector import TokenCorrector
 import json
 from tqdm import tqdm
 
-
 pipelineCorrector = PipelineCorrector()
 
 vocabulary = set()
@@ -29,12 +28,13 @@ with open("../../Creazione_Dataset/dataset_v2f_reduced.json") as f:
 
 def evalCorrection(dataset, pertMode):
     dataset = [{
-        **datapoint,
-        "text": datapoint["text"],
-        "perturbed": datapoint["perturbed"][pertMode],
-        "corrected": pipelineCorrector.correct(datapoint["perturbed"][pertMode])
-    } for datapoint in tqdm(dataset, desc=f"Correcting {pertMode}")
-    ]
+        **datapoint, "text":
+        datapoint["text"],
+        "perturbed":
+        datapoint["perturbed"][pertMode],
+        "corrected":
+        pipelineCorrector.correct(datapoint["perturbed"][pertMode])
+    } for datapoint in tqdm(dataset, desc=f"Correcting {pertMode}")]
     with open(f"corrections/{pertMode}.json", "w") as f:
         json.dump(dataset, f, indent=2)
 

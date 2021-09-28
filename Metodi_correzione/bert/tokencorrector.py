@@ -6,6 +6,7 @@ import string
 import re
 from Levenshtein import distance
 from utils import cleanOutput, QUOTES
+from fine_tuning.correction_classifier.correction_classifier import Correction_Classifier
 
 
 def detokenize(input: list):
@@ -27,8 +28,9 @@ def mod_tokenize(sentence):
     for token in tokens:
         quote = findQuote(token, QUOTES)
         if quote:
-            divided = [str.strip(t)
-                       for t in re.split(f"({quote})",  token) if t != '']
+            divided = [
+                str.strip(t) for t in re.split(f"({quote})", token) if t != ''
+            ]
             modTokens.extend(divided)
         else:
             modTokens.append(token)
@@ -36,11 +38,11 @@ def mod_tokenize(sentence):
 
 
 class TokenCorrector:
-
     def __init__(self, bert_filler: Filler, vocabulary: set) -> None:
         self.log = False
         self.filler = bert_filler
         self.vocabulary = vocabulary
+        self.correction_classifier = Correction_Classifier()
         for punct in string.punctuation:
             self.vocabulary.add(punct)
 
@@ -52,10 +54,11 @@ class TokenCorrector:
             return False
         if words[index].lower() not in self.vocabulary:
             # Checking if error word is a word with apostrophe
-            if index + 1 < len(words) and words[index+1] in QUOTES:
+            if index + 1 < len(words) and words[index + 1] in QUOTES:
                 word = words[index]
                 possibleFull = [
-                    word.lower() + c for c in ["a", "e", "i", "o", "u"]]
+                    word.lower() + c for c in ["a", "e", "i", "o", "u"]
+                ]
                 return not any([p in self.vocabulary for p in possibleFull])
             return True
         return False
@@ -73,15 +76,33 @@ class TokenCorrector:
                 return True
         return False
 
-    def correct(self, sentence):
+    def correct2(self, sentence):
         tokens = mod_tokenize(sentence)
         for i in range(len(tokens)):
             token = tokens[i]
             if self.isError(tokens, i):
                 sentence = detokenize(
-                    [*tokens[:i], self.filler.FILL_STR, *tokens[i+1:]])
+                    [*tokens[:i], self.filler.FILL_STR, *tokens[i + 1:]])
                 correction = self.filler.guess(sentence, token)
                 if (self.isCorrectionCloseEnough(tokens[i], correction)):
+                    tokens[i] = correction
+        sentence = detokenize(tokens)
+        return sentence
+
+    def correct(self, sentence):
+        tokens = mod_tokenize(sentence)
+        for i in range(len(tokens)):
+            token = tokens[i]
+            if self.isError(tokens, i):
+                original_sentence = detokenize(tokens)
+                sentence = detokenize(
+                    [*tokens[:i], self.filler.FILL_STR, *tokens[i + 1:]])
+                correction_full = self.filler.get_results(sentence, token)[0]
+                correction = correction_full["token_str"]
+                if (self.isCorrectionCloseEnough(tokens[i], correction) and
+                        self.correction_classifier.get_correction_probability(
+                            original_sentence,
+                            correction_full["sequence"]) > 0.97):
                     tokens[i] = correction
         sentence = detokenize(tokens)
         return sentence

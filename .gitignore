@@ -867,3 +867,4 @@ Metodi_correzione/bert/fine_tuning/fine_tuned/pytorch_model.bin
 Metodi_correzione/bert/fine_tuning/train_set_100.json
 Metodi_correzione/bert/utils.py
 Metodi_correzione/bert/fine_tuning/class_dataset.json
+Metodi_correzione/bert/fine_tuning/correction_classifier/classifier/*
