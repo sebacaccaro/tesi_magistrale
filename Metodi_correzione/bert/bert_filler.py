@@ -6,18 +6,20 @@ class Filler:
     MASK_STR = "[MASK]"
     FILL_STR = "exexerrorexex"
 
-    def __init__(self) -> None:
+    def __init__(self, top_k=20) -> None:
         self.unmasker = pipeline('fill-mask',
                                  model='dbmdz/bert-base-italian-xxl-cased',
-                                 top_k=20)
+                                 top_k=top_k)
 
-    def get_results(self, sentence: str, masked_word: str) -> list:
+    def get_results_unsorted(self, sentence: str) -> list:
         # This is done in order to allow to tokenize/detokenize without
         # problem from brackets
         sentence = sentence.replace(self.FILL_STR, self.MASK_STR)
         results = self.unmasker(sentence)
+        return results
 
-        # Selecting the closer option among the results
+    def get_results(self, sentence: str, masked_word: str) -> list:
+        results = self.get_results_unsorted(sentence)
         results = sorted(results,
                          key=lambda x: distance(x["token_str"], masked_word))
         return results

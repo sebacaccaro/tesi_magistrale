@@ -869,3 +869,4 @@ Metodi_correzione/bert/utils.py
 Metodi_correzione/bert/fine_tuning/class_dataset.json
 Metodi_correzione/bert/fine_tuning/correction_classifier/classifier/*
 Metodi_correzione/bert/fine_tuning/errorstudy_dataset.json
+Metodi_correzione/bert/fine_tuning/error_study_raw_stats.json
