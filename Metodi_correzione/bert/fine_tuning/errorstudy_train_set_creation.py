@@ -130,8 +130,12 @@ def produce_datapoints(sentence: str, pert_level: str):
     chosen_token = tokens[chosen_token_index]
 
     perturbed_token = chosen_token
+    counter = 0
     while (perturbed_token == chosen_token):
         perturbed_token = perturbed(chosen_token)
+        counter += 1
+        if counter == 10:
+            return None
 
     datapoint = {
         "sentence": recomposeSentece(tokens, chosen_token_index, "[MASK]"),
@@ -146,7 +150,7 @@ dataset_list = [
     produce_datapoints(x["sent"], x["pert_level"])
     for x in tqdm(dataset_list, desc="Producendo perturbazioni controllate")
 ]
-dataset_list = [x for x in dataset_list if len(x) > 0]
+dataset_list = [x for x in dataset_list if x != None]
 
 with open(OUTPUT_FILE, "w") as f:
     json.dump(dataset_list, f, indent=2)
