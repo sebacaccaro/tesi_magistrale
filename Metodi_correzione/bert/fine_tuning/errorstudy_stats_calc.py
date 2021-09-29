@@ -38,7 +38,7 @@ print("Inizializzando il correttore...",end="")
 filler = Filler(top_k=30)
 print("Fatto")
 
-dataset = [withBertResults(d,filler) for d in tqdm(dataset,desc="Calcolando sostituti bert")]
+dataset = [withBertResults(d,filler) for d in tqdm(dataset,desc="Calcolando sostituti bert") if len(d) > 0]
 dataset = [withStats(d) for d in tqdm(dataset,desc="Elaborando le statistiche")]
 
 with open("error_study_raw_stats.json",'w')as f:
