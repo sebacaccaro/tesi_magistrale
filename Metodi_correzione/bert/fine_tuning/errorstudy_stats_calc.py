@@ -26,7 +26,6 @@ def withStats(sample:dict) -> dict:
             correction = option
 
     sample["correction"] = correction
-    del(sample["results"])
     return sample
 
 print("Aprendo il dataset...",end="")
