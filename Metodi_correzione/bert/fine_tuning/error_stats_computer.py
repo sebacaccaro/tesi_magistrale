@@ -198,6 +198,18 @@ def plot_overview_results(distribution_dict: dict):
     plt.savefig(f"distributions/overview.png")
 
 
+def getTableFromAttrList(results: dict, attrList: list):
+    rows = []
+    for key, stats in results.items():
+        row = [key]
+        for attr in attrList:
+            row.append(str(round(stats[attr], 2)))
+        rows.append(row)
+    # Printing
+    for row in rows:
+        print("& ".join(row) + "\\\\")
+
+
 with open("./error_study_raw_stats.json") as f:
     dataset = json.load(f)
 
@@ -240,3 +252,5 @@ for key, value in results.items():
         color="C1")
 
 plot_overview_results(results)
+getTableFromAttrList(results,
+                     ["found_10_perc", "found_20_perc", "found_30_perc"])

@@ -90,14 +90,38 @@ L'analisi è mirata a fornire le seguenti statistiche:
 \end{itemize}
 
 \subsection{Risultati}
-Per la misurazione delle correzioni possibili è stato scelto di misurare 3 diverse soglie: viene rilevata la presenza del correzione corretta nei primi 10, primi 20 e primi 30 risultati forniti da BERT.
+Per la misurazione delle correzioni possibili è stato scelto di misurare 3 diverse soglie: viene rilevata la presenza del correzione corretta nei primi 10, primi 20 e primi 30 risultati forniti da BERT. Nei risultati \textit{"text"} rappresenta le frasi non perturbate, mentre \textit{"combinato"} rappresenta le performance sull'intero dataset. \\
+I risultati sono riportati in \autoref{fig:foundN} e \autoref{tab:foundN}.
 
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\textbf{Perturbazione} & \textbf{Entro 10} & \textbf{Entro 20} & \textbf{Entro 30} \\ \hline
+text& 70.23& 74.98& 77.41\\
+T1& 56.65& 62.87& 65.42\\
+T2& 54.76& 59.98& 62.47\\
+T3& 45.78& 51.75& 55.03\\
+S1& 65.88& 71.46& 73.77\\
+S2& 64.98& 69.9& 72.24\\
+S3& 61.96& 67.59& 70.62\\
+M1& 54.33& 59.82& 62.94\\
+M2& 50.62& 56.63& 59.76\\
+M3& 39.37& 45.52& 48.51\\
+Combinato& 56.47& 62.07& 64.83\\
+\end{tabular}
+\caption{Correzioni presenti nei primi n risultati prodotti da BERT in percentuale}
+\label{tab:foundN}
+\end{table}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{distributions/overview.png}
+\includegraphics[width=.9\textwidth]{distributions/overview.png}
 \caption{Correzioni presenti nei primi n risultati prodotti da BERT in percentuale}
+\label{fig:foundN}
 \end{figure}
+
+
+
 
 
 %\begin{figure}[H]
