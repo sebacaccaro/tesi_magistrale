@@ -42,7 +42,7 @@ si può notare come il token sottolineato sia un errore. Esso viene quindi masch
 \begin{center}
 \textit{"celebrare la venuta dello [MASK] Santo, noi vi invitiamo ad implorare da Lui il dono della gioia."}
 \end{center}
-Il sistema propone quindi n candidati per questa la frase data in input, di seguito i primi 5:
+Il sistema propone quindi n candidati per questa frase data in input, di seguito i primi 5:
 \begin{itemize}
 \item  \textit{"Spirito"} con probabilità 0.999
 \item  \textit{"spirito"} con probabilità 7.78e-05
@@ -87,11 +87,11 @@ Una volta ottenuto questo dataset, per ogni frase vengono trovati i candidati di
 L'analisi è mirata a fornire le seguenti statistiche:
 \begin{itemize}
 \item \textbf{Correzioni possibili:} percentuale delle volte in cui la correzione corretta è presente nei primi n risultati forniti da BERT. In questo modo è possibile trovare il limite superiore per ogni sistema di correzione che ne faccia uso.
-\item \textbf{Distribuzione delle correzioni:} il ranking di ogni correzione corretta fra i risultati forniti da bert ordinati per probabilità.
+\item \textbf{Distribuzione delle correzioni:} il ranking di ogni soluzione fra i risultati forniti da bert ordinati per probabilità.
 \end{itemize}
 
 \subsection{Risultati}
-Per la misurazione delle correzioni possibili è stato scelto di misurare 3 diverse soglie: viene rilevata la presenza del correzione corretta nei primi 10, primi 20 e primi 30 risultati forniti da BERT. Nei risultati \textit{"text"} rappresenta le frasi non perturbate, mentre \textit{"combinato"} rappresenta le performance sull'intero dataset. \\
+Per la misurazione delle correzioni possibili è stato scelto di misurare 3 diverse soglie: viene rilevata la presenza della correzione corretta nei primi 10, primi 20 e primi 30 risultati forniti da BERT. Nei risultati \textit{"text"} rappresenta le frasi non perturbate, mentre \textit{"combinato"} rappresenta le performance sull'intero dataset. \\
 I risultati sono riportati in \autoref{fig:foundN} e \autoref{tab:foundN}.
 
 \begin{table}[H]
@@ -123,11 +123,11 @@ Combinato& 56.47& 62.07& 64.83\\
 
 Dai risultati è possibile trarre alcune conclusioni:
 \begin{itemize}
-\item BERT ottiene migliori performance nei testi ottenuti da pipeline con un più alto livello di perturbazione. Questo risultato è lecito da aspettarsi, in quanto le parole perturbate rendono meno intellegibile il contesto che BERT usa per produrre i candidati.
-\item Mentre l'incremento delle correzioni corrette presenti nei candidati prodotti da BERT è sensibile  da 10 a 20 risultati, è praticamente trascurabile da 20 a 30 risultati.
+\item BERT ottiene peggiori performance nei testi ottenuti da pipeline con un più alto livello di perturbazione. Questo è un risultato che è lecito aspettarsi, in quanto le parole perturbate rendono meno intellegibile il contesto che BERT usa per produrre i candidati.
+\item Mentre l'incremento delle soluzioni presenti nei candidati prodotti da BERT è sensibile  da 10 a 20 risultati, è praticamente trascurabile da 20 a 30 risultati.
 \end{itemize}
 
-Avendo stabilito la frequenza con la quale la giusta correzione è presente fra i candidati, è necessario che un sistema di correzione sia in grado di trovarla fra la varie alternative proposte.\\
+Avendo stabilito la frequenza con la quale la soluzione è presente fra i candidati, è necessario che un sistema di correzione sia in grado di trovarla fra la varie alternative proposte.\\
 A tale scopo è utile capire in quale posizione fra i risultati il token corretto si trovi. La distribuzione del posizionamento della soluzione è mostrata nel grafico in \autoref{fig:dis_pos}.
 
 \begin{figure}[H]
@@ -157,7 +157,7 @@ Una correzione è considerata corretta solo se è esattamente identica alla paro
 Per misurare quanto il sistema di correzione riesca ad approssimare il limite superiore di BERT sono introdotte le seguenti metriche:
 \begin{itemize}
 \item \textbf{Percentuale di scelta corretta:} per le correzioni nelle quali la soluzione è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema è in grado di identificarla e sceglierla.
-\item \textbf{Percentuale di falsi negativi:} per le correzioni nelle quali la soluzione è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema trova la soluzione, ma la scarta perchè valutata troppo distante dalla parola da correggere.
+\item \textbf{Percentuale di falsi negativi:} per le correzioni nelle quali la soluzione è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema trova la soluzione, ma la scarta perché valutata troppo distante dalla parola da correggere.
 \item \textbf{Percentuale di falsi positivi:} per le correzioni nelle quali la soluzione \textbf{non} è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema sceglie comunque uno dei candidati, producendo un errore.
 \end{itemize}
 
@@ -168,7 +168,7 @@ Nella \autoref{tab:analisi_risultati} sono riportati i risultati per le metriche
 \begin{table}[H]
 \centering
 \begin{tabular}{cccc}
-\textbf{Perturbazione} & \textbf{Scelte Corrette} & \textbf{Falsi Negativi} &  \textbf{Falsi Positivi} \\ \hline
+\textbf{Pert.} & \textbf{\%Scelte Corrette} & \textbf{\%Falsi Neg.} &  \textbf{\%Falsi Pos.} \\ \hline
 text& 88.16& 3.05& 27.28\\
 T1& 86.41& 3.59& 32.29\\
 T2& 83.97& 4.01& 32.2\\
@@ -186,7 +186,7 @@ Combinato& 85.3& 3.58& 32.5\\
 \end{table}
 
 Come è lecito aspettarsi, i risultati sono tanto migliori quanto più basso è il livello di perturbazione.\\
-Come visibile in \autoref{fig:torta_giuste}, oltre ai falsi negativi, il sistema sbaglia la soluzione nell'11\% delle correzioni. L'eventualità di una correzione sbagliata si presenta quando la soluzione non è la parola più vicina a quella da correggere nei risultati proposti da BERT. Ciò si può evincere anche dal grafico in \autoref{fig:lev_distribution}, dove si può notare come la grande maggioranza delle soluzioni sono il risultato più vicino alla parola da correggere.
+Come visibile in \autoref{fig:torta_giuste}, oltre ai falsi negativi, il sistema sbaglia la soluzione nell'11\% delle correzioni. L'eventualità di una correzione sbagliata si presenta quando la soluzione non è la parola più vicina a quella da correggere nei risultati proposti da BERT. Ciò si può evincere anche dal grafico in \autoref{fig:lev_distribution}, dove si può notare come la grande maggioranza, ma non la totalità, delle soluzioni sono il risultato più vicino alla parola da correggere.
 
 \begin{figure}[H]
 \centering
