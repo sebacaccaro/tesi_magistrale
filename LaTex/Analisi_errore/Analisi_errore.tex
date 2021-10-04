@@ -15,6 +15,7 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{tikz}
+\usepackage{graphicx}
 \usetikzlibrary{positioning}
 
 
@@ -120,7 +121,134 @@ Combinato& 56.47& 62.07& 64.83\\
 \label{fig:foundN}
 \end{figure}
 
+Dai risultati è possibile trarre alcune conclusioni:
+\begin{itemize}
+\item BERT ottiene migliori performance nei testi ottenuti da pipeline con un più alto livello di perturbazione. Questo risultato è lecito da aspettarsi, in quanto le parole perturbate rendono meno intellegibile il contesto che BERT usa per produrre i candidati.
+\item Mentre l'incremento delle correzioni corrette presenti nei candidati prodotti da BERT è sensibile  da 10 a 20 risultati, è praticamente trascurabile da 20 a 30 risultati.
+\end{itemize}
 
+Avendo stabilito la frequenza con la quale la giusta correzione è presente fra i candidati, è necessario che un sistema di correzione sia in grado di trovarla fra la varie alternative proposte.\\
+A tale scopo è utile capire in quale posizione fra i risultati il token corretto si trovi. La distribuzione del posizionamento della soluzione è mostrata nel grafico in \autoref{fig:dis_pos}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{distributions/score_order_Combinato}
+\caption{Distribuzione della soluzione nei primi 30 risultati}
+\label{fig:dis_pos}
+\end{figure}
+
+Il grafico in \autoref{fig:dis_pos} è relativo al insieme combinato di tutte le frasi. Non vengono riportati i singoli grafici delle altre catene i perturbazione per brevità, in quanto sono praticamente sovrapponili a quello presente.\\
+La distribuzione mostra come i risultati rilevanti si trovino a ridosso delle prime posizioni. Tuttavia, questa statista non basta per scegliere in modo affidabile il candidato per la correzione.
+
+
+\section{Analisi prestazioni correttore}
+In questa sezione sono misurate le prestazioni della parte di error correction relativa alla correzione dei singoli token del correttore sviluppato.
+
+\subsection{Metodologia dell'analisi}
+Per testare esclusivamente la parte di error correction viene usata una versione leggermente modificata del sistema di correzione sviluppato:
+\begin{itemize}
+\item La parte di error detection è completamente rimossa, in quanto non necessaria. Infatti, come visto in precedenza, in ogni frase l'errore da correggere è stato introdotto appositamente ed è già demarcato.
+\item L'output del sistema non è l'intera frase con la correzione incorporata, ma solo la correzione proposta per il token errato.
+\end{itemize}
+
+Una correzione è considerata corretta solo se è esattamente identica alla parola originale.
+
+\subsection{Metriche}
+Per misurare quanto il sistema di correzione riesca ad approssimare il limite superiore di BERT sono introdotte le seguenti metriche:
+\begin{itemize}
+\item \textbf{Percentuale di scelta corretta:} per le correzioni nelle quali la soluzione è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema è in grado di identificarla e sceglierla.
+\item \textbf{Percentuale di falsi negativi:} per le correzioni nelle quali la soluzione è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema trova la soluzione, ma la scarta perchè valutata troppo distante dalla parola da correggere.
+\item \textbf{Percentuale di falsi positivi:} per le correzioni nelle quali la soluzione \textbf{non} è presente nei primi 20 risultati di BERT, è la percentuale di volte nelle quali il sistema sceglie comunque uno dei candidati, producendo un errore.
+\end{itemize}
+
+
+\subsection{Risultati}
+
+Nella \autoref{tab:analisi_risultati} sono riportati i risultati per le metriche definite in precedenza.
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\textbf{Perturbazione} & \textbf{Scelte Corrette} & \textbf{Falsi Negativi} &  \textbf{Falsi Positivi} \\ \hline
+text& 88.16& 3.05& 27.28\\
+T1& 86.41& 3.59& 32.29\\
+T2& 83.97& 4.01& 32.2\\
+T3& 80.17& 3.14& 35.16\\
+S1& 86.93& 3.93& 27.25\\
+S2& 87.85& 2.84& 28.04\\
+S3& 86.41& 4.06& 29.86\\
+M1& 85.03& 3.77& 31.63\\
+M2& 84.07& 3.88& 32.53\\
+M3& 80.29& 3.58& 40.35\\
+Combinato& 85.3& 3.58& 32.5\\
+\end{tabular}
+\caption{Risultati sperimentali dell'error correction del sistema sviluppato}
+\label{tab:analisi_risultati}
+\end{table}
+
+Come è lecito aspettarsi, i risultati sono tanto migliori quanto più basso è il livello di perturbazione.\\
+Come visibile in \autoref{fig:torta_giuste}, oltre ai falsi negativi, il sistema sbaglia la soluzione nell'11\% delle correzioni. L'eventualità di una correzione sbagliata si presenta quando la soluzione non è la parola più vicina a quella da correggere nei risultati proposti da BERT. Ciò si può evincere anche dal grafico in \autoref{fig:lev_distribution}, dove si può notare come la grande maggioranza delle soluzioni sono il risultato più vicino alla parola da correggere.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,trim={0 1.5cm 0 1.5cm},clip]{distributions/correct_combinato}
+\caption{Scelte correte, scelte errate e falsi negativi relativi al combinato di tutti i livelli di perturbazione}
+\label{fig:torta_giuste}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{distributions/lev_pos_combinato}
+\caption{Distribuzione dalla soluzione fra i risultati di BERT ordinati per la distanza di Levenshtein}
+\label{fig:lev_distribution}
+\end{figure}
+
+
+In \autoref{fig:falsi_pos} invece si può vedere cosa succede in caso la soluzione non sia presente fra i primi 20 risultati: nel 67,5\% dei casi il sistema non effettua una correzione, mentre nel resto dei casi viene fornita una correzione errata.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,trim={0 1.5cm 0 1.5cm},clip]{distributions/non_correct_combinato}
+\caption{Falsi positivi e correzioni errate scartate relativi al combinato di tutti i livelli di perturbazione}
+\label{fig:falsi_pos}
+\end{figure}
+
+Date queste statistiche, è possibile valutare in modo comprensivo il comportamento del correttore.\\
+Vengono divise le scelte del correttore in due categorie:
+\begin{itemize}
+\item \textbf{Scelte positive}: distinguono i casi in cui il correttore sceglie la giusta soluzione se presente, o decide di non intervenire nel caso la soluzione non sia presente fra opzioni fornite da BERT.
+\item \textbf{Scelte Negative}: distinguono i casi in cui il correttore sceglie una correzione sbagliata o decide di non intervenire in caso la soluzione sia presente fra i risultati di BERT. Sono inclusi anche i casi nei quali, in mancanza della soluzione fra i risultati, il correttore fornisce una correzione errata.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth,trim={0 1.5cm 0 1cm},clip]{distributions/overview_scelte_combinato}
+\caption{Scelte positive e negative relative al combinato di tutti i livelli di perturbazione. Nel diagramma, le scelte negative sono quelle distaccate dalla torta principale.}
+\label{fig:scelte_pos_neg}
+\end{figure}
+
+Dal diagramma in \autoref{fig:scelte_pos_neg} si nota come il sistema di correzione faccia un scelta positiva nel 78\% dei casi.\\
+In \autoref{tab:scelte_pos_neg} sono invece riportate le percentuali di scelte negative e positive per tutti i livelli di perturbazione.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ccc}
+\textbf{Perturbazione} & \textbf{\% Scelte Positive} & \textbf{\% Scelte Negative} \\ \hline
+text& 84.29& 15.71\\
+T1& 79.47& 20.53\\
+T2& 77.5& 22.5\\
+T3& 72.77& 27.23\\
+S1& 82.88& 17.12\\
+S2& 83.06& 16.94\\
+S3& 81.14& 18.86\\
+M1& 78.34& 21.66\\
+M2& 76.87& 23.13\\
+M3& 69.04& 30.96\\
+Combinato& 78.55& 21.45\\
+\end{tabular}
+\caption{Percentuale di scelte positive e negative per tutti i livelli di perturbazione}
+\label{tab:scelte_pos_neg}
+\end{table}
 
 
 
