@@ -1,0 +1,151 @@
+%
+% Tesi D.S.I. - modello preso da
+% Stanford University PhD thesis style -- modifications to the report style
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                         %
+%			TESI DOTTORATO                                                   %
+%			______________                                                   %
+%                                                                         %
+%			AUTORE: Elena Pagani                                             %
+%                                                                         %
+%			Ultima revisione: 7.X.1998                                       %
+%           correzioni atrent                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+\documentclass[a4paper,12pt]{report}
+%    \renewcommand{\baselinestretch}{1.6}      % interline spacing
+%
+% \includeonly{}
+%
+%			PREAMBOLO
+%
+\usepackage[a4paper]{geometry}
+\usepackage[italian]{babel}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{epsfig}
+\usepackage{setspace}
+\usepackage{tesi}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{color,soul}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{positioning}
+
+
+% per le accentate
+\usepackage[utf8]{inputenc}
+%
+\newtheorem{myteor}{Teorema}[section]
+%
+\newenvironment{teor}{\begin{myteor}\sl}{\end{myteor}}
+%
+%
+%			TITOLO
+%
+\begin{document}
+\newcommand{\E}{È}
+\noindent
+\hl{\textbf{Scadenze:}\\
+\textbf{Presentazione domanda e titolo:} entro il 22 Novembre\\
+\textbf{Consegna riassunto:} dal 22 novembre al 6 dicembre\\
+\textbf{Consegna tesi:} entro il 6 dicembre
+}
+\title{TITOLO DA DEFINIRE}
+\author{Sebastiano Caccaro}
+\dept{Corso di Laurea Magistrale in Informatica} 
+\anno{2020-2021}
+\matricola{958683}
+\relatore{Prof. Alfio FERRARA}
+\correlatore{Dr. Francesco PERITI}
+%
+%        \submitdate{month year in which submitted to GPO}
+%		- date LaTeX'd if omitted
+%	\copyrightyear{year degree conferred (next year if submitted in Dec.)}
+%		- year LaTeX'd (or next year, in December) if omitted
+%	\copyrighttrue or \copyrightfalse
+%		- produce or don't produce a copyright page (false by default)
+%	\figurespagetrue or \figurespagefalse
+%		- produce or don't produce a List of Figures page
+%		  (false by default)
+%	\tablespagetrue or \tablespagefalse
+%		- produce or don't produce a List of Tables page
+%		  (false by default)
+% 
+%			DEDICA
+%
+\beforepreface
+\prefacesection{}
+        {\hfill \Large {\sl dedicato a \dots}}
+% 
+%			PREFAZIONE
+%
+\prefacesection{Prefazione}
+hkjafgyruet.
+%
+%
+%			ORGANIZZAZIONE
+\section*{Organizzazione della tesi}
+\label{organizzazione}
+La tesi \`e organizzata come segue:
+\begin{itemize}
+\item nel Capitolo 1 ....
+\end{itemize}
+%
+%			RINGRAZIAMENTI
+%
+\prefacesection{Ringraziamenti}
+asdjhgftry.
+\afterpreface
+% 
+% 
+\chapter{Introduzione}
+\label{sec:intro}
+
+
+% Probabilmente verra messo qua
+
+%\paragraph{Errore} Si definisce errore una discrepanza fra il testo originale (ovvero quello presente nell'immagine scanerizzata o fotografata)
+%
+%
+%\cite{tong1996statistical}
+%
+%Ai fini di questo processo è quindi importante individuare correttamente gli errori per massimizzare le performance di correzione. \E\ altresì importante non segnalare falsi positivi, per evitare, come già spiegato, di introdurre nuovi errori. 
+
+\chapter{Stato dell'Arte}
+\label{sec:arte}
+
+\chapter{Dataset e Perturbazione}
+\label{sec:dataset}
+
+\chapter{Metodologia}
+\label{sec:metodologia}
+\input{capitoli/metodologia}
+
+\chapter{Implementazione, Test e Risultati}
+\label{sec:test}
+
+\chapter{Analisi dell'errore}
+\label{sec:analisi}
+
+
+
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{../bibliografia}
+
+
+\end{document}
+
+
+ 
