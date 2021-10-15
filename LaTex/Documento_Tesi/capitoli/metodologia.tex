@@ -1,16 +1,53 @@
-\hl{\textbf{READ ME}}\\
-\hl{Nello scrivere questo capitolo, faccio le seguenti assunzioni:\\
-- Nel capitolo "dataset e perturbazione" sono gia' presenti le definizioni di termini come tokenizzare, token, detokenizzare ecc\\
-- E' gia' presente una spiegazione comprensiva di cosa sia BERT nel capitolo sullo stato dell'arte}
-
-
 In questo capitolo è descritta la metodologia del sistema di correzione.\\
 Nella \autoref{sec:met_introduzione} vengono descritti gli obiettivi del processo di correzione e le criticità che lo contraddistinguono.
-Nella \autoref{sec:met_panoramica} è presente una panoramica generale del processo di correzione, e sono introdotte le varie fasi che lo compongono. Nella \autoref{sec:met_errdet} e \autoref{sec:met_errcor} invece sono descritte più nel dettaglio le fasi di error detection e correction che compongono il processo.
+Nella \autoref{sec:met_panoramica} è presente una panoramica generale del processo di correzione, e sono introdotte le varie fasi che lo compongono. Nella \autoref{sec:met_errdet} e \autoref{sec:met_errcor} sono descritte più nel dettaglio le fasi di error detection e correction che compongono il processo.
 
 
 \section{Introduzione}
 \label{sec:met_introduzione}
+L'optical character recognition, o OCR, è una tecnologia tramite la quale è possibile estrarre e digitalizzare del testo da un'immagine. Più precisamente, per digitalizzare si intende ottenere del testo in una una codifica leggibile da una macchina, come ad esempio ASCII o Unicode.
+
+\begin{figure}[H]
+\centering
+{
+\begin{minipage}{0.4\textwidth}
+\includegraphics[width=\textwidth]{immagini/metodologia/ocr_ex.png}
+\end{minipage} \hfill
+\begin{minipage}{0.06\textwidth}
+\Large$\rightarrow$
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\footnotesize	
+Prima. di dare la parola al primo iscritto, \\
+mi permetto di far presente alla Camera che \\
+sono già stati presentati vari ordini del giorno \\
+e var.1 emendamenti, relativi a questo disegno \\
+di legge. Come la Camera sa, gli emendamenti, \\
+di regola, debbono esser presentati alrneno \\
+ventiquattro ore prima della seduta in cui \\
+vengono discussi.
+\end{minipage}
+\caption{Esempio di testo estratto tramite OCR}
+\label{fig:met_ocr_esempio}
+}
+\end{figure}
+
+L'uso di sistemi OCR è particolarmente vantaggioso per l'archiviazione dei documenti. Infatti, l'estrazione del testo rende possibile eseguire sui documenti operazioni di ricerca e di reperimento informazioni. Si pensi a un'operazione basilare come la ricerca di tutti i documenti che contengono una determinata parola: un task dispendioso e manuale che è quasi istantaneo se si ha a disposizione il testo digitalizzato.
+\paragraph{Errori}
+I sistemi OCR presentano però alcuni problemi che possono influenzare negativamente le performance nel reperimento di informazioni \cite{impatto_ocr_1}\cite{impatto_ocr_2}. Si veda, ad esempio, il testo estratto in \autoref{fig:met_ocr_esempio}: seppur la maggior parte delle parole sono state riconosciute correttamente, è possibile notare alcuni errori. 
+Generalmente la presenza di tali errori è dovuta a piccole imprecisioni nell'immagine iniziale: si pensi ad esempio un granello di polvere che può essere scambiato per un punto, o ad una \textit{"n"} battuta male che viene scambiata per la sequenza \textit{"ii"}. Si possono distinguere le seguenti categorie di errore:
+\begin{itemize}
+\item \textbf{Errore di token}. Si ha un errore di token aggiunte, rimozioni o sostituzioni di caratteri occorrono all'interno di una parola senza però dividerla o eliminarla. Questo tipo di errore si divide in due ulteriori sottocategorie:
+	\begin{itemize}
+	\item Non-word error (NW), quando la parola risultante non è presente in un dato vocabolario.
+	\item Real-word error (RW), quando la parola risultante è presente in un dato vocabolario.
+	\end{itemize}
+	
+\item \textbf{Errore di segmentazione} (SG). Si ha un errore di segmentazione quando aggiunte, rimozioni o sostituzioni di caratteri occorrono in maniera tale da dividere o unire parole. Sono considerati errori di segmentazione anche aggiunte di caratteri e segni di punteggiatura spuri all'interno del testo.
+\end{itemize}
+
+
+--------------------------------------------\\
 Lo scopo del processo di OCR-Post Processing è quello di correggere e minimizzare gli errori introdotti dall'acquisizione di testo da immagini. Più in generale, data una frase contenente degli errori, lo scopo del processo di correzione è quello produrre in output la stessa frase senza errori. Nel fare ciò è inoltre necessario assicurarsi di non introdurne di nuovi.\\
 La metodologia di correzione sviluppata, una volta identificati gli errori, fa uso del BERT Masked Language Modeling per produrre una serie di candidati per la correzione. Un approccio simile è utilizzato in \cite{OCRMaskFilling}, dove una combinazione di BERT e FastText riesce a produrre candidati corretti nel 70\% dei casi. L'approccio appena citato però non include le fasi di error detection e scelta del candidato corretto, che sono invece implementate nella metodologia proposta e applicate al dataset descritto nel \autoref{sec:dataset}.
 
