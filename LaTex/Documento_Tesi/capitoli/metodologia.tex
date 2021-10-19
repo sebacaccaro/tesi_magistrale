@@ -301,3 +301,85 @@ In frasi contenenti molti errori, è possibile che una sola applicazione del mod
 \subsection{Modulo di correzione Split}
 \label{sec:met_mod_split}
 
+\subsubsection{Error detection}
+\label{sec:met_split_errdet}
+Il modulo di correzione Split corregge tutti gli errori di spezzettamento con spazi (SP).
+La fase di error detection si compone di tre stadi:
+\begin{enumerate}
+\item \textbf{Individuazione delle sequenze}: data un frase contenente errori di tipo SP, sono delimitati i punti di inizio e terminazione delle sequenze contenenti errori. L'individuazione di tali sequenze è eseguita tramite la seguente espressione regolare:
+\begin{lstlisting}[language=Python]
+r'(?:\s|^)(\w(?:\W?\s\w{1,2}){3,})(?:\W|\s|$)'
+\end{lstlisting}
+La precedente espressione regolare intercetta tutte le sequenze di almeno tre gruppi di caratteri alfanumerici con lunghezza massima due intervallati da spazi e/o caratteri non alfanumerici. Per maggiore chiarezza, in \autoref{table:met_split_esempi} sono riportati alcuni esempi di sequenze riconosciute.
+
+\item \textbf{Filtraggio punteggiatura}: all'interno delle sequenze vengono rimossi tutti i caratteri non alfanumerici. Ciò serve e rimuovere eventuali segni di punteggiatura spuri che possono diminuire l'efficacia delle seguenti fasi.
+
+\item \textbf{Validazione errore:} non tutte le sequenze riconosciute dall'espressione regolare sono degli errori. Si pensi ad esempio ad una serie di preposizioni o congiunzioni, come il quarto esempio in \autoref{table:met_split_esempi}. Si usa quindi un'euristica per scartare le sequenze che si ritenga non contengano errori. Sono considerati errori tutte le sequenze nelle quali il numero di gruppi di 2 caratteri è minore del numero di gruppi di 1 carattere.
+
+\end{enumerate}
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ccc}
+	\textbf{Frase} & \textbf{Sequenza} & \textbf{Errore} \\ \hline
+	
+	\textit{"d i l e t t i membri, della ..."}	&	\textit{d i l e t t i}	&	Sì \\
+	\textit{"guidato d ui l l a fede"}			& 	\textit{d ui l l a}		&	Sì \\
+	\textit{"... altro tipo di u n i o, n e."}	&	\textit{u n i o, n e}	&	Sì \\
+	\textit{"in me e io in te, siano anch..."}	&	\textit{in me e io in te}&	No
+	\end{tabular}
+	\caption{Esempi di sequenze riconosciute}
+	\label{table:met_split_esempi}
+\end{table}
+
+Data quindi una frase $F$ contenente errori di segmentazione, la fase di error detection è formalizzata come segue:
+\begin{equation}
+\textit{ED}_{split}: F \rightarrow [(s_1,b_1,e_1),...,(s_n,b_n,e_n)]
+\end{equation}
+dove:
+\begin{itemize}
+\item Ogni tupla corrisponde ad un errore individuato e validato
+\item $s_i$ è la sequenza filtrata contenente l'errore
+\item $b_i$ è il punto di inizio in $F$ della sequenza
+\item $e_i$ è il punto di fine in $F$ delle sequenze
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{immagini/metodologia/split_error_detection}
+\caption{Schema del processo di error detection. Nell'immagine, ogni $c_i$ è un carattere}
+\label{fig:met_split_errdet}
+\end{figure}
+
+\paragraph{Esempio}
+Data la frase:
+\begin{center}
+\textit{coinvolsero ogni uomo \ul{e o' g n i} donna, \ul{p r o c u r a n d o}.}
+\end{center}
+si procede con lo stadio di individuazione delle sequenze. Le sequenze individuate sono quello sottolineate nella frase data. Sono riportate di seguito, nel seguente formato (sequenza,posizione inizio sequenza, posizione fine sequenza):
+\begin{enumerate}
+\item \textit{"e o' g n i"}, 22, 32
+\item \textit{"p r o c u r a n d o"}, 40, 59
+\end{enumerate}
+
+Si procede quindi con lo stadio di filtraggio:
+\begin{enumerate}
+\item \textit{"e o g n i"}, 22, 32
+\item \textit{"p r o c u r a n d o"}, 40, 59
+\end{enumerate}
+Si noti come nella prima sequenza è stato cancellato un apostrofo, ma le posizioni di inizio e fine rimangono le stesse. Lo stadio di validazione in questo caso non scarta alcuna soluzione: in entrambe le sequenze, infatti, il numero di gruppi di 1 carattere è maggiore del numero di gruppi di 2 caratteri.
+
+\subsubsection{Error correction}
+\label{sec:met_split_errcor}
+
+
+
+
+
+
+
+
+
+
+
