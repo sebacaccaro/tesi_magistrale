@@ -1,6 +1,6 @@
 In questo capitolo è descritta la metodologia del sistema di correzione.\\
 Nella \autoref{sec:met_introduzione} vengono descritti gli obiettivi del processo di correzione e le criticità che lo contraddistinguono.
-Nella \autoref{sec:met_panoramica} è presente una panoramica generale del processo di correzione, e sono le fasi e le componenti del sistema. Nella \autoref{eq:met_BERT} è descritto il funzionamento del BERT MLM, che sta alla base del processo di correzione. Nelle sottosezioni \ref{sec:met_tok_correct} e \ref{sec:met_mod_split} è descritto il funzionamento dei moduli che stanno alla base del sistema di correzione.
+Nella \autoref{sec:met_panoramica} è presente una panoramica generale del processo di correzione, e sono descritte le fasi e le componenti del sistema. Nella \autoref{sec:met_BERT_MLM} è descritto il funzionamento del BERT MLM, che sta alla base del processo di correzione. Nelle sottosezioni \ref{sec:met_tok_correct} e \ref{sec:met_mod_split} è descritto il funzionamento dei moduli che stanno alla base del sistema di correzione.
 
 
 \section{Introduzione}
@@ -198,7 +198,7 @@ fase può quindi essere suddiviso in due stadi:
 \item \textbf{Identificazione degli errori}: ogni token è analizzato singolarmente per determinare se contenga o meno un errore. Un token è considerato errato se sono vere le seguente condizioni:
 	\begin{itemize}
 	\item Ha una lunghezza minima di 2 caratteri. Questa condizione è necessaria per evitare di introdurre nuovi errori correggendo inutilmente errori di tipo SP. Ad esempio, sarebbe deleterio provare a correggere le singole lettere di \textit{"Q u a l c h e"}.
-	\item Dato un vocabolario di parole corrette, il token considerato non è presente in tale vocabolario. La ricerca nel vocabolario è eseguita in maniera case-insensitive.
+	\item Dato un vocabolario di parole corrette, il token considerato non è presente in tale vocabolario. La ricerca nel vocabolario è eseguita in maniera case-insensitive. Tale approccio, seppur molto semplice ha alcune criticità. Ad esempio, ogni parola non appartenente alla lingua italiana verrà segnalata come errore. \E\ quindi auspicabile disporre di un vocabolario che comprenda anche alcune parole straniere di uso comune.
 	\end{itemize}
 Un'eccezione a quest'ultima condizione è data da tutti i token che precedono un apostrofo. Questi token sono considerati corretti se almeno una fra tutte le combinazioni token + vocale è corretta. Si prenda ad esempio il token \textit{"dell"} non presente nel vocabolario, seguito dal token apostrofo. Vengono generate le 5 combinazioni token-vocale \textit{"della"},\textit{"delle"},\textit{"delli"},\textit{"dello"},\textit{"dellu"}. Siccome almeno una di queste è corretta, il token è considerato corretto.
 \end{enumerate}
@@ -312,7 +312,7 @@ r'(?:\s|^)(\w(?:\W?\s\w{1,2}){3,})(?:\W|\s|$)'
 \end{lstlisting}
 La precedente espressione regolare intercetta tutte le sequenze di almeno tre gruppi di caratteri alfanumerici con lunghezza massima due intervallati da spazi e/o caratteri non alfanumerici. Per maggiore chiarezza, in \autoref{table:met_split_esempi} sono riportati alcuni esempi di sequenze riconosciute.
 
-\item \textbf{Filtraggio punteggiatura}: all'interno delle sequenze vengono rimossi tutti i caratteri non alfanumerici. Ciò serve e rimuovere eventuali segni di punteggiatura spuri che possono diminuire l'efficacia delle seguenti fasi.
+\item \textbf{Filtraggio punteggiatura}: all'interno delle sequenze vengono rimossi tutti i caratteri non alfanumerici o spaziature. Ciò serve e rimuovere eventuali segni di punteggiatura spuri che possono diminuire l'efficacia delle seguenti fasi.
 
 \item \textbf{Validazione errore:} non tutte le sequenze riconosciute dall'espressione regolare sono degli errori. Si pensi ad esempio ad una serie di preposizioni o congiunzioni, come il quarto esempio in \autoref{table:met_split_esempi}. Si usa quindi un'euristica per scartare le sequenze che si ritenga non contengano errori. Sono considerati errori tutte le sequenze nelle quali il numero di gruppi di 2 caratteri è minore del numero di gruppi di 1 carattere.
 
@@ -335,7 +335,7 @@ La precedente espressione regolare intercetta tutte le sequenze di almeno tre gr
 
 Data quindi una frase $F$ contenente errori di segmentazione, la fase di error detection è formalizzata come segue:
 \begin{equation}
-\textit{ED}_{split}: F \rightarrow [(s_1,b_1,e_1),...,(s_n,b_n,e_n)]
+\textit{ED}_{split}: F \rightarrow [(s_1,b_1,e_1),...,(s_n,b_n,e_n)] = L_{seq}
 \end{equation}
 dove:
 \begin{itemize}
@@ -372,6 +372,134 @@ Si noti come nella prima sequenza è stato cancellato un apostrofo, ma le posizi
 
 \subsubsection{Error correction}
 \label{sec:met_split_errcor}
+La fase di Error Correction mira a correggere gli errori individuati nella fase precedente. Più formalmente è definita come:
+\begin{equation}
+EC_{split}: (F,L_{seq}) \rightarrow F_{corr}
+\end{equation}
+dove $F_{corr}$ è la frase con le correzione apportate.\\
+La fase di Error Correction si compone dei seguenti stadi:
+\begin{enumerate}
+\item \textbf{Compressione:} per ogni sequenza $s_i$ individuata da correggere, si rimuovono gli spazi bianchi, in modo da ottenere un'unica parola continua detta $s\prime_i$.
+\item \textbf{Correzione con vocabolario}: se una sequenza $s\prime_i$ è presente nel vocabolario, allora è $s\prime_i$ viene inserita nella frase al posto della sequenza contenente l'errore.
+\item \textbf{Correzione con BERT:} si fa uso del BERT MLM per trovare una correzione, in modo simile a quanto fatto nel modulo di correzione token. A seconda della tipologia dell' errore sono applicabili due strategie di correzione.
+		\begin{itemize}
+		\item Con sottrazione		
+		\item Con rimpiazzo		
+		\end{itemize}
+\end{enumerate}
+
+Ognuno degli stadi appena descritti è applicato in sequenza ad ogni singola tupla prodotta dalla fase precedente.
+
+\paragraph{Funzione di sostituzione}
+Viene introdotta una funzione detta funzione di sostituzione. Data una frase $F$, una sequenza $s$, una valore di inizio $b$ e un valore di fine $e$, la funzione è definita come:
+\begin{equation}
+\textit{Sos}: (F,s,b,e) \rightarrow F\prime
+\end{equation}
+dove $F\prime$ è la frase $F$ in cui tutti i caratteri fra $b$ ed $e$ sono stati sostituiti da $s$.\\
+Alternativamente, definendo come $T$ la tupla $(s,b,e)$ è possibile scrivere la funzione anche come segue:
+\begin{equation}
+\textit{Sos}: (F,T) \rightarrow F\prime
+\end{equation}
+Ad esempio, data la frase $f_{es}$:
+\begin{center}
+\textit{Onorando una tradizione plurisecolare}
+\end{center}
+e la tupla $t_{es}$ (\textit{"usanza"},14,25), si ha che:
+\begin{equation}
+\textit{Sos}(f_{es},t_{es}) = \textit{Onorando una usanza plurisecolare}
+\end{equation}
+
+
+\paragraph{Compressione}
+Lo stadio di compressione rimuove gli spazi da ogni sequenza $s$ individuata come errore. Più formalmente, data una tupla $(s,b,e)$, lo stadio di compressione è definito come segue:
+\begin{equation}
+\textit{Comp}: (s,b,e) \rightarrow (s\prime,b,e)
+\end{equation}
+dove $s\prime$ è la sequenza $s$ senza spaziature. Riprendendo l'esempio proposto nella fase di error detection, le tuple prodotte diventano rispettivamente:
+\begin{enumerate}
+\item \textit{"eogni"}, 22, 32
+\item \textit{"procurando"}, 40, 59
+\end{enumerate}
+
+\paragraph{Correzione con vocabolario}
+Date le tuple prodotte dallo stadio precedente, lo stadio di correzione con vocabolario applica una correzione per tutte le tuple la cui sequenza corrisponde ad una parola presente nel vocabolario. \\
+Data quindi la frase $F$ contenente errori di segmentazione e una tupla $(s\prime,b,e)$ detta $t_{corr}$ che rispetta la condizione enunciata precedentemente, la frase con la correzione applicata $F_{corr}$ si ottiene come segue:
+\begin{equation}
+F_{corr} = \textit{Sos}(F,t_{corr})
+\end{equation}
+Se la tupla che si sta trattando può essere utilizzata per una correzione con vocabolario, la correzione si arresta in questo stadio. Altrimenti, si procede allo stadio di correzione con BERT.\\
+Continuando l'esempio predente, si nota come la seconda tupla contenga la sequenza "procurando" che è una parola all'interno del vocabolario. Ricordando la frase originale
+\begin{center}
+\textit{coinvolsero ogni uomo e o' g n i donna, p r o c u r a n d o.}
+\end{center}
+detta $F_{ex}$, e la tupla $t_2$ (\textit{"procurando"}, 40, 59), la correzione si applica come segue:
+\begin{equation}
+F_{corr} = \textit{Sos}(F_{ex},t_{2})
+\end{equation}
+Il risulta è la frase $F_{corr}$:
+\begin{center}
+\textit{coinvolsero ogni uomo e o' g n i donna, procurando.}
+\end{center}
+
+
+\paragraph{Correzione con BERT}
+Per tutte le tuple per le quali non è stato possibile applicare una correzione con vocabolario, si passa allo stadio di correzione con BERT. Il primo step di questo stadio consiste nel mascheramento della sequenza errata nella fase originale. Data una tupla $(s\prime,b,e)$ prodotta dallo stadio di compressione e una frase $F$, si ottiene la frase mascherata $F_{mask}$ come segue:
+\begin{equation}
+F_{mask} = \textit{Sos}(F,\textit{[MASK]},b,e)
+\end{equation}
+A questo punto si sfrutta il BERT MLM per produrre un candidato per la correzione. Il processo è analogo alla fase di generazione e scelta dei candidati del modulo di correzione token nella \autoref{sec:met_errcor}, per cui si rimanda il lettore al paragrafo che ne spiega il funzionamento.\\
+Una volta prodotto il candidato per la correzione, detto $c_{corr}$, è possibile applicare una correzione per sottrazione o per rimpiazzo.
+
+
+\paragraph{Correzione con sottrazione}
+Si applica in caso $c_{corr}$ coincida con la fine o l'inizio della sequenza compressa $s\prime$. Questo è il caso in cui la sequenza riconosciuta come errore di spezzettamento con spazi comprende due parole. Pertanto, se $c_{corr}$ corrisponde all'inizio di $s\prime$, si ottengono le due stringhe $\textit{sub}_1$ e $\textit{sub}_2$ come segue:
+\begin{equation}
+\textit{sub}_1,\textit{sub}_2 = c_{corr}, s\prime -c_{corr}
+\end{equation}
+Se invece $c_{corr}$ corrisponde alla fine di $s\prime$, le stringhe $\textit{sub}_1$ e $\textit{sub}_2$ si ottengono  come segue:
+\begin{equation}
+\textit{sub}_1,\textit{sub}_2 = s\prime -c_{corr},c_{corr},
+\end{equation}
+Data quindi la frase $F$ contenente errori di segmentazione, la tupla $(s\prime,b,e)$ e le stringhe $\textit{sub}_1,\textit{sub}_2$, la frase con la correzione applicata $F_{corr}$ si ottiene come segue:
+\begin{equation}
+F_{corr} = \textit{Sos}(F, \textit{sub}_1 + "\ " + \textit{sub}_2  ,b,e)
+\end{equation}
+La correzione con sottrazione corregge i casi in cui la sequenza contenente errore è formata da due parole. Può accadere che la stringa $s\prime -c_{corr}$ non rappresenti una parola corretta, ovvero potrebbe non essere presente nel vocabolario. Non sono previsti controlli e contromisure ad hoc per tale eventualità: la correzione di eventuali errori di questo tipo è delegata ai moduli di correzione token che possono essere inseriti a valle nella pipeline.\\
+Si consideri ora l'esempio portato avanti negli stadi precedenti: data la tupla $t_2$ (\textit{"eogni"}, 22, 32) e la frase $F_{ex}$
+\begin{center}
+\textit{coinvolsero ogni uomo e o' g n i donna, p r o c u r a n d o.}
+\end{center}
+si ottiene come la frase $F_{mask}$ applicando la funzione di sostituzione:
+\begin{equation}
+F_{mask} = \textit{Sos}(F_{ex},\textit{[MASK]},22,32)
+\end{equation}
+Si ottiene dunque la frase
+\begin{center}
+\textit{coinvolsero ogni uomo [MASK] donna, p r o c u r a n d o.}
+\end{center}
+Sfruttando il BERT MLM si ottiene il candidato $c_{corr}$ "ogni". Il candidato corrisponde alla fine di $s\prime$, pertanto si ottengono $\textit{sub}_1,\textit{sub}_2 = \textit{e}, \textit{ogni}$. Si applica quindi la funzione di sostituzione:
+\begin{equation}
+F_{corr} = \textit{Sos}(F_{ex}, \textit{e} + "\ " + \textit{ogni} ,22,32)
+\end{equation}
+La frase corretta $F_{corr}$ è quindi: 
+\begin{center}
+\textit{coinvolsero ogni uomo e ogni donna, p r o c u r a n d o.}
+\end{center}
+
+\paragraph{Correzione con rimpiazzo}
+Si applica in caso $c_{corr}$ non coincida con la fine o l'inizio della sequenza compressa $s\prime$. Questo step utilizza un'euristica per validare la correzione prodotta dal BERT MLM. La soluzione prodotta da BERT è valutata ammissibile e solo se $d_{lev}(s\prime,c_{corr}) \leqslant 4$.\\
+In caso la soluzione sia ammissibile, la correzione è applicata tramite la funzione di sostituzione:
+\begin{equation}
+F_{corr} = \textit{Sos}(F,c_{corr},b,r)
+\end{equation}
+In caso la soluzione non sia ammissibile, la correzione si arresta senza apportare correzioni.
+
+
+
+
+
+
+
 
 
 
