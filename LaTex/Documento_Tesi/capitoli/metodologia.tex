@@ -1,11 +1,11 @@
-In questo capitolo è descritta la metodologia del sistema di correzione.\\
+In questo capitolo è descritta la metodologia di correzione.\\
 Nella \autoref{sec:met_introduzione} vengono descritti gli obiettivi del processo di correzione e le criticità che lo contraddistinguono.
-Nella \autoref{sec:met_panoramica} è presente una panoramica generale del processo di correzione, e sono descritte le fasi e le componenti del sistema. Nella \autoref{sec:met_BERT_MLM} è descritto il funzionamento del BERT MLM, che sta alla base del processo di correzione. Nelle sottosezioni \ref{sec:met_tok_correct} e \ref{sec:met_mod_split} è descritto il funzionamento dei moduli che stanno alla base del sistema di correzione.
+Nella \autoref{sec:met_panoramica} è presente una panoramica generale del processo di correzione. Sono inoltre descritte le fasi e le componenti del sistema. Nella \autoref{sec:met_BERT_MLM} è descritto il funzionamento del BERT Masked Language Model. Nelle sottosezioni \ref{sec:met_tok_correct} e \ref{sec:met_mod_split} è descritto il funzionamento dei moduli che stanno alla base del sistema di correzione.
 
 
 \section{Introduzione}
 \label{sec:met_introduzione}
-L'optical character recognition, o OCR, è una tecnologia tramite la quale è possibile estrarre e digitalizzare del testo da un'immagine. Più precisamente, per digitalizzare si intende ottenere del testo in una una codifica leggibile da una macchina, come ad esempio ASCII o Unicode.
+L'Optical Character Recognition, o OCR, è una tecnologia tramite la quale è possibile estrarre e digitalizzare il testo presente in un'immagine. Più precisamente, "digitalizzare" significa tradurre il testo dell'immagine in una una codifica leggibile da una macchina, come ad esempio ASCII o Unicode.
 
 \begin{figure}[H]
 \centering
@@ -27,7 +27,7 @@ di regola, debbono esser presentati alrneno \\
 ventiquattro ore prima della seduta in cui \\
 vengono discussi.
 \end{minipage}
-\caption{Esempio di testo estratto tramite OCR}
+\caption{A sinistra un frammento di immagine contenente testo, a destra il testo digitalizzato estratto dal frammento di immagine.}
 \label{fig:met_ocr_esempio}
 }
 \end{figure}
@@ -38,21 +38,21 @@ I sistemi OCR presentano però alcuni problemi che possono influenzare negativam
 Generalmente la presenza di tali errori è dovuta a piccole imprecisioni nell'immagine iniziale: si pensi ad esempio un granello di polvere che può essere scambiato per un punto, o ad una \textit{"n"} battuta male che viene scambiata per la sequenza \textit{"ii"}.
 Si possono distinguere le seguenti categorie di errore:
 \begin{itemize}
-\item \textbf{Errore di token}. Si ha un errore di token quando aggiunte, rimozioni o sostituzioni di caratteri occorrono all'interno di una parola senza però dividerla o eliminarla. Questo tipo di errore si divide in due ulteriori sottocategorie:
+\item \textbf{Word Error}. Aggiunta, rimozione o sostituzione di caratteri spuri all'interno di una parola. Questo tipo di errore si divide in due ulteriori sottocategorie:
 	\begin{itemize}
-	\item Non-word error (NW), quando la parola risultante non è presente in un dato vocabolario.
-	\item Real-word error (RW), quando la parola risultante è presente in un dato vocabolario.
+	\item Non-word error (NW): la parola affetta da errore non è presente in un dato vocabolario. Un errore di questo tipo è la parola \textit{"gioia"} che diventa \textit{"g1o1a"}.
+	\item Real-word error (RW): la parola affetta da errore è presente in un dato vocabolario, ma non è corretta nella frase in cui è inserita. Ad esempio, la frase \textit{"qualvolta i popoli ripongono la loro fiducia  nelle \ul{armi} e nella guerra"} può essere erroneamente interpretata come \textit{"qualvolta i popoli ripongono la loro fiducia  nelle \ul{ami} e nella guerra"}. "ami" è una parola presente nel vocabolario, ma non è corretta nel contesto della frase data.
 	\end{itemize}
 	
-\item \textbf{Errore di segmentazione}. Si ha un errore di segmentazione quando aggiunte, rimozioni o sostituzioni di caratteri occorrono in maniera tale da dividere o unire parole. Sono considerati errori di segmentazione anche aggiunte di caratteri e segni di punteggiatura spuri all'interno del testo. Sono distinte le seguenti sottocategorie di errori di segmentazione:
+\item \textbf{Word Segmentation Error}. Si ha un errore di segmentazione quando aggiunte, rimozioni o sostituzioni di caratteri (incluso il carattere spazio) occorrono in maniera tale da dividere o unire parole. Sono considerati errori di segmentazione anche aggiunte di caratteri e segni di punteggiatura spuri all'interno del testo. Sono distinte le seguenti sottocategorie di errori di segmentazione:
 	\begin{itemize}
-	\item Spezzettamento con spazi (SP), quando i caratteri di una parola o più parole adiacenti sono intervallati da spaziature.
-	\item Divisione con punteggiatura (DP), quando un segno di punteggiatura divide in due una parola.
-	\item Punteggiatura spuria (PS), quando un segno di punteggiatura viene aggiunto fra una parola e l'altra.
+	\item Space Splitting (SP), quando i caratteri di una parola o più parole adiacenti sono intervallati da spaziature. Ad esempio, si ha un errore di questo tipo nella frase \textit{"vostra presenza conferma l'\ul{attaccamento alla} cattedra di Pietro e la fedeltà al suo Magistero"} che viene letta come \textit{"vostra presenza conferma l'\ul{a t t a c c a m e n t o a l l a} cattedra di Pietro e la fedeltà al suo Magistero"}.
+	\item Punctuation Splitting (DP), quando uno o più segni di punteggiatura dividono in più parti una parola. Ad esempio, data la parola \textit{"attaccamento"} si ha un errore DP quando essa viene interpretata come \textit{"at,tacc,amento"}.
+	\item Punctuation Insertion (PS), quando uno o più segni di punteggiatura vengono aggiunti fra una parola e l'altra. Ad esempio, data la frase \textit{"Per secoli la Chiesa ha patrocinato artisti che hanno..."}, si hanno errori PS quando essa viene interpretata come \textit{"Per \ul{secoli'la} Chiesa \ul{ha.,patrocinato} artisti che hanno..."}.
 	\end{itemize}
 \end{itemize}
 
-In \autoref{tab:met_esempio_errori} sono riportati alcuni esempi di errori.
+In \autoref{tab:met_esempio_errori} sono riportati ulteriori esempi degli errori appena elencati.
 
 \begin{table}[H]
 \centering
@@ -71,20 +71,20 @@ vicinanze  del & vicinanze .del & PS & Introduzione di punteggiatura\\
 \label{tab:met_esempio_errori}
 \end{table}
 
-Se, come già detto, gli errori derivano spesso da piccoli difetti nell'immagine di partenza, è lecito aspettarsi una maggior quantità di errori da documenti di più deteriorati, come archivi storici. Per lo stesso motivo l'intensità degli errori può variare a seconda delle specifiche condizioni delle specifiche parti del documento.
+Se, come già detto, gli errori derivano spesso da piccoli difetti nell'immagine di partenza, è lecito aspettarsi una maggior quantità di errori da documenti più deteriorati o datati, come archivi storici. Per lo stesso motivo l'intensità degli errori può variare, a seconda delle condizioni in parti diverse di uno documento.
 
-\paragraph{Post-processing}
+\paragraph{OCR Post-processing}
 Una strategia spesso adottata per minimizzare il numero di errori è l'aggiunta di
 una fase di post elaborazione (OCR post-processing) in seguito all'acquisizione
 dei documenti tramite OCR. Lo scopo della fase di OCR post-processing è quello di correggere gli errori introdotti durante l'estrazione del testo dalle immagini. Una delle difficoltà in questa fase sta nel non introdurre nuovi errori nel testo. Si pensi ai seguenti casi:
 \begin{itemize}
 \item Il sistema prova a correggere una parola che non contiene errori. In questo caso, qualsiasi correzione risulterà in un nuovo errore. Una delle maggiori criticità nello sviluppare il sistema di correzione, infatti, sta nell'identificare correttamente gli errori all'interno del testo.
-\item Il sistema identifica correttamente un errore, ma propone una correzione sbagliata. Si pensi al seguente esempio: la parola \textit{"amati"} viene riconosciuta come \textit{"amolfi"}. Il sistema potrebbe correggere con \textit{"amati"}, introducendo un errore.
+\item Il sistema identifica correttamente un errore, ma propone una correzione sbagliata. Si pensi al seguente esempio: \textit{"vesodvi"} viene erroneamente corretto in \textit{"vedovi"}. Tuttavia, la parola originale era \textit{"vescovi"}.
 \end{itemize}
 
 \ \\
 La metodologia di correzione sviluppata è modellata come una pipeline che si compone di una serie di moduli ripetibili in sequenza. Ogni modulo è una funzione che si occupa di individuare e correggere una specifica categoria di errore.\\
-La metodologia sviluppata si propone di correggere i real-word error (RW) e gli errori di spezzettamento con spazi (SP).
+La metodologia sviluppata si propone di correggere gli errori di tipo RW e SP.
 
 \section{Architettura del sistema}
 \label{sec:met_processo}
@@ -170,7 +170,7 @@ la parola \textit{"soie"} sottolineata è stata individuata come errore. \E\ qui
 \begin{center}
 \textit{"che assistono ragazze in difficoltà, le persone [MASK] e abbandonate, gli ammalati e gli anziani."}
 \end{center}
-BERT produce quindi una lista di candidati, di cui sono riportati solo i primi 5:
+BERT produce quindi una lista di candidati. Sono riportati i risultati impostando come soglia $n=5$. I candidati rappresentano le top-5 più probabili correzioni.
 \begin{itemize}
 \item \textit{"sole"} con probabilità 0.42
 \item \textit{"anziane"} con probabilità 0.28
@@ -189,15 +189,16 @@ Bisogna sottolineare come la parola originale sia trasparente al modello BERT. C
 
 \subsubsection{Error Detection}
 \label{sec:met_tok_errdet}
-Il modulo di correzione token ha lo scopo di individuare e correggere tutti i non-word error (NW).  L'individuazione degli errori è effettuata in modo automatico dopo
+Il modulo di correzione token ha lo scopo di individuare e correggere tutti gli errori di tipo NW.  L'individuazione degli errori è effettuata in modo automatico dopo
 una pre-elaborazione (pre-processing) del testo. Il funzionamento di questa
 fase può quindi essere suddiviso in due stadi:
 
 \begin{enumerate}
-\item \textbf{Pre-elaborazione}: la frase viene tokenizzata, ovvero viene divisa singole parole dette token. Questo stadio è implementato tramite la libreria NLTK\cite{nltk}.
-\item \textbf{Identificazione degli errori}: ogni token è analizzato singolarmente per determinare se contenga o meno un errore. Un token è considerato errato se sono vere le seguente condizioni:
+\item \textbf{Sentence pre-processing}: la frase viene tokenizzata, ovvero viene divisa singole parole dette token. Questo stadio è implementato tramite la libreria NLTK\cite{nltk}.
+\item \textbf{Error marking}: ogni token è analizzato singolarmente per determinare se contenga o meno un errore. Un token è considerato errato se sono vere le seguente condizioni:
 	\begin{itemize}
-	\item Ha una lunghezza minima di 2 caratteri. Questa condizione è necessaria per evitare di introdurre nuovi errori correggendo inutilmente errori di tipo SP. Ad esempio, sarebbe deleterio provare a correggere le singole lettere di \textit{"Q u a l c h e"}.
+	\item Ha una lunghezza minima di 2 caratteri. Questa condizione è necessaria per evitare di introdurre nuovi errori correggendo inutilmente errori di tipo SP. Ad esempio, sarebbe deleterio provare a correggere le singole lettere di \textit{"Q u a l c h e"}. Ciò è dovuto al fatto che il modulo di correzione token è progettato per correggere singoli token: nell'esempio precedente, si tenterebbe quindi la correzione di tutte le sub-word che compongono il token. Per questo tipo di errori, è stato sviluppato di modulo di correzione Split (\autoref{sec:met_mod_split}).
+	
 	\item Dato un vocabolario di parole corrette, il token considerato non è presente in tale vocabolario. La ricerca nel vocabolario è eseguita in maniera case-insensitive. Tale approccio, seppur molto semplice ha alcune criticità. Ad esempio, ogni parola non appartenente alla lingua italiana verrà segnalata come errore. \E\ quindi auspicabile disporre di un vocabolario che comprenda anche alcune parole straniere di uso comune.
 	\end{itemize}
 Un'eccezione a quest'ultima condizione è data da tutti i token che precedono un apostrofo. Questi token sono considerati corretti se almeno una fra tutte le combinazioni token + vocale è corretta. Si prenda ad esempio il token \textit{"dell"} non presente nel vocabolario, seguito dal token apostrofo. Vengono generate le 5 combinazioni token-vocale \textit{"della"},\textit{"delle"},\textit{"delli"},\textit{"dello"},\textit{"dellu"}. Siccome almeno una di queste è corretta, il token è considerato corretto.
@@ -218,10 +219,10 @@ Il processo appena descritto è schematizzato in \autoref{fig:met_tok_errdet}. T
 La fase di error correction ha lo scopo di correggere gli errori individuati nella precedente fase. La fase di error correction è composta dai seguenti stadi:
 
 \begin{enumerate}
-\item Mascheramento
-\item Detokenizzazione
-\item Generazione e scelta dei candidati
-\item Validazione
+\item Masking
+\item Detokenization
+\item Candidates generation and picking
+\item Validation
 \end{enumerate}
 
 Ognuno di questi stadi è ripetuto per ognuno degli errori identificati durante la fase precedente.
@@ -235,24 +236,24 @@ Ognuno di questi stadi è ripetuto per ognuno degli errori identificati durante 
 
 
 
-\paragraph{Mascheramento}
-Lo stadio di mascheramento ha lo scopo di mascherare uno dei token errati individuati nella fase precedente. Si ricorda che, a causa del funzionamento del BERT MLM descritto nella \autoref{sec:met_BERT_MLM}, è possibile mascherare solo un token alla volta.\\
-Data una sequenza di token $S = [t_1,...,t_n]$ e l'insieme $E = [t_i,t_j,...]\subseteq S$ dei token contenenti errore non ancora corretti, lo stadio di mascheramento è descritto dalla seguente funzione:
+\paragraph{Masking}
+Lo stadio di masking ha lo scopo di mascherare uno dei token errati individuati nella fase precedente. Si ricorda che, a causa del funzionamento del BERT MLM descritto nella \autoref{sec:met_BERT_MLM}, è possibile mascherare solo un token alla volta.\\
+Data una sequenza di token $S = [t_1,...,t_n]$ e l'insieme $E = [t_i,t_j,...]\subseteq S$ dei token contenenti errore non ancora corretti, lo stadio di masking è descritto dalla seguente funzione:
 \begin{equation}
 M: S \rightarrow [t_1,...,\text{[MASK]},...,t_n] = S\prime
 \end{equation}
 dove \textit{[MASK]} sostituisce il primo token estratto dall'insieme $E$. Quanto descritto corrisponde al primo passaggio nella \autoref{fig:met_errgen}.
 
 
-\paragraph{Detokenizzazione}
-Come spiegato nella \autoref{sec:met_BERT_MLM}, la funzione di mask-filling del BERT MLM richiede come input una sequenza intesa come frase, e non come insieme di token. \E\ quindi compito dello stadio di detokenizzazione ricomporre una sequenza a partire dall'output dello stadio precedente. Lo stadio di detokenizzazione è descritto dalla seguente funzione:
+\paragraph{Detokenization}
+Come spiegato nella \autoref{sec:met_BERT_MLM}, la funzione di mask-filling del BERT MLM richiede come input una sequenza intesa come frase, e non come insieme di token. \E\ quindi compito dello stadio di detokenization ricomporre una sequenza a partire dall'output dello stadio precedente. Lo stadio di detokenization è descritto dalla seguente funzione:
 \begin{equation}
 D: [t_1,...,\text{[MASK]},...,t_n] \rightarrow F_{mask}
 \end{equation}
 dove $F_{mask}$ è una frase contente una maschera.
 
-\paragraph{Generazione e scelta dei candidati}
-Lo stadio di generazione e scelta dei candidati sfrutta il BERT MLM per generare dei candidati per la correzione, e sfrutta un'euristica per determinare il candidato con la maggior probabilità di essere corretto (da qui in poi riferito come soluzione). Più precisamente, la generazione dei candidati avviene tramite la funzione di mask-filling descritta nell'\autoref{eq:met_BERT} (\autoref{sec:met_BERT_MLM}). La fattibilità di applicare tale approccio per la generazione di candidati per la correzione è dimostrata in \cite{OCRMaskFilling}. Nel paper appena citato si riporta come, usando una combinazione di BERT e FastText, la giusta correzione da applicare sia presente fra i candidati prodotti con una probabilità del 70\%. \hl{TODO: inserire riferimento ai risultati del capitolo analisi errore.}\\
+\paragraph{Candidates generation and picking}
+Lo stadio di candidates generation and picking sfrutta il BERT MLM per generare dei candidati per la correzione, e sfrutta un'euristica per determinare il candidato con la maggior probabilità di essere corretto (da qui in poi riferito come soluzione). Più precisamente, la generazione dei candidati avviene tramite la funzione di mask-filling descritta nell'\autoref{eq:met_BERT} (\autoref{sec:met_BERT_MLM}). La fattibilità di applicare tale approccio per la generazione di candidati per la correzione è dimostrata in \cite{OCRMaskFilling}. Nel paper appena citato si riporta come, usando una combinazione di BERT e FastText, la giusta correzione da applicare sia presente fra i candidati prodotti con una probabilità del 70\%. \hl{TODO: inserire riferimento ai risultati del capitolo analisi errore.}\\
 Lo step di generazione dei candidati è formalizzato come segue:
 \begin{equation}
 G: F_{mask} \rightarrow [c_1,...,c_n]= C
@@ -262,7 +263,7 @@ L'euristica per la scelta della soluzione sceglie il candidato con la più bassa
 \begin{equation}
 s = \operatorname*{argmin}_{c_i \in C} d_{lev}(c_i,m)
 \end{equation}
-In caso uno o più candidati abbiamo la stessa distanza dal token mascherato, viene scelto quello con la maggior probabilità prodotta da BERT.
+In caso uno o più candidati abbiano la stessa distanza dal token mascherato, viene scelto quello con la maggior probabilità prodotta da BERT.
 \hl{TODO: giustificazione dell'euristica attraverso risultato presenti nel capitolo di analisi errore}
 
 \begin{figure}[H]
@@ -272,14 +273,14 @@ In caso uno o più candidati abbiamo la stessa distanza dal token mascherato, vi
 \label{fig:met_errgen}
 \end{figure}
 
-\paragraph{Validazione}
+\paragraph{Validation}
 Può accadere che la soluzione non sia una correzione adatta: si pensi ai seguenti casi:
 \begin{enumerate}
 \item L'error detection contrassegna un token corretto come errore. In questo caso, ogni tentativo di correzione introdurrebbe nuovi errori all'interno del testo.
 \item BERT non produce la giusta correzione fra i candidati. Anche in questo caso, qualunque sia il candidato scelto, il sistema di correzione andrebbe a introdurre nuovi errori all'interno del testo.
 \end{enumerate}
 
-\E\ introdotta quindi un'ulteriore fase di validazione, con lo scopo di valutare se la soluzione prodotta possa o meno rappresentare una correzione valida. La validazione è implementata tramite un'euristica che valuta se la soluzione trovata è troppo lontana (in termini di distanza di Levenshtein) dal token mascherato. Chiamando $l$ la lunghezza in caratteri del token mascherato, e $d$ la distanza di Levenshtein fra il token mascherato e la soluzione trovata, la soluzione è valida se:
+\E\ introdotta quindi un'ulteriore fase di validation, con lo scopo di valutare se la soluzione prodotta possa o meno rappresentare una correzione valida. La validazione è implementata tramite un'euristica che valuta se la soluzione trovata è troppo lontana (in termini di distanza di Levenshtein) dal token mascherato. Chiamando $l$ la lunghezza in caratteri del token mascherato, e $d$ la distanza di Levenshtein fra il token mascherato e la soluzione trovata, la soluzione è valida se:
 \begin{itemize}
 \item $l > 10 \wedge d < 5$ 
 \item $l > 5 \wedge d < 4$ 
@@ -296,79 +297,136 @@ Se la validazione scarta la soluzione trovata il sistema ignora la correzione. A
 Il processo appena descritto si ripete per ogni errore contrassegnato durante la fase di error detection. Una volta completata la correzione dell'ultimo token errato, la fase di error correction può dirsi conclusa.
 
 \subsubsection{Ripetizione}
-In frasi contenenti molti errori, è possibile che una sola applicazione del modulo di correzione token non basti correggere tutti i non-word errors. Ciò è dovuto al funzionamento di BERT, che usa il contesto a destra e sinistra della maschera per produrre i candidati di correzione. Se questo contesto è sporcato da molti errori, è più probabile che BERT non sia in grado di produrre una soluzione adeguata. \E\ quindi possibile che dopo l'applicazione di questo o altri moduli, e la conseguente correzione di alcuni errori, sia possibile ottenere migliori risultati sulle correzioni precedentemente non riuscite.
+In frasi contenenti molti errori, è possibile che una sola applicazione del modulo di correzione token non basti correggere tutti i non-word errors.\\
+Ciò è dovuto al funzionamento di BERT, che usa il contesto a destra e sinistra della maschera per produrre i candidati di correzione. Se questo contesto è sporcato da molti errori, è più probabile che BERT non sia in grado di produrre una soluzione adeguata. \E\ quindi possibile che dopo l'applicazione di questo o altri moduli, e la conseguente correzione di alcuni errori, sia possibile ottenere migliori risultati sulle correzioni precedentemente non riuscite.\\
+Questo approccio comporta però uno svantaggio: se la prima o una della prime correzioni sono sbagliate, il rischio è quello di introdurre rumore anche nelle correzioni successive.
 
 \subsection{Modulo di correzione Split}
 \label{sec:met_mod_split}
 
 \subsubsection{Error detection}
 \label{sec:met_split_errdet}
-Il modulo di correzione Split corregge tutti gli errori di spezzettamento con spazi (SP).
+Il modulo di correzione Split corregge tutti gli errori di tipo SP.\\
 La fase di error detection si compone di tre stadi:
 \begin{enumerate}
-\item \textbf{Individuazione delle sequenze}: data un frase contenente errori di tipo SP, sono delimitati i punti di inizio e terminazione delle sequenze contenenti errori. L'individuazione di tali sequenze è eseguita tramite la seguente espressione regolare:
+\item \textbf{Sequences marking}: data un frase contenente errori di tipo SP, sono delimitati i punti di inizio e terminazione delle sequenze contenenti errori. L'individuazione di tali sequenze è eseguita tramite la seguente espressione regolare:
 \begin{lstlisting}[language=Python]
 r'(?:\s|^)(\w(?:\W?\s\w{1,2}){3,})(?:\W|\s|$)'
 \end{lstlisting}
 La precedente espressione regolare intercetta tutte le sequenze di almeno tre gruppi di caratteri alfanumerici con lunghezza massima due intervallati da spazi e/o caratteri non alfanumerici. Per maggiore chiarezza, in \autoref{table:met_split_esempi} sono riportati alcuni esempi di sequenze riconosciute.
 
-\item \textbf{Filtraggio punteggiatura}: all'interno delle sequenze vengono rimossi tutti i caratteri non alfanumerici o spaziature. Ciò serve e rimuovere eventuali segni di punteggiatura spuri che possono diminuire l'efficacia delle seguenti fasi.
+\item \textbf{Punctuation filtering}: all'interno delle sequenze vengono rimossi tutti i caratteri non alfanumerici o spaziature. Ciò serve e rimuovere eventuali segni di punteggiatura spuri che possono diminuire l'efficacia delle seguenti fasi.
 
-\item \textbf{Validazione errore:} non tutte le sequenze riconosciute dall'espressione regolare sono degli errori. Si pensi ad esempio ad una serie di preposizioni o congiunzioni, come il quarto esempio in \autoref{table:met_split_esempi}. Si usa quindi un'euristica per scartare le sequenze che si ritenga non contengano errori. Sono considerati errori tutte le sequenze nelle quali il numero di gruppi di 2 caratteri è minore del numero di gruppi di 1 carattere.
+\item \textbf{Error validation:} non tutte le sequenze riconosciute dall'espressione regolare sono degli errori. Si pensi ad esempio ad una serie di preposizioni o congiunzioni, come il quarto esempio in \autoref{table:met_split_esempi}. Si usa quindi un'euristica per scartare le sequenze che si ritenga non contengano errori. Sono considerati errori tutte le sequenze nelle quali il numero di gruppi di 2 caratteri è minore del numero di gruppi di 1 carattere.
 
 \end{enumerate}
 
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ccc}
-	\textbf{Frase} & \textbf{Sequenza} & \textbf{Errore} \\ \hline
+	\begin{tabular}{cccc}
+	\textbf{\#} & \textbf{Frase} & \textbf{Sequenza} & \textbf{Errore} \\ \hline
 	
-	\textit{"d i l e t t i membri, della ..."}	&	\textit{d i l e t t i}	&	Sì \\
-	\textit{"guidato d ui l l a fede"}			& 	\textit{d ui l l a}		&	Sì \\
-	\textit{"... altro tipo di u n i o, n e."}	&	\textit{u n i o, n e}	&	Sì \\
-	\textit{"in me e io in te, siano anch..."}	&	\textit{in me e io in te}&	No
+	1 &\textit{"d i l e t t i membri, della ..."}	&	\textit{d i l e t t i}	&	Sì \\
+	2 &\textit{"guidato d ui l l a fede"}			& 	\textit{d ui l l a}		&	Sì \\
+	3 &\textit{"... altro tipo di u n i o, n e."}	&	\textit{u n i o, n e}	&	Sì \\
+	4 &\textit{"in me e io in te, siano anch..."}	&	\textit{in me e io in te}&	No \\
+	5 &\textit{"...dopo qu al ch e esitazione..."}	&	\textit{qu al ch e}&	Sì\\
+	6 &\textit{"...dopo q u al che esitazione..."}	&	\textit{q u al}&	Sì\\
+	7 &\textit{"...dopo qu al che esitazione..."}	&	/ &	/\\
 	\end{tabular}
 	\caption{Esempi di sequenze riconosciute}
 	\label{table:met_split_esempi}
 \end{table}
-
-Data quindi una frase $F$ contenente errori di segmentazione, la fase di error detection è formalizzata come segue:
-\begin{equation}
-\textit{ED}_{split}: F \rightarrow [(s_1,b_1,e_1),...,(s_n,b_n,e_n)] = L_{seq}
-\end{equation}
-dove:
+L'approccio di error correction appena esposto presenta però alcune limitazioni. Se uno dei gruppi della parola divisa contiene più di tre caratteri alfanumerici, la sequenza prodotta può:
 \begin{itemize}
-\item Ogni tupla corrisponde ad un errore individuato e validato
+\item Non essere riconosciuta. \E\ il caso dell'esempio 7 nella \autoref{table:met_split_esempi}. In questo caso, il gruppo \textit{"che"} non è catturato dall'espressione regolare. Ciò comporta che il numero di gruppi di caratteri sia troppo basso per essere riconosciuto dall'espressione regolare.
+\item Essere riconosciuta parzialmente.  \E\ il caso dell'esempio 6 nella \autoref{table:met_split_esempi}. In questo caso, il gruppo \textit{"che"} non è catturato dall'espressione regolare. Ciò comporta che venga catturata la sequenza \textit{"q u a l"}, che verrà corretta, introducendo possibilmente un errore. Il gruppo \textit{"che"}, invece, viene erroneamente considerato corretto.
+\end{itemize}
+\ \\
+Data quindi una frase $f \in F$ contenente errori di segmentazione, dove $F$ è l'insieme di tutte le frasi, la fase di error detection è formalizzata come segue:
+\begin{equation}
+\textit{ED}_{split}: F \rightarrow L_{seq}
+\end{equation}
+dove ogni $l_{seq} \in L_{seq}$ è un insieme di tuple $[(s_1,b_1,e_1),...,(s_n,b_n,e_n)]$ nel quale ogni tupla corrisponde ad un errore individuato e validato. Ogni tupla è composta come segue:
+\begin{itemize}
 \item $s_i$ è la sequenza filtrata contenente l'errore
-\item $b_i$ è il punto di inizio in $F$ della sequenza
-\item $e_i$ è il punto di fine in $F$ delle sequenze
+\item $b_i$ è il punto di inizio in $f$ della sequenza
+\item $e_i$ è il punto di fine in $f$ delle sequenze
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{immagini/metodologia/split_error_detection}
-\caption{Schema del processo di error detection. Nell'immagine, ogni $c_i$ è un carattere}
-\label{fig:met_split_errdet}
-\end{figure}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[width=\textwidth]{immagini/metodologia/split_error_detection}
+%\caption{Schema del processo di error detection. Nell'immagine, ogni $c_i$ è un carattere}
+%\label{fig:met_split_errdet}
+%\end{figure}
 
 \paragraph{Esempio}
 Data la frase:
 \begin{center}
 \textit{coinvolsero ogni uomo \ul{e o' g n i} donna, \ul{p r o c u r a n d o}.}
 \end{center}
-si procede con lo stadio di individuazione delle sequenze. Le sequenze individuate sono quello sottolineate nella frase data. Sono riportate di seguito, nel seguente formato (sequenza,posizione inizio sequenza, posizione fine sequenza):
-\begin{enumerate}
-\item \textit{"e o' g n i"}, 22, 32
-\item \textit{"p r o c u r a n d o"}, 40, 59
-\end{enumerate}
 
-Si procede quindi con lo stadio di filtraggio:
-\begin{enumerate}
-\item \textit{"e o g n i"}, 22, 32
-\item \textit{"p r o c u r a n d o"}, 40, 59
-\end{enumerate}
-Si noti come nella prima sequenza è stato cancellato un apostrofo, ma le posizioni di inizio e fine rimangono le stesse. Lo stadio di validazione in questo caso non scarta alcuna soluzione: in entrambe le sequenze, infatti, il numero di gruppi di 1 carattere è maggiore del numero di gruppi di 2 caratteri.
+
+\begin{table}[H]
+\centering
+\tabcolsep=0.16cm
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+0&1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16&17&18&19\\
+\hline
+c&o&i&n&v&o&l&s&e&r&o& &o&g&n&i& &u&o&m\\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\tabcolsep=0.11cm
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+20&21&22&23&24&25&26&27&28&29&30&31&32&33&34&35&36&37&38&39\\
+\hline
+o& &e& &o&'& &g& &n& &i& &d&o&n&n&a&,&\\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\tabcolsep=0.11cm
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+40&41&42&43&44&45&46&47&48&49&50&51&52&53&54&55&56&57&58&59\\
+\hline
+p& &r& &o& &c& &u& &r& &a& &n& &d& &o&.\\
+\hline
+\end{tabular}
+\caption{Caratteri e indici delle frase esempio}
+\end{table}
+
+
+
+
+si procede con lo stadio di sequences marking. Le sequenze individuate sono quelle sottolineate nella frase data. Sono riportate di seguito insieme alla loro posizione di inizio e di fine.
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\#&\textbf{Sequenza} & \textbf{Pos.Inizio} & \textbf{Pos.Fine}\\ \hline
+1&\textit{"e o' g n i"}&22& 32\\
+2&\textit{"p r o c u r a n d o"}& 40& 59\\
+\end{tabular}
+\end{table}
+
+Si procede quindi con lo stadio di punctuation filtering:
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\#&\textbf{Sequenza} & \textbf{Pos.Inizio} & \textbf{Pos.Fine}\\ \hline
+1&\textit{"e o g n i"}&22& 32\\
+2&\textit{"p r o c u r a n d o"}& 40& 59\\
+\end{tabular}
+\end{table}
+Si noti come nella prima sequenza è stato cancellato un apostrofo, ma le posizioni di inizio e fine rimangono le stesse, in quanto demarcano l'inizio e la fine della sequenza nella frase originale. Lo stadio di error validation in questo caso non scarta alcuna soluzione: in entrambe le sequenze, infatti, il numero di gruppi di 1 carattere è maggiore del numero di gruppi di 2 caratteri.
 
 \subsubsection{Error correction}
 \label{sec:met_split_errcor}
@@ -379,9 +437,9 @@ EC_{split}: (F,L_{seq}) \rightarrow F_{corr}
 dove $F_{corr}$ è la frase con le correzione apportate.\\
 La fase di Error Correction si compone dei seguenti stadi:
 \begin{enumerate}
-\item \textbf{Compressione:} per ogni sequenza $s_i$ individuata da correggere, si rimuovono gli spazi bianchi, in modo da ottenere un'unica parola continua detta $s\prime_i$.
-\item \textbf{Correzione con vocabolario}: se una sequenza $s\prime_i$ è presente nel vocabolario, allora è $s\prime_i$ viene inserita nella frase al posto della sequenza contenente l'errore.
-\item \textbf{Correzione con BERT:} si fa uso del BERT MLM per trovare una correzione, in modo simile a quanto fatto nel modulo di correzione token. A seconda della tipologia dell' errore sono applicabili due strategie di correzione.
+\item \textbf{Compression:} per ogni sequenza $s_i$ individuata da correggere, si rimuovono gli spazi bianchi, in modo da ottenere un'unica parola continua detta $s\prime_i$.
+\item \textbf{Vocabulary correction}: se una sequenza $s\prime_i$ è presente nel vocabolario, allora è $s\prime_i$ viene inserita nella frase al posto della sequenza contenente l'errore.
+\item \textbf{BERT correction:} si fa uso del BERT MLM per trovare una correzione, in modo simile a quanto fatto nel modulo di correzione token. A seconda della tipologia dell' errore sono applicabili due strategie di correzione.
 		\begin{itemize}
 		\item Con sottrazione		
 		\item Con rimpiazzo		
@@ -391,9 +449,9 @@ La fase di Error Correction si compone dei seguenti stadi:
 Ognuno degli stadi appena descritti è applicato in sequenza ad ogni singola tupla prodotta dalla fase precedente.
 
 \paragraph{Funzione di sostituzione}
-Viene introdotta una funzione detta funzione di sostituzione. Data una frase $F$, una sequenza $s$, una valore di inizio $b$ e un valore di fine $e$, la funzione è definita come:
+Viene introdotta una funzione detta funzione di sostituzione. Data una frase $f \in F$, una sequenza $s \in S$, una valore di inizio $b \in I$ e un valore di fine $e \in E$, la funzione è definita come:
 \begin{equation}
-\textit{Sos}: (F,s,b,e) \rightarrow F\prime
+\textit{Sos}: (F,S,I,E) \rightarrow F\prime
 \end{equation}
 dove $F\prime$ è la frase $F$ in cui tutti i caratteri fra $b$ ed $e$ sono stati sostituiti da $s$.\\
 Alternativamente, definendo come $T$ la tupla $(s,b,e)$ è possibile scrivere la funzione anche come segue:
@@ -402,32 +460,36 @@ Alternativamente, definendo come $T$ la tupla $(s,b,e)$ è possibile scrivere la
 \end{equation}
 Ad esempio, data la frase $f_{es}$:
 \begin{center}
-\textit{Onorando una tradizione plurisecolare}
+\textit{Onorando una trod1z1one plurisecolare}
 \end{center}
-e la tupla $t_{es}$ (\textit{"usanza"},14,25), si ha che:
+e la tupla $t_{es}$ (\textit{"tradizione"},14,25), si ha che:
 \begin{equation}
-\textit{Sos}(f_{es},t_{es}) = \textit{Onorando una usanza plurisecolare}
+\textit{Sos}(f_{es},t_{es}) = \textit{Onorando una tradizione plurisecolare}
 \end{equation}
 
 
-\paragraph{Compressione}
-Lo stadio di compressione rimuove gli spazi da ogni sequenza $s$ individuata come errore. Più formalmente, data una tupla $(s,b,e)$, lo stadio di compressione è definito come segue:
+\paragraph{Compression}
+Lo stadio di compression rimuove gli spazi da ogni sequenza $s$ individuata come errore. Più formalmente, data una tupla $(s,b,e) \in T$ , lo stadio di compression è definito come segue:
 \begin{equation}
-\textit{Comp}: (s,b,e) \rightarrow (s\prime,b,e)
+\textit{Comp}: T \rightarrow T\prime
 \end{equation}
-dove $s\prime$ è la sequenza $s$ senza spaziature. Riprendendo l'esempio proposto nella fase di error detection, le tuple prodotte diventano rispettivamente:
-\begin{enumerate}
-\item \textit{"eogni"}, 22, 32
-\item \textit{"procurando"}, 40, 59
-\end{enumerate}
+dove in cui $T\prime$ è l'insieme di tutte le tuple $(s\prime,b,e)$ in cui $s\prime$ è la sequenza $s$ senza spaziature. Riprendendo l'esempio proposto nella fase di error detection, le tuple prodotte diventano rispettivamente:
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\#&\textbf{Sequenza} & \textbf{Pos.Inizio} & \textbf{Pos.Fine}\\ \hline
+1&\textit{"eogni"}&22& 32\\
+2&\textit{"procurando"}& 40& 59\\
+\end{tabular}
+\end{table}
 
-\paragraph{Correzione con vocabolario}
-Date le tuple prodotte dallo stadio precedente, lo stadio di correzione con vocabolario applica una correzione per tutte le tuple la cui sequenza corrisponde ad una parola presente nel vocabolario. \\
+\paragraph{Vocabulary correction}
+Date le tuple prodotte dallo stadio precedente, lo stadio di vocabulary correction applica una correzione per tutte le tuple la cui sequenza corrisponde ad una parola presente nel vocabolario. \\
 Data quindi la frase $F$ contenente errori di segmentazione e una tupla $(s\prime,b,e)$ detta $t_{corr}$ che rispetta la condizione enunciata precedentemente, la frase con la correzione applicata $F_{corr}$ si ottiene come segue:
 \begin{equation}
 F_{corr} = \textit{Sos}(F,t_{corr})
 \end{equation}
-Se la tupla che si sta trattando può essere utilizzata per una correzione con vocabolario, la correzione si arresta in questo stadio. Altrimenti, si procede allo stadio di correzione con BERT.\\
+Se la tupla che si sta trattando può essere utilizzata per una correzione con vocabolario, la correzione si arresta in questo stadio. Altrimenti, si procede allo stadio di BERT correction.\\
 Continuando l'esempio predente, si nota come la seconda tupla contenga la sequenza "procurando" che è una parola all'interno del vocabolario. Ricordando la frase originale
 \begin{center}
 \textit{coinvolsero ogni uomo e o' g n i donna, p r o c u r a n d o.}
@@ -442,8 +504,8 @@ Il risulta è la frase $F_{corr}$:
 \end{center}
 
 
-\paragraph{Correzione con BERT}
-Per tutte le tuple per le quali non è stato possibile applicare una correzione con vocabolario, si passa allo stadio di correzione con BERT. Il primo step di questo stadio consiste nel mascheramento della sequenza errata nella fase originale. Data una tupla $(s\prime,b,e)$ prodotta dallo stadio di compressione e una frase $F$, si ottiene la frase mascherata $F_{mask}$ come segue:
+\paragraph{BERT correction}
+Per tutte le tuple per le quali non è stato possibile applicare una correzione con vocabolario, si passa allo stadio di BERT correction. Il primo step di questo stadio consiste nel mascheramento della sequenza errata nella fase originale. Data una tupla $(s\prime,b,e)$ prodotta dallo stadio di compressione e una frase $F$, si ottiene la frase mascherata $F_{mask}$ come segue:
 \begin{equation}
 F_{mask} = \textit{Sos}(F,\textit{[MASK]},b,e)
 \end{equation}
