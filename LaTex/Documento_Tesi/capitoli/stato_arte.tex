@@ -37,7 +37,7 @@ OCR pre-processing e post-processing sono spesso usati in congiunzione per otten
 In letteratura sono presenti numerosi approcci al problema dell'OCR post-processing, molti dei quali adottano strategie molto differenti. Dato ciò, non è possibile delineare una metodologia generale che ogni approccio segue, ma, in generale, ogni approccio deve:
 \begin{enumerate}
 \item \textbf{Identificare gli errori} (Error Detection), ovvero delimitare tutte le sezioni contenenti errori nel testo, senza delimitare sezioni corrette. \hl{Espandere?}
-\item \textbf{Correggere gli errori} (Error Correction), ovvero ripristinare testo originale nelle sezioni individuate in precedenza. \hl{Espandere?}
+\item \textbf{Correggere gli errori} (Error Correction), ovvero ripristinare il testo originale nelle sezioni individuate in precedenza. \hl{Espandere?}
 \end{enumerate}
 
 Nelle seguenti sottosezioni sono quindi esposti alcuni dei principali approcci per letteratura, raggruppati nelle seguenti categorie di metodologie:
@@ -116,17 +116,61 @@ re, their, there\}. I candidati per un possibile errore sono quindi le parole ap
 
 \item Error Correction. Per ogni candidato si considera un intorno di 2 parole, andando così a comporre un 5-gram. Se il 5-gram in cui è presente l'errore nel testo è $[t_1,t_2,\textit{err},t_3,t_4]$, allora per il candidato $c_i$ sarà $[t_1,t_2,c_i,t_3,t_4]$. Il candidato scelto è quello il cui 5-gram compare più volte in \gw. In caso nessun 5-gram compaia nel dataset, il processo si ripete con il 3-gram $[t_2,c_i,t_3]$ e successivamente solo con l'unigram $[c_i]$, ovvero viene scelto il candidato con la maggior frequenza nel corpus.
 \end{enumerate}
-Gli approcci fin'ora descritti, seppur molto efficaci contro i non-word errors, ma non correggono o sono poco efficaci contro i real-word errors e altri tipi di errori. Si pensi ad esempio a situazioni in cui token viene separato da spazi, o in cui due token sono fusi insieme. Inoltre questi approcci, richiedono un'elevata quantità di dati per funzionare efficacemente (\gw\ occupa 87GiB su disco) , il che non li rende facilmente applicabili.
+Gli approcci descritti fino ad ora, seppur molto efficaci contro i non-word errors, ma non correggono o sono poco efficaci contro i real-word errors e altri tipi di errori. Si pensi ad esempio a situazioni in cui token viene separato da spazi, o in cui due token sono fusi insieme. Inoltre questi approcci, richiedono un'elevata quantità di dati per funzionare efficacemente (\gw\ occupa 87GiB su disco) , il che non li rende facilmente applicabili.
 
 % Potrei aggiungere cose anche da https://aclanthology.org/H05-1109.pdf
 % o da https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8978061
 
 \subsection{Approcci basati su NMT}
+%Neural machine translation is a recently proposed approach to machine translation. Unlike the traditional statistical machine translation, the neural machine
+%translation aims at building a single neural network that can be jointly tuned to
+%maximize the translation performance.
+\paragraph{Neural Machine Translation} Il Neural Machine Translation (NMT) è un approccio al machine translation che consiste nella costruzione di un solo neural network che può essere messo a punto singolarmente per massimizzare le performance di traduzione\cite{nmtdef}. I modelli più recenti nel campo del NMT sfruttano la cosiddetta architettura encoder-decoder (\autoref{fig:art_encdec}). Tali modelli sono anche comunemente riferiti come modelli sequence-to-sequence (seq2seq), in quanto trasformano una sequenza di caratteri o lettere appartenente a un dominio (ad esempio quello dell frasi in lingua italiana) ad una sequenza appartenente ad un altro dominio (ad esempio quello delle frasi in lingua inglese). In questi modelli, la frase iniziale passa attraverso l'encoder, che ne restituisce una rappresentazione sotto forma di una lista di valori numerici. Successivamente, questi valori sono dati in input al decoder, che produce una frase con lo stesso significato, ma con il vocabolario e la grammatica della lingua target. Encoder e decoder possono essere implementati con diverse architetture, ma, data la natura dei dati trattati (dati sequenziali, come frasi), sono spesso implementati con dei Recurrent Neural Network (RNN).
 
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{immagini/stato_arte/encoder_decoder}
+\caption{Schema semplificato di un'architettura encoder-decoder che traduce da italiano a inglese}
+\label{fig:art_encdec}
+\end{figure}
+
+L'idea che gli approcci in questa sezione propongono è quindi quella di trattare il problema della correzione degli errori come un problema di traduzione di sequenze: dato il dominio $E$ delle sequenze contenenti errori, e il dominio $C$ delle sequenze corrette (detto anche Ground Truth, abbreviato GT), il modello seq2seq che effettua la traduzione può essere visto come la seguente funzione:
+\begin{equation}
+M: E \rightarrow C
+\end{equation}
+Allo stesso modo, ogni modello necessita prima di essere allenato con corpus parallelo dove ad ogni sequenza $e \in E$ corrisponde un sequenza corretta $c \in C$.
+
+\paragraph{Modelli Word Based e Character based} Come si è visto, i modelli seq2seq trasformano una sequenza in un'altra sequenza. In base al tipo di elementi che compongono tali sequenze, è possibile descrivere due tipologie di modelli:
+\begin{itemize}
+\item Modelli Word Based (da qui in poi riferiti come WB): in questo tipo modelli un elemento corrisponde ad una parola, o meglio, ad un token. Questo tipo di approcci richiede quindi che tutte le sequenze in $E$ e in $C$ siano tokenizzate. Inoltre, prima dell'allenamento, è necessario estrarre i dizionari della lingua d'origine e della lingua target dai corpora utilizzati.
+\item Modelli Character Based (da qui in poi riferiti come CB): in questo tipo di modelli un elemento corrisponde ad un carattere. Prima del training, è necessario estrarre il set di caratteri della lingua d'origine e della lingua target dai corpora utilizzati.
+\end{itemize}
+Da un'analisi della letteratura, si evince come i modelli CB siano generalmente preferiti per il task dell'OCR Post-Processing\cite{mokhtar2018ocr,hamalainen2019paft,nguyen2020neural,
+nastase2018correction,duong2020unsupervised,amrhein2018supervised}.
+In \cite{mokhtar2018ocr} viene proposto un confronto sullo stesso corpus fra due architetture molto simili, la prima WB e la seconda CB. Nello studio, gli autori concludono come l'architettura character based produca risultati significativamente migliori. I modelli CB infatti riescono a correggere gli errori a livello di carattere, e ciò comporta i seguenti vantaggi:
+\begin{itemize}
+\item A differenza dei modelli WB, i modelli CB possono correggere anche errori in parole non presenti nel dizionario estratto.
+\item Rispetto ai modelli WB, sono richiesti meno dati durante la fase di allenamento.
+\end{itemize}
+
+
+\paragraph{Approcci basati su NMT}
+Il primo approccio presentato è quello descritto in \cite{nguyen2020neural}. Nella soluzione presentata gli autori utilizzano il tool OpenNMT\cite{klein2017opennmt} per allenare un modello CB. Il modello è allenato sia con coppie di sequenze identiche (quindi senza errori) che con sequenze dove la frase acquisita tramite OCR e la GT differiscono. Per queste ultime è adottata la seguente strategia di data augmentation: per ogni errore, si costruiscono cinque 5-gram con il token errato e i suoi token vicini facendo scorrere una finestra sopra la sezione di testo contenente il token errato. In questo modo si producono 5 sequenze diverse che possono essere usate per il training, evitando di un avere un modello con troppo bias verso le sequenze senza errori. L'approccio per la correzione si divide dunque in due fasi: un prima fase di error detection utilizza un modello BERT (si rimanda il lettore alla \autoref{sec:art_bert}) messo a punto per la classificazione per individuare gli errori nelle sequenze; una seconda fase di error correction invece utilizza il modello di NMT allenato precedentemente per correggere gli errori.\\
+In \cite{amrhein2018supervised} si utilizza una metodologia simile per il training del modello, sviluppato con il framework Nematus\cite{sennrich2017nematus}. Questo approccio utilizza una tecnica chiamata "factored NMT", utilizzata anche in \cite{nguyen2020neural}, che permette di aggiungere informazioni strutturate alle sequenze in input. Ad esempio, è possibile aggiungere ad ogni carattere della sequenza informazioni sull'identificativo e l'anno del corpus di provenienza. Ciò permette di usare più corpora eterogenei per l'allenamento di un solo modello, aumentando così i dati a disposizione.\\
+\cite{nastase2018correction} propone invece un approccio per correggere unicamente i word segmentation errors (si rimanda il lettore alla \autoref{sec:met_introduzione}), ovvero errori introdotti da spazi spuri che influiscono sulla segmentazione del testo. La metodologia proposta allena un modello su coppie di sequenze così composte: la sequenza target è una sequenza corretta senza errori; la sequenza di input invece è la sequenza target senza spaziature. In questo modo, il modello è allenato per inserire correttamente gli spazi e può essere usato per correggere i word segmentation error.\\
+In \cite{hamalainen2019paft} si propone invece un approccio per il post processing e l'allenamento di un modello di NMT senza disporre di un corpus parallelo. L'approccio propone di allenare modello Word2Vec direttamente sul corpus contenente gli errori introdotti dal software di OCR. Dopodiché, per ogni parola estratta corretta (la correttezza è verificata attraverso un dizionario) si usa il modello Word2Vec per trovare le parole semanticamente più simili. Di queste, quelle con distanza di Levenshtein minore o uguale di 3 sono considerate versioni errate della parola corretta. Successivamente, le coppie di parole corrette e parole versione errate sono usate per allenare il modello di NMT, che è poi utilizzato per la correzione. Dato che il risultante modello è allenato per la correzione di singole parole, gli errori di segmentazione non vengono corretti. Inoltre, si rende necessaria una fase di error detection basata su un dizionario. \\
+L'approccio proposto è ulteriormente sviluppato in \cite{duong2020unsupervised}. Gli autori procedono sempre con la creazione di un corpus parallelo per l'allenamento di un modello di NMT, ma con una diversa strategia. In questo caso si parte da sequenze senza errori, che fungono da input per l'allenamento, e si creano sequenze target mediante l'introduzione di errori in maniera controllata. Inoltre, in questo caso, le sequenze usate per l'allenamento sono degli 5-gram centrati sulla parola errata, con lo scopo di fornire un maggior contesto per migliorare la correzione.
 
 
 \subsection{Approcci basati su BERT}
+\label{sec:art_bert}
+
+% Non devo per forza citare 50 mila paper
+% Dico che c'è la possibilità che il soft masking possa funzionare e porto le prove
+
+
+
 \subsection{Altri Approcci}
 
 
