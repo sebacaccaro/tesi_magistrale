@@ -1,4 +1,5 @@
-In questo capitolo bla bla bla sezione .... \hl{Aggiungere}
+In questo capitolo si passa in rassegna lo stato dell'arte riguardante il tema dell'OCR post-processing.\\
+Nella \autoref{sec:arte_intro} è presentata un' introduzione al problema affrontato e alcune definizioni di base. Nella \autoref{sec:art_post_post} sono trattati gli approcci più recenti al problema dell'OCR post-processing presenti in letteratura, divisi in base al tipo di metodologia adottata. Per ogni categoria si fornisce una breve introduzione atta a rendere più chiari gli approcci presentati.
 
 \section{Introduzione}
 \label{sec:arte_intro}
@@ -36,8 +37,8 @@ OCR pre-processing e post-processing sono spesso usati in congiunzione per otten
 \label{sec:art_post_post}
 In letteratura sono presenti numerosi approcci al problema dell'OCR post-processing, molti dei quali adottano strategie molto differenti. Dato ciò, non è possibile delineare una metodologia generale che ogni approccio segue, ma, in generale, ogni approccio deve:
 \begin{enumerate}
-\item \textbf{Identificare gli errori} (Error Detection), ovvero delimitare tutte le sezioni contenenti errori nel testo, senza delimitare sezioni corrette. \hl{Espandere?}
-\item \textbf{Correggere gli errori} (Error Correction), ovvero ripristinare il testo originale nelle sezioni individuate in precedenza. \hl{Espandere?}
+\item \textbf{Identificare gli errori} (Error Detection), ovvero delimitare tutte le sezioni contenenti errori nel testo, senza delimitare sezioni corrette.
+\item \textbf{Correggere gli errori} (Error Correction), ovvero ripristinare il testo originale nelle sezioni individuate in precedenza
 \end{enumerate}
 
 Nelle seguenti sottosezioni sono quindi esposti alcuni dei principali approcci per letteratura, raggruppati nelle seguenti categorie di metodologie:
@@ -45,10 +46,7 @@ Nelle seguenti sottosezioni sono quindi esposti alcuni dei principali approcci p
 \item Approcci basati su n-grams
 \item Approcci basati su NMT
 \item Approcci basati su BERT
-\item Altri approcci
 \end{itemize}
-
-\hl{Controllo che non sia cambiato niente}
 
 \subsection{Approcci basati su n-grams}
 Per discutere gli approcci basati sugli n-grams è prima necessario definire i concetti di token, tokenizzazione e n-gram. 
@@ -165,15 +163,14 @@ L'approccio proposto è ulteriormente sviluppato in \cite{duong2020unsupervised}
 
 \subsection{Approcci basati su BERT}
 \label{sec:art_bert}
+%https://towardsdatascience.com/bert-explained-state-of-the-art-language-model-for-nlp-f8b21a9b6270
+\paragraph{BERT}
+BERT\cite{devlin2018bert} (Bidirectional Encoder Representation from Transformers) è un'architettura per la costruzione di modelli linguistici sviluppata da Google sulla base dei modelli transformers. Una delle differenze fra BERT e un transformer base consiste nella sola presenza di un encoder. Infatti, essendo BERT progettato solo per la modellazione linguistica (e non per la trasformazione di sequenze), non si rende necessaria la presenza di un decoder. Inoltre, a differenza dei modelli direzionali, in cui l'encoder legge il testo in input da sinistra verso desta o viceversa, l'encoder di BERT legge l'intera sequenza all'unisono. Ciò consente al modello di comprendere il contesto di una parola in base al testo a destra e sinistra di quest'ultima. I modelli BERT sono pre-allenati minimizzando la perdita combinata per i task di Masked Language Modelling (MLM) (\autoref{sec:met_BERT_MLM}) e Next Sentence Prediction (NSP). Dopo la fase di pre-allenamento è possibile eseguire il fine-tuning del modello per uno specifico task di NLP, come Classification, Question Answering e Named Entity Recognition (NER).
 
-% Non devo per forza citare 50 mila paper
-% Dico che c'è la possibilità che il soft masking possa funzionare e porto le prove
-
-
-
-\subsection{Altri Approcci}
-
-
+\paragraph{Approcci basati su BERT}
+In \cite{nguyen2020neural}  gli autori eseguono il fine tuning di un modello BERT per eseguire error detection in un dataset in lingua inglese. Ciò avviene dividendo in un primo momento la frase in input in sub-token tramite WordPiece. Il modello BERT classifica quindi i subtoken come validi o non validi: i token che contengono subtoken non validi sono segnalati quindi come errore.\\
+In \cite{OCRMaskFilling} gli autori usano una combinazione di BERT e FastText per generare possibili candidati per la correzione di errori introdotti da software OCR in testi in lingua inglese. Limitandosi ai 50 candidati più probabili prodotti con entrambi i metodi, la giusta correzione è presente fra i candidati nel 71\% dei casi. Non è tuttavia proposto un metodo per scegliere il candidato corretto.\\
+In \cite{zhang2020spelling} gli autori combinano un neural network di classificazione binaria per l'error detection e un'ulteriore neural network basato su BERT per l'error correction. I token (che in questo caso sono caratteri, dato che l'approccio lavora su testi in lingua cinese)  marcati come errore sono mascherati dal correction network, che propone e sceglie successivamente le soluzioni con più probabilità di essere corrette. I due network sono allenati congiuntamente con un approccio end-to-end, con la loss function che è data da una combinazione lineare delle loss function di correction e detection network.
 
 
 
