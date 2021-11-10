@@ -1,0 +1,153 @@
+\hl{TODO: Riasunto capitolo}
+bla bla bla bla
+
+\section{Introduzione}
+\label{dst:intro}
+Lo sviluppo di un sistema di OCR post-processing non può prescindere dall'esecuzione di test per valutare, migliorare e confrontare le soluzioni adottate. Ciò rende necessario l'utilizzo di un dataset sul quale poter eseguire tutte le batterie di test necessarie. Tale dataset deve inoltre essere strutturato in modo tale da permettere di calcolare facilmente le metriche descritte in \hl{TODO: inserire cit a cap 5}. Se infatti lo scopo di un sistema di OCR post-processing è quello di correggere gli errori introdotti dai software di OCR, è necessario conoscere la posizione degli errori per controllare se siano stati corretti o meno.\\
+La soluzione più semplice a questo problema è quella di disporre, per ogni frammento del dataset, sia del testo acquisito tramite OCR (e quindi contenente errori), sia del testo originale, detto anche ground truth. Non è però semplice trovare dataset di questo tipo, specialmente se in lingua italiana. Spesso, infatti, è necessario che la ground truth sia acquisita manualmente con un grosso dispendio di tempo e risorse: a causa di ciò, questo approccio non è stato considerato percorribile.\\
+Si è invece deciso di adottare un approccio differente, che consiste nell'introduzione artificiale di errori all'interno di testo nativamente digitale (e quindi senza errori) per simulare l'acquisizione tramite software di OCR. I vantaggi del processo appena descritto, detto "perturbazione", sono riassumibili nei seguenti punti:
+\begin{itemize}
+ \item Produrre il dataset, una volta definita la funzione che esegue la perturbazione, è molto meno oneroso in termini di tempo e risorse. L'unico requisito è quello di procurarsi una collezione sufficientemente ampia di testo in formato digitale. Ciò è relativamente semplice, e può essere fatto, ad esempio, tramite web scraping.
+ 
+ \item \E\ possibile definire arbitrariamente l'intensità e la tipologia degli errori nel testo tramite l'uso di diverse funzioni di perturbazione. Ciò permette, dato un singolo testo di partenza, di ottenere testi con diverse intensità e tipologie di errori. In questo modo si rende possibile valutare le performance del sistema di OCR post-processing al variare delle condizioni del testo dato in input.
+\end{itemize} 
+
+Il principale rischio che si corre utilizzando l'approccio appena descritto risiede nel fatto che il testo perturbato potrebbe non rispecchiare fedelmente gli errori presenti in testo acquisito realmente tramite software di OCR.
+
+\section{Creazione del dataset}
+\label{dst:creazione}
+Il dataset di partenza è una collezione di 15073 documenti in formato JSON, ottenuti mediante il web scraping del sito ufficiale del vaticano \url{www.vatican.va}. \hl{TODO: Domanda: Devo citare il lab per il dataset? Se si, come?} I documenti contengono preghiere, lettere, discorsi, encicliche ecc. editi da figure ecclesiastiche dal 1439 al 2021.\\
+Ogni documento è caratterizzato dalla struttura descritta in \autoref{tab:dst_docstrut}.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+\textbf{Nome campo} & \textbf{Contenuto} \\ \hline
+title & Titolo del documento \\
+description & Insieme di keyword del documento\\
+author & Autore del testo nel documento \\
+creator & Coincide con author \\
+language & Codice della lingua del documento (es. it, fr) \\
+date & Data di redazione del documento \\
+url & Url da cui è stato il documento \\
+class & Tipologia di documento (es. discorso, preghiera...)\\
+text & Testo completo estratto dal documento (titolo compreso)\\
+url\_references & Link al feed RSS del sito del vaticano \\
+text\_references & Posizione della pagina nella gerarchia del sito\\
+italic & Testo estratto in corsivo nella pagina \\
+paragraphs & Testo estratto diviso in paragrafi contenenti id e testo
+\end{tabular}
+\caption{Struttura di un documento nel dataset}
+\label{tab:dst_docstrut}
+\end{table}
+
+Dato il dataset descritto, l'obiettivo è quello di trasformalo in un formato consono al testing. Nello specifico, è necessario frammentare il testo contenuto nei documenti in frasi di lunghezza minima e massima predeterminate. Le ragioni di questa decisione sono approfondite in \hl{TODO: ref a capitolo 5}, ma in breve, spezzare il testo in frammenti più piccoli facilita il processo di allineamento delle frasi e quindi la valutazione delle correzioni. Per ognuno dei frammenti si vogliono poi produrre più versioni perturbate con diverse funzioni di perturbazione. Infine, è necessario che le frasi siano accompagnate da dei metadati che consentano la ricomposizione del testo originale mediante il riordinamento dei frammenti.\\
+La creazione del dataset per il testing, descritta nelle prossime sezioni, segue dunque le seguenti fasi:
+\begin{enumerate}
+\item Filtraggio lingue
+\item Estrazione
+\item Frammentazione
+\item Filtraggio paragrafi
+\item Perturbazione
+\item Riduzione (Opzionale)
+\end{enumerate}
+
+\paragraph{Filtraggio lingue}
+In questa fase vengono filtrati tutti i documenti non presenti fra lingue scelte. Dato l'insieme dei documenti $D$ e l'insieme delle lingue consentite $L$, l'insieme filtrato dei documenti $D_{fl}$ si ottiene come segue:
+\begin{equation}
+D_{fl} = \{d \in D | \textit{language}_d \in L  \} 
+\end{equation}
+dove, dato un documento $d \in D$, $\textit{language}_d$ è la lingua in cui è redatto. Le lingue scelte per la creazione del dataset sono elencate nella \autoref{dst:configurazione}.
+
+\paragraph{Estrazione}
+In questa fase sono scartati i campi superflui ai fini del testing, e sono ritenuti solo i paragrafi assieme ad alcuni metadati utili a ricomporre il testo originale in seguito. \E\ possibile formalizzare la prima parte di questa fase come segue:
+\begin{equation}
+D_{es1} = \{ meta({paragraphs}_d) \forall d \in D  \}
+\end{equation}
+dove la funzione $meta$ aggiunge ai paragrafi in ${paragraphs}_d$ l'id del documento di provenienza. Si ottiene quindi un insieme di insiemi di paragrafi, dove ogni paragrafo è strutturato come in \autoref{tab:dst_parstrut}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+\textbf{Nome campo} & \textbf{Contenuto} \\ \hline
+text  & Testo contenuto nel paragrafo\\
+parId & Codice del paragrafo all'interno del documento \\
+docId & Codice del documento di provenienza del paragrafo.
+\end{tabular}
+\caption{Struttura di un paragrafo}
+\label{tab:dst_parstrut}
+\end{table}
+
+La fase di estrazione è completata appiattendo le liste di paragrafi nell'insieme $D_{es1}$ 
+\begin{equation}
+D_{es} = \bigcup\limits_{p \in D_{es1}} p
+\end{equation}
+$D_{es}$ contiene quindi tutti i paragrafi del dataset iniziale strutturati come mostrato in \autoref{tab:dst_parstrut}.
+
+
+
+\paragraph{Frammentazione}
+Lo scopo di questa fase è quello di scomporre i paragrafi estratti nella fase precedente in frammenti più brevi, detti frasi, con le seguenti caratteristiche:
+\newcommand{\lmin}{$l_{min}$}
+\newcommand{\lmax}{$l_{max}$}
+\begin{itemize}
+\item Ogni frase è disgiunta dalla altre frasi estratte dal medesimo paragrafo.
+\item Ogni frase è compresa fra una lunghezza minima \lmin\ e una lunhezza massima \lmax\ (\autoref{dst:configurazione}).
+\end{itemize}
+
+Dato quindi il testo di un paragrafo $text_p$, la frammentazione avviene secondo la seguente procedura:
+
+\begin{enumerate}
+\item Se la lunghezza di $text_p$ è minore di \lmin, non si procede e si scarta la stringa.
+\item Si divide $text_p$ su un segno di punteggiatura fra i seguenti: "?", "!", ";", ":", ".", ",". Se sono disponibili più opzioni (ovvero più punti in cui è possibile dividere su segni di punteggiatura) si divide nel punto minore o uguale a \lmax\ che più si avvicina al valore di \lmax. La parte a sinistra del punto di divisione è una frase estratta. La parte a destra invece viene riutilizza come input della procedura di frammentazione, tornando al punto 1. Se non fosse possibile eseguire alcuna divisione, si passa al punto successivo.
+\item Si divide $text_p$ su uno spazio. Se sono disponibili più opzioni (ovvero più punti in cui è possibile dividere su uno spazio) si divide nel punto minore o uguale a \lmax\ che più si avvicina al valore di \lmax. La parte a sinistra del punto di divisione è una frase estratta. La parte a destra invece viene riutilizza come input della procedura di frammentazione, tornando al punto 1. Se non fosse possibile eseguire alcuna divisione, si passa al punto successivo.
+\item Se la lunghezza di $text_p$ è minore di \lmax, $text_p$ è aggiunto alle frasi estratte. Altrimenti, si divide $text_p$ in posizione \lmax. La parte a sinistra del punto di divisione è una frase estratta. La parte a destra invece viene riutilizza come input della procedura di frammentazione, tornando al punto 1. 
+\end{enumerate}
+
+La procedura appena descritta fa in modo che i frammenti approssimino il più possibile \lmax, evitando il più possibile introdurre possibili errori. Spezzare un paragrafo nel mezzo di una parola, ad esempio, andrebbe a creare due frammenti contenenti degli errori (uno sulla parola finale del primo, l'altro sulla parola iniziale del secondo.\\
+Durante la frammentazione ogni frammento ritiene i metadati relativi al documento e al paragrafo di appartenenza. In più, si aggiunge un ulteriore campo per tenere traccia della posizione del frammento all'interno del paragrafo di appartenenza. In questo modo, è possibile ricomporre un documento in secondo momento. Ogni frase prodotta rispetta il seguente schema:
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+\textbf{Nome campo} & \textbf{Contenuto} \\ \hline
+text  & Testo contenuto nella frase\\
+parId & Codice del paragrafo di provenienza \\
+docId & Codice del documento di provenienza.\\
+parPos & Posizione della frase all'interno del paragrafo di provenienza\\
+\end{tabular}
+\caption{Struttura di una frase}
+\label{tab:dst_frasestrut}
+\end{table}
+
+La frase di formalizzazione si può quindi formalizzare in due step. Nel primo step, ogni paragrafo viene frammentato nella lista delle sue frasi:
+\begin{equation}
+D_{fr1} = \{ extr(p) \forall p \in D_{es}  \}
+\end{equation}
+dove $extr$ è la funzione che estrae le frasi secondo la procedura descritta precedentemente, producendo un insieme di frasi strutturate come mostrato in \autoref{tab:dst_frasestrut}. Nel secondo step si appiattisce l'insieme di insiemi che si è andato a creare, per ottenere insieme di frasi:
+\begin{equation}
+D_{fr} = \bigcup\limits_{f \in D_{fr1}} f
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Perturbazione}
+\label{dst:perturbazione}
+
+
+\section{Configurazione}
+\label{dst:configurazione}
