@@ -3,8 +3,8 @@ Nella \autoref{dst:intro} sono discussi gli obiettivi e le caratteristiche che i
 \section{Introduzione}
 \label{dst:intro}
 Lo sviluppo di un sistema di OCR post-processing non può prescindere dall'esecuzione di test per valutare, migliorare e confrontare le soluzioni adottate. Ciò rende necessario l'utilizzo di un dataset sul quale poter eseguire tutte le batterie di test necessarie. Tale dataset deve inoltre essere strutturato in modo tale da permettere di calcolare facilmente le metriche descritte in \hl{TODO: inserire cit a cap 5}. Se infatti lo scopo di un sistema di OCR post-processing è quello di correggere gli errori introdotti dai software di OCR, è necessario conoscere la posizione degli errori per controllare se siano stati corretti o meno.\\
-La soluzione più semplice a questo problema è quella di disporre, per ogni frammento del dataset, sia del testo acquisito tramite OCR (e quindi contenente errori), sia del testo originale, detto anche ground truth. Non è però semplice trovare dataset di questo tipo, specialmente se in lingua italiana. Spesso, infatti, è necessario che la ground truth sia acquisita manualmente con un grosso dispendio di tempo e risorse: a causa di ciò, questo approccio non è stato considerato percorribile.\\
-Si è invece deciso di adottare un approccio differente, che consiste nell'introduzione artificiale di errori all'interno di testo nativamente digitale (e quindi senza errori) per simulare l'acquisizione tramite software di OCR. I vantaggi del processo appena descritto, detto "perturbazione", sono riassumibili nei seguenti punti:
+La soluzione più semplice a questo problema è quella di disporre, per ogni frammento del dataset, sia del testo acquisito tramite OCR (e quindi contenente errori), sia del testo originale, detto anche ground truth. Non è però semplice trovare dataset di questo tipo, specialmente se in lingua italiana. Spesso, infatti, è necessario che la ground truth sia acquisita manualmente con un grosso dispendio di tempo e risorse: a causa di ciò, questo approccio non è stato considerato percorribile ai fini della tesi.\\
+Si è invece deciso di adottare un approccio differente, che consiste nell'introduzione artificiale di errori all'interno di testo nativamente digitale (e quindi senza errori) per simularne l'acquisizione tramite OCR. I vantaggi del processo appena descritto, detto "perturbazione", sono riassumibili nei seguenti punti:
 \begin{itemize}
  \item Produrre il dataset, una volta definita la funzione che esegue la perturbazione, è molto meno oneroso in termini di tempo e risorse. L'unico requisito è quello di procurarsi una collezione sufficientemente ampia di testo in formato digitale. Ciò è relativamente semplice, e può essere fatto, ad esempio, tramite web scraping. 
  \item \E\ possibile definire arbitrariamente l'intensità e la tipologia degli errori nel testo tramite l'uso di diverse funzioni di perturbazione. Ciò permette, dato un singolo testo di partenza, di ottenere testi con diverse intensità e tipologie di errori. In questo modo si rende possibile valutare le performance del sistema di OCR post-processing al variare delle condizioni del testo dato in input.
@@ -38,7 +38,7 @@ paragraphs & Testo estratto diviso in paragrafi contenenti id e testo
 \label{tab:dst_docstrut}
 \end{table}
 
-Dato il dataset descritto, l'obiettivo è quello di trasformalo in un formato consono al testing. Nello specifico, è necessario frammentare il testo contenuto nei documenti in frasi di lunghezza minima e massima predeterminate. Le ragioni di questa decisione sono approfondite in \hl{TODO: ref a capitolo 5}, ma in breve, spezzare il testo in frammenti più piccoli facilita il processo di allineamento delle frasi e quindi la valutazione delle correzioni. Per ognuno dei frammenti si vogliono poi produrre più versioni perturbate con diverse funzioni di perturbazione. Infine, è necessario che le frasi siano accompagnate da dei metadati che consentano la ricomposizione del testo originale mediante il riordinamento dei frammenti.\\
+Dato il dataset descritto, l'obiettivo è quello di trasformalo in un formato consono al testing. Nello specifico, è necessario frammentare il testo contenuto nei documenti in frasi di lunghezza minima e massima predeterminate. Le ragioni di questa decisione sono approfondite in \hl{TODO: ref a capitolo 5}, ma, in breve, spezzare il testo in frammenti più piccoli facilita il processo di allineamento delle frasi e quindi la valutazione delle correzioni. Per ognuno dei frammenti si vogliono poi produrre più versioni perturbate con diverse funzioni di perturbazione. Infine, è necessario che le frasi siano accompagnate da dei metadati che consentano la ricomposizione del testo originale mediante il riordinamento dei frammenti.\\
 La creazione del dataset per il testing, descritta nelle prossime sezioni, segue dunque le seguenti fasi:
 \begin{enumerate}
 \item Filtraggio lingue
@@ -57,7 +57,7 @@ D_{fl} = \{d\ \forall d \in D\ |\ \textit{language}_d \in L  \}
 dove, dato un documento $d \in D$, $\textit{language}_d$ è la lingua in cui è redatto. Le lingue scelte per la creazione del dataset sono elencate nella \autoref{dst:configurazione}.
 
 \paragraph{Estrazione}
-In questa fase sono scartati i campi superflui ai fini del testing, e sono ritenuti solo i paragrafi assieme ad alcuni metadati utili a ricomporre il testo originale in seguito. \E\ possibile formalizzare la prima parte di questa fase come segue:
+In questa fase sono scartati i campi superflui ai fini del testing, e sono mantenuti solo i paragrafi assieme ad alcuni metadati utili a ricomporre il testo originale in seguito. \E\ possibile formalizzare la prima parte di questa fase come segue:
 \begin{equation}
 D_{es1} = \{ meta({paragraphs}_d)\ \forall d \in D  \}
 \end{equation}
@@ -101,7 +101,7 @@ Dato quindi il testo di un paragrafo $text_p$, la frammentazione avviene secondo
 \item Se la lunghezza di $text_p$ è minore di \lmax, $text_p$ è aggiunto alle frasi estratte. Altrimenti, si divide $text_p$ in posizione \lmax. La parte a sinistra del punto di divisione è una frase estratta. La parte a destra invece viene riutilizza come input della procedura di frammentazione, tornando al punto 1. 
 \end{enumerate}
 
-La procedura appena descritta fa in modo che i frammenti approssimino il più possibile \lmax, evitando il più possibile introdurre possibili errori. Spezzare un paragrafo nel mezzo di una parola, ad esempio, andrebbe a creare due frammenti contenenti degli errori (uno sulla parola finale del primo, l'altro sulla parola iniziale del secondo.\\
+La procedura appena descritta fa in modo che i frammenti approssimino il più possibile \lmax, evitando il più possibile introdurre errori. Spezzare un paragrafo nel mezzo di una parola, ad esempio, andrebbe a creare due frammenti contenenti degli errori (uno sulla parola finale del primo, l'altro sulla parola iniziale del secondo.\\
 Durante la frammentazione ogni frammento ritiene i metadati relativi al documento e al paragrafo di appartenenza. In più, si aggiunge un ulteriore campo per tenere traccia della posizione del frammento all'interno del paragrafo di appartenenza. In questo modo, è possibile ricomporre un documento in secondo momento. Ogni frase prodotta rispetta il seguente schema:
 \begin{table}[H]
 \centering
@@ -116,7 +116,7 @@ parPos & Posizione della frase all'interno del paragrafo di provenienza\\
 \label{tab:dst_frasestrut}
 \end{table}
 
-La frase di formalizzazione si può quindi formalizzare in due step. Nel primo step, ogni paragrafo viene frammentato nella lista delle sue frasi:
+La frase di frammentazione si può quindi formalizzare in due step. Nel primo step, ogni paragrafo viene frammentato nella lista delle sue frasi:
 \begin{equation}
 D_{fr1} = \{ extr(p)\ \forall p \in D_{es}  \}
 \end{equation}
@@ -126,7 +126,7 @@ D_{fr} = \bigcup\limits_{f \in D_{fr1}} f
 \end{equation}
 
 \paragraph{Filtraggio paragrafi}
-Lo scopo di questa fase è quello di rimuovere dal dataset tutti le frasi che appartengono al primo o all'ultimo paragrafo di un documento. Ciò si rende necessario perchè questi paragrafi spesso contengono intestazioni o piè di pagina ripetitivi andrebbero a sporcare il dataset. Ad esempio, l'ultimo paragrafo contiene spesso una frase simile \textit{"© Copyright 2004 - Libreria Editrice Vaticana"}, mentre il primo spesso contiene solamente una data.\\
+Lo scopo di questa fase è quello di rimuovere dal dataset tutti le frasi che appartengono al primo o all'ultimo paragrafo di un documento. Ciò si rende necessario perchè questi paragrafi spesso contengono intestazioni o piè di pagina ripetitivi andrebbero a sporcare il dataset. Ad esempio, l'ultimo paragrafo contiene spesso una frase simile  a \textit{"© Copyright 2004 - Libreria Editrice Vaticana"}, mentre il primo spesso contiene solamente una data.\\
 \E\ definita la seguente funzione $\textit{maxPar}$ che, data una frase $f \in D_{fr}$, indica se $f$ appartiene all'ultimo paragrafo del documento da cui è stata estratta:
 \begin{equation}
   maxPar(f) =
@@ -195,7 +195,7 @@ Data una stringa $s$, lo scopo del processo di perturbazione è quello produrre 
 
 \subsection{Moduli di perturbazione}
 \label{dst:modpert}
-La componente base del sistema di perturbazione è il modulo di perturbazione. Un modulo di perturbazione non è altro che una funzione che modella l'inserimento di un tipo di errore. Ciò significa che per ogni tipologia di errore modellata si rende necessaria la creazione di un modulo di perturbazione. Ad esempio, è possibile definire un modulo di perturbazione che modelli la sostituzione di alcuni caratteri, o un modulo che inserisca della punteggiatura spuria. \\
+La componente base del sistema di perturbazione è il modulo di perturbazione. Un modulo di perturbazione non è altro che una funzione che modella l'inserimento di una specifica tipologia di errore. Ciò significa che per ogni tipologia di errore modellata si rende necessaria la creazione di un modulo di perturbazione. Ad esempio, è possibile definire un modulo di perturbazione che modelli la sostituzione di alcuni caratteri, o un modulo che inserisca della punteggiatura spuria. \\
 Tutti i moduli di perturbazione, data una lista ordinata di token, introducono errori mediante la modifica, la divisione, l'unione o la cancellazione di uno o più token. \\
 Data una lista di token $list_t = [t_1,...,t_n]$,
 Il funzionamento di un modulo di perturbazione si può dividere nelle seguenti tre fasi:
@@ -204,7 +204,7 @@ Il funzionamento di un modulo di perturbazione si può dividere nelle seguenti t
 	\item \textbf{Raggruppamento}: I token sono raggruppati in gruppi consecutivi e disgiunti di $k$ elementi, dove $k$ varia a seconda della tipologia di modulo di perturbazione. \\
 La fase di raggruppamento è quindi definita come segue:
 \begin{equation}
-group: [t_1,...,t_n] \rightarrow [g1,...,g_q]
+group: [t_1,...,t_n] \rightarrow [g_1,...,g_q]
 \end{equation}
 dove ogni $g_i$ è un gruppo di token $[t_1,..., t_k  ]$ e $q = \lceil n/k \rceil$.\\
 	
@@ -262,7 +262,6 @@ Dal funzionamento dei moduli di perturbazione si evince come la funzione $f_{per
 \end{itemize}
 
 Ognuno di questi moduli è stato creato per modellare un particolare tipo di errore. Le tipologie di errore modellate sono state decise in base all'analisi di documenti il cui testo è stato acquisito tramite OCR. Più nello specifico, si tratta delle trascrizioni dei dibattiti parlamentari della prima e della seconda legislatura della repubblica italiana.
-\hl{Si puo espandere un po di piu?}
 
 \subsubsection{Modulo di space splitting}
 Il modulo di space splitting modella l'errore in cui le lettere di una parola sono intramezzate da degli spazi. Siccome la perturbazione avviene su un singolo token, i token in input sono raggruppati in gruppi di un token ($k = 1$). Si definisce dunque la funzione di perturbazione del modulo:
@@ -352,7 +351,7 @@ dove $a_{ti} \in A_t$ e $i$ è un numero intero casuale fra 1 e 5.
 \begin{equation}
 f_{alternative}(\textit{"cammin"}) = a_{cammin\_2} ="camniin"
 \end{equation}
-\hl{Rivedere matematica, posso espandere?}
+
 
 \subsection{Moduli speciali}
 \label{sec:dst_modspec}
@@ -689,6 +688,7 @@ In questa sottosezione sono descritte le istanze del dataset create e i loro par
 \item $l_{max}$: lunghezza massima di una frase nel dataset.
 \item \textit{Lingue}: lista di lingue consentite nelle frasi nel dataset.
 \item \textit{Superpipeline}: lista di superpipelines usate per la perturbazione.
+\item \textit{Dimensione}: numero di elementi che formano il dataset, se esso viene ridotto
 \end{itemize}
 
 In \autoref{tab:dst_dstconfig} sono elencate le versione del dataset definiti e i loro parametri:
@@ -698,10 +698,10 @@ In \autoref{tab:dst_dstconfig} sono elencate le versione del dataset definiti e 
 
 \begin{table}[H]
 \centering
-\begin{tabular}{ccccc}
-\textbf{Codice} & \boldmath{$l_{min}$} & \boldmath{$l_{max}$} & \textbf{Lingue} & \textbf{Superpipeline}\\ \hline
-\dsta & 8 & 50 & [it] & [T1, T2, T3, S1, S2, S3, M1, M2, M3]\\
-\dstb & 20 & 100 & [it] & [T1, T2, T3, S1, S2, S3, M1, M2, M3]\\
+\begin{tabular}{cccccc}
+\textbf{Codice} & \boldmath{$l_{min}$} & \boldmath{$l_{max}$} & \textbf{Lingue} & \textbf{Superpipeline} & \textbf{Dimensione}\\ \hline
+\dsta & 8 & 50 & [it] & \tiny[T1, T2, T3, S1, S2, S3, M1, M2, M3]& 10000\\
+\dstb & 20 & 100 & [it] & \tiny[T1, T2, T3, S1, S2, S3, M1, M2, M3]& 10000\\
 \end{tabular}
 \caption{Configurazione delle versioni del dataset}
 \label{tab:dst_dstconfig}
