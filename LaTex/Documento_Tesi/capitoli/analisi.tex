@@ -1,0 +1,111 @@
+\hl{Fillare introduzione}
+
+\section{Introduzione}
+\label{sec:ana_intro}
+Nel \autoref{sec:test} sono esposti i risultati dei test sul sistema di correzione. I test svolti valutano le performance complessive del sistema, ma non danno alcuna indicazione rispetto alle fasi che lo compongono. Identificare quali sono le fasi che più influenzano negativamente o positivamente le performance di correzione può essere utile per capire quali sono le componenti da migliorare con più priorità per lo sviluppo del sistema.\\
+L'analisi presentata in questo capitolo riguarda nello specifico la correzione dei word error (\autoref{sec:met_introduzione}), e quindi del modulo di correzione token (\autoref{sec:met_tok_correct}). Come visto in precedenza, il modulo di correzione token opera in due fasi: error detection e error correction. L'analisi, che verte sulla fase di error correction, valuterà:
+\begin{itemize}
+\item La capacità del modello di BERT di produrre la soluzione per la correzione fra i vari candidati. La presenza della soluzione fra i candidati è condizione necessaria per poter applicare la giusta correzione: è quindi importante capire qual è il limite superiore che la generazione dei candidati pone al processo di correzione.
+
+\item La capacità del sistema di correzione di scegliere il candidato corretto, se presente, fra quelli proposti dal modello BERT. Verrà valutata anche la capacità del sistema di evitare di apportare correzioni nel caso BERT non produca la soluzione fra i candidati.
+\end{itemize}
+La valutazione di questi due step del processo di correzione permetterà di stabilire quali sono i margini di miglioramento nella fase di error correction, considerando il limite superiore imposto dalla generazione dei candidati del modello BERT. Questo, confrontato con i risultati dei testi illustrati nel \autoref{sec:test}, permetterà di valutare anche il margine di errore della fase di error detection.
+
+
+\section{Creazione di un dataset specifico}
+\label{sec:ana_dst}
+Come spiegato nell'introduzione, l'analisi presentata in questo capitolo verte unicamente sulla parte di error correction. \E\ quindi chiaro come la metodologia dell'analisi deve prevedere un modo per escludere l'error detection dal processo di correzione. Ciò implica che è necessario disporre frasi in cui gli errori sono in posizione nota, in modo da non dover fare error detection.
+
+\paragraph{Metodologia} L'idea è quella di perturbare ulteriormente le frasi presenti in \dstb, introducendo un solo word error per frase. Il token perturbato non viene però reinserito nella frase, ma viene mascherato, permettendo così di conoscere la posizione dell'errore da correggere ed di avere una frase già pronta per la generazione dei candidati.\\
+Ad esempio, data la frase già perturbata:
+\begin{center}
+\textit{"Sarà n e c e s s a r i o uno sforzo straordinario per mobilitare le risorse."}
+\end{center}
+si introduce un ulteriore word error, e si maschera la posizione dell'errore, ottenendo la seguente tripletta:
+\begin{enumerate}
+\item Frase: \textit{"Sarà n e c e s s a r i o uno sforzo [MASK] per mobilitare le risorse."}
+\item Token originale: \textit{"straordinario"}
+\item Token perturbato: \textit{"strnordinnrio"}
+\end{enumerate}
+Quanto appena spiegato informalmente è un processo divisibile nelle seguenti fasi:
+\begin{enumerate}
+\item Estrazione
+\item Perturbazione
+\end{enumerate}
+
+\paragraph{Estrazione}
+Lo scopo di questa fase è quello di ottenere una lista di frasi perturbate con diverse superpipeline. Nel contesto di questo capitolo si intende una frase come una stringa senza l'aggiunta di ulteriori metadati. Per ogni sample $s \in \dstb$ è possibile estrarre due tipi di frase:
+\begin{itemize}
+\item La frase originale non perturbata, presente nel campo \textit{text}.
+\item Una frase perturbata scelta dal campo \textit{perturbed}. Ogni frase perturbata è identificata dalla superpipeline usata per la sua perturbazione.
+\end{itemize}
+\hl{Spiegare il perche del numero 35000?}
+Si ottiene l'insieme delle frasi estratte $D_{extr}$ estraendo casualmente frasi da \dstb\ in modo da rispettare la distribuzione in \autoref{tab:ana_distr}:
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\textbf{Tipo frase} & \textbf{Num. frasi} \\
+\hline
+text & 3500 \\
+T1 & 3500 \\
+T2 & 3500 \\
+T3 & 3500 \\
+S1 & 3500 \\
+S2 & 3500 \\
+S3 & 3500 \\
+M1 & 3500 \\
+M2 & 3500 \\
+M3 & 3500 \\ 
+\hline
+\textbf{Totale} & \textbf{35000}
+\end{tabular}
+\caption{Distribuzione delle frasi estratte. Per "tipo" si intende \textit{text} se la frase non è perturbata; se invece la frase è perturbata il tipo corrisponde alla superpipeline utilizzata}
+\label{tab:ana_distr}
+\end{table}
+Ogni frase è inoltre associata al suo tipo: in questo modo durante l'analisi sarà possibile valutare i risultati anche i base all'intensità della perturbazione.
+
+\paragraph{Perturbazione}
+Per ogni frase $f \in D_{extr}$ il primo passaggio nella fase di perturbazione consiste nel tokenizzare la frase. Si ottiene quindi una lista di token $T = [t_1,...,t_n]$. Questo passaggio si rende necessario in quanto si vuole introdurre un errore all'interno di un singolo token.\\
+Fra lista di token ottenuta dalla tokenizzazione si individua un subset $P \subseteq T$ di token detti "perturbabili". Un token $t$ è considerato perturbabile se soddisfa le seguenti condizioni:
+\begin{itemize}
+\item Dato lo stesso vocabolario $V$ usato per l'error detection (\autoref{sec:met_tok_errdet}), $t \in V$.
+
+\item $t$ è lungo almeno due caratteri.
+\end{itemize}
+Queste condizioni servono ad evitare di ri-perturbare un token che è già stato perturbato in precedenza o che deriva dallo split di un altro token. Si pensi ad esempio a una situazione in cui \textit{"papa"} viene perturbato come \textit{"p a p a"}: pur essendo \textit{"a"} presente nel vocabolario, non sarebbe corretto considerare \textit{"a"} come un token perturbabile.\\
+Si sceglie quindi in modo casuale un solo token $t_p$ da perturbare dall'insieme $P$. Per perturbare $t_p$ si usa la funzione $f_{alternative}$ del modulo di characters replacement (\autoref{dst:modpert}). Quindi, si ha che:
+\begin{equation}
+t\prime_p = f_{alternative}(t_p)
+\end{equation}
+Successivamente si sostituisce $t_p$ nell'insieme $T$ con il token \textit{"[MASK]"}, ottenendo la lista di token $T\prime = [t_1,...,[MASK],...,t_n]$. Infine, si detokenizza $T\prime$ per ottenere la frase mascherata $f\prime$. \\
+Alla fine di questa fase, per ogni frase $f \in D_{extr}$ è prodotta una tupla strutturata come in \autoref{tab:ana_tuplapert}:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cc}
+\textbf{Campo} & \textbf{Contenuto}\\ \hline
+\textit{sent} & Frase originale mascherata ($f\prime$)\\
+\textit{maskedTok} & Token che è stato mascherato ($t\prime_p$)\\
+\textit{correctTok} & Token originale non perturbato ($t_p$)\\
+\textit{pertSup} & Tipo di $f$ (\autoref{tab:ana_distr}) \\
+
+
+\end{tabular}
+\caption{Tupla prodotta per ogni frase $f$ dalla fase di perturbazione}
+\label{tab:ana_tuplapert}
+\end{table}
+\noindent
+L'insieme delle tuple risultanti ottenuto da questa fase è detto $D_{an}$.
+
+
+
+
+
+
+
+
+\section{Analisi generazione dei candidati}
+\label{sec:ana_bert}
+
+\section{Analisi scelta dei candidati}
+\label{sec:ana_cor}
