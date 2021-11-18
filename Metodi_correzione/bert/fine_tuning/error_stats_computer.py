@@ -114,9 +114,11 @@ def getStats(datapoints: list):
 
     total_samples = len(datapoints)
 
-    correct_choice_perc = (levenstein_distribution[0] / found_20 * 100) - (
-        discarded / len(datapoints_with_correction) * 100)
+    false_negatives = discarded / len(datapoints_with_correction) * 100
+    correct_choice_perc = (levenstein_distribution[0] / found_20 *
+                           100) - false_negatives
 
+    tot0 = (levenstein_distribution[0] / found_20 * 100)
     return {
         "found_10":
         found_10,
@@ -143,15 +145,21 @@ def getStats(datapoints: list):
         "lev_distribution":
         levenstein_distribution,
         "false_negatives_perc":
-        discarded / len(datapoints_with_correction) * 100,
+        false_negatives,
         "false_positives_perc":
         false_positives / len(datapoints_with_no_correction) * 100,
+        "notfalseperc":
+        100 - false_positives / len(datapoints_with_no_correction) * 100,
         "lev_correct_perc":
         lev_correct / len(datapoints_with_correction) * 100,
         "correct_choice_perc":
         correct_choice_perc,
+        "no_correct_choice_perc":
+        100 - correct_choice_perc - false_negatives,
         "no_correction":
-        not_found
+        not_found,
+        "tot0":
+        tot0
     }
 
 
@@ -226,7 +234,7 @@ def plot_correct_percentage(correct_dict: dict,
     explosion = [
         0 if key in key_to_explode else 0.1 for key in correct_dict.keys()
     ] if key_to_explode else None
-
+    print(explosion, correct_dict.keys(), key_to_explode)
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', explode=explosion)
     ax1.axis(
         'equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
@@ -248,7 +256,7 @@ def getTableFromAttrList(results: dict, attrList: list):
 
 def addPosNegChoises(statDict: dict):
     corret_choice_dict = {
-        "Scelte Corrette":
+        "Selezioni Corrette":
         statDict["correct_choice_perc"],
         "Falsi Negativi":
         statDict["false_negatives_perc"],
@@ -257,8 +265,8 @@ def addPosNegChoises(statDict: dict):
         statDict["false_negatives_perc"]
     }
     non_correct_dict = {
-        "Falsi positivi": statDict["false_positives_perc"],
-        "Correzioni errate scartate": 100 - statDict["false_positives_perc"]
+        "Non-selezioni mancate": statDict["false_positives_perc"],
+        "Non-selezioni corrette": 100 - statDict["false_positives_perc"]
     }
     corret_choice_dict = {
         key: value * statDict["found_20"]
@@ -269,16 +277,17 @@ def addPosNegChoises(statDict: dict):
         for key, value in non_correct_dict.items()
     }
     complete = {**non_correct_dict, **corret_choice_dict}
-    correct_keys = ["Scelte Corrette", "Correzioni errate scartate"]
-    non_cor_keys = ["Falsi Negativi", "Scelte Errate", "Falsi positivi"]
+    correct_keys = ["Selezioni Corrette", "Non-selezioni corrette"]
+    non_cor_keys = ["Falsi Negativi", "Scelte Errate", "Non-selezioni mancate"]
     correct_choice_ration = sum(
         [value for key, value in complete.items() if key in correct_keys])
     non_corr_choice_ration = sum(
         [value for key, value in complete.items() if key in non_cor_keys])
     total = correct_choice_ration + non_corr_choice_ration
     return {
-        **statDict, "correct_choice_perc": correct_choice_ration / total * 100,
-        "non_corr_choice_perc": non_corr_choice_ration / total * 100
+        **statDict, "correct_choice_perc_2":
+        correct_choice_ration / total * 100,
+        "non_corr_choice_perc_2": non_corr_choice_ration / total * 100
     }
 
 
@@ -323,24 +332,23 @@ for key, value in results.items():
 
 results = {key: addPosNegChoises(value) for key, value in results.items()}
 comb = results["Combinato"]
-pprint(comb)
 
 plot_overview_results(results)
 corret_choice_dict = {
-    "Scelte Corrette":
-    comb["correct_choice_perc"],
-    "Falsi Negativi":
+    "Selezioni Corrette":
+    results["Combinato"]["correct_choice_perc"],
+    "Selezioni Mancate":
     comb["false_negatives_perc"],
-    "Scelte Errate":
-    100 - comb["correct_choice_perc"] - comb["false_negatives_perc"]
+    "Selezioni Errate":
+    100 - results["Combinato"]["correct_choice_perc"] -
+    comb["false_negatives_perc"]
 }
 plot_correct_percentage(corret_choice_dict, "correct_combinato")
 non_correct_dict = {
-    "Falsi positivi": comb["false_positives_perc"],
-    "Correzioni errate scartate": 100 - comb["false_positives_perc"]
+    "Non-selezioni mancate": comb["false_positives_perc"],
+    "Non-selezioni corrette": 100 - comb["false_positives_perc"]
 }
 plot_correct_percentage(non_correct_dict, "non_correct_combinato")
-
 corret_choice_dict = {
     key: value * comb["found_20"]
     for key, value in corret_choice_dict.items()
@@ -350,14 +358,14 @@ non_correct_dict = {
     for key, value in non_correct_dict.items()
 }
 plot_complete = {**corret_choice_dict, **non_correct_dict}
-
 plot_correct_percentage(
     plot_complete,
     "overview_scelte_combinato",
-    key_to_explode=["Correzioni errate scartate", "Scelte Corrette"])
+    key_to_explode=["Non-selezioni corrette", "Selezioni Corrette"])
 getTableFromAttrList(results,
                      ["found_10_perc", "found_20_perc", "found_30_perc"])
 getTableFromAttrList(
     results,
-    ["correct_choice_perc", "false_negatives_perc", "false_positives_perc"])
-getTableFromAttrList(results, ["correct_choice_perc", "non_corr_choice_perc"])
+    ["correct_choice_perc", "no_correct_choice_perc", "false_negatives_perc"])
+getTableFromAttrList(results, ["notfalseperc", "false_positives_perc"])
+print(results["Combinato"]["tot0"])
