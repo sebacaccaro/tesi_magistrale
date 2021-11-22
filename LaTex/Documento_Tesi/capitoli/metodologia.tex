@@ -253,7 +253,7 @@ D: [t_1,...,\text{[MASK]},...,t_n] \rightarrow F_{mask}
 dove $F_{mask}$ è una frase contente una maschera.
 
 \paragraph{Candidates generation and picking}
-Lo stadio di candidates generation and picking sfrutta il BERT MLM per generare dei candidati per la correzione, e sfrutta un'euristica per determinare il candidato con la maggior probabilità di essere corretto (da qui in poi riferito come soluzione). Più precisamente, la generazione dei candidati avviene tramite la funzione di mask-filling descritta nell'\autoref{eq:met_BERT} (\autoref{sec:met_BERT_MLM}). La fattibilità di applicare tale approccio per la generazione di candidati per la correzione è dimostrata in \cite{OCRMaskFilling}. Nel paper appena citato si riporta come, usando una combinazione di BERT e FastText, la giusta correzione da applicare sia presente fra i candidati prodotti con una probabilità del 70\%. \hl{TODO: inserire riferimento ai risultati del capitolo analisi errore.}\\
+Lo stadio di candidates generation and picking sfrutta il BERT MLM per generare dei candidati per la correzione, e sfrutta un'euristica per determinare il candidato con la maggior probabilità di essere corretto (da qui in poi riferito come soluzione). Più precisamente, la generazione dei candidati avviene tramite la funzione di mask-filling descritta nell'\autoref{eq:met_BERT} (\autoref{sec:met_BERT_MLM}). La fattibilità di applicare tale approccio per la generazione di candidati per la correzione è dimostrata in \cite{OCRMaskFilling}. Nel paper appena citato si riporta come, usando una combinazione di BERT e FastText, la giusta correzione da applicare sia presente fra i candidati prodotti con una probabilità del 70\%. Risultati comparabili sono stati ottenuti con una metodologia simile dai test illustrati nella \autoref{sec:analisi}.\\
 Lo step di generazione dei candidati è formalizzato come segue:
 \begin{equation}
 G: F_{mask} \rightarrow [c_1,...,c_n]= C
@@ -263,8 +263,7 @@ L'euristica per la scelta della soluzione sceglie il candidato con la più bassa
 \begin{equation}
 s = \operatorname*{argmin}_{c_i \in C} d_{lev}(c_i,m)
 \end{equation}
-In caso uno o più candidati abbiano la stessa distanza dal token mascherato, viene scelto quello con la maggior probabilità prodotta da BERT.
-\hl{TODO: giustificazione dell'euristica attraverso risultato presenti nel capitolo di analisi errore}
+In caso uno o più candidati abbiano la stessa distanza dal token mascherato, viene scelto quello con la maggior probabilità prodotta da BERT. Questa euristica, seppur molto semplice, è decisamente efficace, come dimostrato dall'analisi nella \autoref{sec:ana_cor}.
 
 \begin{figure}[H]
 \centering
