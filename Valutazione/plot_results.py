@@ -8,12 +8,18 @@ fig_size[1] = 10
 
 
 def codeConvert(code):
-    return {key: {
-        **x,
-        "corrected_per_perturbation": x["corrected_errors"]/x["perturbation_errors"],
-        "introduced_per_sample": x["introduced_errors"]/x["total_samples"],
-        "introduced_per_corrected": x["introduced_errors"]/x["corrected_errors"],
-    } for key, x in code.items()}
+    return {
+        key: {
+            **x,
+            "corrected_per_perturbation":
+            x["corrected_errors"] / x["perturbation_errors"],
+            "introduced_per_sample":
+            x["introduced_errors"] / x["total_chars"],
+            "introduced_per_corrected":
+            x["introduced_errors"] / x["corrected_errors"],
+        }
+        for key, x in code.items()
+    }
 
 
 def calculateVals(vals):
@@ -21,11 +27,17 @@ def calculateVals(vals):
 
 
 def plottable_sub_dict(dict_to_plot: dict, stat_to_plot: str) -> dict:
-    return {key: value[stat_to_plot] for key, value in sorted(dict_to_plot.items())}
+    return {
+        key: value[stat_to_plot]
+        for key, value in sorted(dict_to_plot.items())
+    }
 
 
 def plottable_dict(dict_to_plot: dict, stat_to_plot: str) -> dict:
-    return {key: plottable_sub_dict(dict_int, stat_to_plot) for key, dict_int in dict_to_plot.items()}
+    return {
+        key: plottable_sub_dict(dict_int, stat_to_plot)
+        for key, dict_int in dict_to_plot.items()
+    }
 
 
 """ def plot_dict(subPlot, D: dict, title):
@@ -47,7 +59,13 @@ def plottable_dict(dict_to_plot: dict, stat_to_plot: str) -> dict:
     add_value_labels(subPlot, -15) """
 
 
-def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True, bar_offset=1):
+def bar_plot(ax,
+             data,
+             colors=None,
+             total_width=0.8,
+             single_width=1,
+             legend=False,
+             bar_offset=1):
     """Draws a bar plot with multiple bars per data point.
 
     Parameters
@@ -103,19 +121,33 @@ def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True
     for i, (name, values) in enumerate(data.items()):
         # The offset in x direction of that bar
         x_offset = ((i - n_bars / 2) * bar_width +
-                    bar_width / 2) + bar_offset*bar_width
+                    bar_width / 2) + bar_offset * bar_width
 
         # Draw a bar for every value of that type
         for x, y in enumerate(values):
-            bar = ax.bar(x + x_offset, y, width=bar_width *
-                         single_width, color=colors[i % len(colors)])
+            bar = ax.bar(x + x_offset,
+                         y,
+                         width=bar_width * single_width,
+                         color=colors[i % len(colors)])
 
         # Add a handle to the last drawn bar, which we'll need for the legend
         bars.append(bar[0])
 
     # Draw legend if we need
     if legend:
-        ax.legend(bars, data.keys())
+        ax.legend(bars, data.keys(), loc='lower center')
+        # Shrink current axis's height by 10% on the bottom
+        """ box = ax.get_position()
+        ax.set_position(
+            [box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+
+        # Put a legend below current axis
+        ax.legend(bars,
+                  data.keys(),
+                  loc='upper center',
+                  bbox_to_anchor=(0.5, -0.05),
+                  fancybox=True,
+                  ncol=5) """
 
 
 def plot_dict(subPlot, D: dict, title):
@@ -124,7 +156,9 @@ def plot_dict(subPlot, D: dict, title):
     subPlot.set_xticks(range(len(df.index)))
     subPlot.set_xticklabels(df.index)
     subPlot.title.set_text(title)
-    print("Se il grafico non è centrato, gioca con il parametro bar:offset nella funzione plot_dict")
+    print(
+        "Se il grafico non è centrato, gioca con il parametro bar:offset nella funzione plot_dict"
+    )
 
 
 def add_value_labels(ax, spacing=5):
@@ -159,18 +193,18 @@ def add_value_labels(ax, spacing=5):
 
         # Create annotation
         ax.annotate(
-            label,                      # Use `label` as label
-            (x_value, y_value),         # Place label at end of the bar
-            xytext=(0, space),          # Vertically shift label by `space`
+            label,  # Use `label` as label
+            (x_value, y_value),  # Place label at end of the bar
+            xytext=(0, space),  # Vertically shift label by `space`
             textcoords="offset points",  # Interpret `xytext` as offset in points
-            ha='center',                # Horizontally center label
+            ha='center',  # Horizontally center label
             color="white",
-            va=va)                      # Vertically align label differently for
+            va=va)  # Vertically align label differently for
         # positive and negative values
 
 
 if __name__ == "__main__":
-    with open("./valutazione_tot.json") as f:
+    with open("./valutazione_2.json") as f:
         val = json.load(f)
 
     val = calculateVals(val)
@@ -186,8 +220,8 @@ if __name__ == "__main__":
 
     plot_dict(axes[axNum], plottable_dict(gp, "corrected_per_perturbation"),
               "Errori corretti per errore di perturbazione introdotto")
-    axNum += 1
 
+    axNum += 1
     plot_dict(axes[axNum], plottable_dict(gp, "introduced_per_sample"),
               "Errori introdotti per frase")
     axNum += 1
@@ -196,12 +230,12 @@ if __name__ == "__main__":
               "Errori introdotti per errore corretto")
     axNum += 1
 
-    plot_dict(axes[axNum], plottable_dict(gp, "lev_reduction"),
+    plot_dict(axes[axNum], plottable_dict(gp, "lev_reduction_per_sentence"),
               "Riduzione della distanza di Levenshtein")
     axes[axNum].axhline(0, color='black', linewidth=1)
     axNum += 1
 
-    plot_dict(axes[axNum], plottable_dict(gp, "total_distance"),
+    plot_dict(axes[axNum], plottable_dict(gp, "total_distance_per_char"),
               "Distanza di Levenshtein totale")
     axes[axNum].axhline(0, color='black', linewidth=1)
     axNum += 1

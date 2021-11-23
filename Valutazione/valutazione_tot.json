@@ -6,7 +6,8 @@
       "introduced_errors": 2122,
       "lev_reduction": 3135,
       "total_distance": 18731,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "T3": {
       "perturbation_errors": 30705,
@@ -14,7 +15,8 @@
       "introduced_errors": 2509,
       "lev_reduction": 6746,
       "total_distance": 34168,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "M3": {
       "perturbation_errors": 42020,
@@ -22,7 +24,8 @@
       "introduced_errors": 2750,
       "lev_reduction": 8272,
       "total_distance": 50157,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "S1": {
       "perturbation_errors": 7062,
@@ -30,7 +33,8 @@
       "introduced_errors": 1900,
       "lev_reduction": -1058,
       "total_distance": 8995,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "M2": {
       "perturbation_errors": 26675,
@@ -38,7 +42,8 @@
       "introduced_errors": 2438,
       "lev_reduction": 5765,
       "total_distance": 30125,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "M1": {
       "perturbation_errors": 21147,
@@ -46,7 +51,8 @@
       "introduced_errors": 2197,
       "lev_reduction": 4069,
       "total_distance": 24215,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "S2": {
       "perturbation_errors": 8622,
@@ -54,7 +60,8 @@
       "introduced_errors": 1882,
       "lev_reduction": -642,
       "total_distance": 10435,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "S3": {
       "perturbation_errors": 15517,
@@ -62,7 +69,8 @@
       "introduced_errors": 1889,
       "lev_reduction": 1571,
       "total_distance": 16482,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "T2": {
       "perturbation_errors": 20793,
@@ -70,7 +78,8 @@
       "introduced_errors": 2224,
       "lev_reduction": 5043,
       "total_distance": 22596,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     }
   },
   "Bert@100": {
@@ -80,7 +89,8 @@
       "introduced_errors": 4084,
       "lev_reduction": 9881,
       "total_distance": 33410,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "T3": {
       "perturbation_errors": 59812,
@@ -88,7 +98,8 @@
       "introduced_errors": 4765,
       "lev_reduction": 19617,
       "total_distance": 60872,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "M3": {
       "perturbation_errors": 82801,
@@ -96,7 +107,8 @@
       "introduced_errors": 6497,
       "lev_reduction": 21653,
       "total_distance": 94020,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "S1": {
       "perturbation_errors": 14370,
@@ -104,7 +116,8 @@
       "introduced_errors": 3579,
       "lev_reduction": -1597,
       "total_distance": 17750,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "M2": {
       "perturbation_errors": 53518,
@@ -112,7 +125,8 @@
       "introduced_errors": 4696,
       "lev_reduction": 16114,
       "total_distance": 55867,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "M1": {
       "perturbation_errors": 41298,
@@ -120,7 +134,8 @@
       "introduced_errors": 4692,
       "lev_reduction": 10473,
       "total_distance": 45098,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "S2": {
       "perturbation_errors": 17435,
@@ -128,7 +143,8 @@
       "introduced_errors": 3556,
       "lev_reduction": -1153,
       "total_distance": 20794,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "S3": {
       "perturbation_errors": 31240,
@@ -136,7 +152,8 @@
       "introduced_errors": 3896,
       "lev_reduction": 3657,
       "total_distance": 32472,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "T2": {
       "perturbation_errors": 41294,
@@ -144,17 +161,19 @@
       "introduced_errors": 4214,
       "lev_reduction": 14125,
       "total_distance": 41218,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     }
   },
-  "Pgp@50": {
+  "Ftwv@50": {
     "T1": {
       "perturbation_errors": 15994,
       "corrected_errors": 2599,
       "introduced_errors": 10350,
       "lev_reduction": -19877,
       "total_distance": 41743,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "T3": {
       "perturbation_errors": 29844,
@@ -162,7 +181,8 @@
       "introduced_errors": 9985,
       "lev_reduction": -17352,
       "total_distance": 58266,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "M3": {
       "perturbation_errors": 41447,
@@ -170,7 +190,8 @@
       "introduced_errors": 8939,
       "lev_reduction": -12857,
       "total_distance": 71286,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "S1": {
       "perturbation_errors": 7087,
@@ -178,7 +199,8 @@
       "introduced_errors": 10443,
       "lev_reduction": -20276,
       "total_distance": 28213,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "M2": {
       "perturbation_errors": 26274,
@@ -186,7 +208,8 @@
       "introduced_errors": 9435,
       "lev_reduction": -15921,
       "total_distance": 51811,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "M1": {
       "perturbation_errors": 20793,
@@ -194,7 +217,8 @@
       "introduced_errors": 9811,
       "lev_reduction": -17338,
       "total_distance": 45622,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "S2": {
       "perturbation_errors": 8678,
@@ -202,7 +226,8 @@
       "introduced_errors": 10208,
       "lev_reduction": -19536,
       "total_distance": 29329,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "S3": {
       "perturbation_errors": 15638,
@@ -210,7 +235,8 @@
       "introduced_errors": 9520,
       "lev_reduction": -17051,
       "total_distance": 35104,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     },
     "T2": {
       "perturbation_errors": 20253,
@@ -218,17 +244,19 @@
       "introduced_errors": 10077,
       "lev_reduction": -19061,
       "total_distance": 46700,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 434661
     }
   },
-  "Pgp@100": {
+  "Ftwv@100": {
     "T1": {
       "perturbation_errors": 31641,
       "corrected_errors": 7742,
       "introduced_errors": 21653,
       "lev_reduction": -40114,
       "total_distance": 83405,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "T3": {
       "perturbation_errors": 58694,
@@ -236,7 +264,8 @@
       "introduced_errors": 22053,
       "lev_reduction": -30054,
       "total_distance": 110543,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "M3": {
       "perturbation_errors": 82437,
@@ -244,7 +273,8 @@
       "introduced_errors": 20437,
       "lev_reduction": -19550,
       "total_distance": 135223,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "S1": {
       "perturbation_errors": 14504,
@@ -252,7 +282,8 @@
       "introduced_errors": 20018,
       "lev_reduction": -39010,
       "total_distance": 55163,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "M2": {
       "perturbation_errors": 53053,
@@ -260,7 +291,8 @@
       "introduced_errors": 19995,
       "lev_reduction": -28527,
       "total_distance": 100508,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "M1": {
       "perturbation_errors": 40841,
@@ -268,7 +300,8 @@
       "introduced_errors": 20789,
       "lev_reduction": -35263,
       "total_distance": 90834,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "S2": {
       "perturbation_errors": 17559,
@@ -276,7 +309,8 @@
       "introduced_errors": 19578,
       "lev_reduction": -36978,
       "total_distance": 56619,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "S3": {
       "perturbation_errors": 31570,
@@ -284,7 +318,8 @@
       "introduced_errors": 18016,
       "lev_reduction": -32450,
       "total_distance": 68579,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     },
     "T2": {
       "perturbation_errors": 40573,
@@ -292,7 +327,8 @@
       "introduced_errors": 21544,
       "lev_reduction": -35515,
       "total_distance": 90858,
-      "total_samples": 10000
+      "total_samples": 10000,
+      "total_chars": 850017
     }
   }
 }

@@ -1,16 +1,16 @@
 In questa sezione sono illustrate la metodologia di test, le metriche utilizzate e risultati ottenuti dai test svolti.\\
-Nella sezione \autoref{sec:test_intro} sono illustrati gli obiettivi dei test e la metodologia con i quali sono svolti. Nella \autoref{sec:test_metriche} sono descritte le metriche usate per svolgere i test. Nella \autoref{sec:test_risultati} sono riportati i risultati ottenuti dai test.
+Nella sezione \autoref{sec:test_intro} sono illustrati gli obiettivi dei test e la metodologia con la quale sono svolti. Nella \autoref{sec:test_metriche} sono descritte le metriche usate per svolgere i test. Nella \autoref{sec:test_risultati} sono riportati i risultati ottenuti dai test.
 
 \section{Introduzione}
 \label{sec:test_intro}
-La metodologia di test adottata ha lo scopo di valutare automaticamente e in modo ripetibile le prestazioni del sistema di correzione. Tale metodologia è utile durante lo sviluppo del sistema di correzione, in quanto rende possibile quantificare l'impatto delle modifiche apportate al funzionamento o alla configurazione.\\
+La metodologia di test adottata ha lo scopo di valutare automaticamente e in modo ripetibile le prestazioni del sistema di correzione. Tale metodologia è utile durante lo sviluppo del sistema di correzione, in quanto rende possibile quantificare l'impatto delle modifiche apportate al funzionamento e alla configurazione.\\
 Inoltre, i test svolti in questo capitolo rendono possibile:
 \begin{itemize}
 \item Valutare le performance del sistema su vari tipi e intensità di errore. Come illustrato nel \autoref{sec:dataset}, per ogni frase perturbata nel dataset, sono presenti 9 versioni perturbate con diverse superpipeline. Valutando le performance di correzione sulle diverse tipologie di frasi, è possibile determinare come si comporta il sistema di correzioni di fronte a diversi tipi di errore.
 
 \item Confrontare le performance del sistema di correzione su diverse versioni del dataset. Nel \autoref{sec:dataset} sono infatti state definite due versioni del dataset, \dsta\ e \dstb, che differiscono per la lunghezza delle frasi. Portare a termine i test su entrambe le versioni permette quindi di capire quanto la lunghezza delle frasi influisca sulle prestazioni del sistema di correzione.
 
-\item Confrontare il sistema di correzione sviluppato con altri sistemi di OCR post-processing per avere un riscontro sul quale meglio valutare i risultati ottenuti. A tale scopo, si utilizza come confronto la metodologia di correzione proposta in \cite{hamalainen2019paft}, già illustrata nella \autoref{sec:arte_nmt}; l'approccio utilizzato è però leggermente modificato, e utilizza una combinazione di FastText e Word2Vec per trovare le parole semanticamente simili a quelle errate (a differenza del solo Word2Vec come nel paper originale). Per distinguere il metodo sviluppato da quello usato come confronto, si ci riferirà con:
+\item Confrontare il sistema di correzione sviluppato con altri sistemi di OCR post-processing per avere un riscontro con il quale meglio valutare i risultati ottenuti. A tale scopo, si utilizza come confronto la metodologia di correzione proposta in \cite{hamalainen2019paft}, già illustrata nella \autoref{sec:arte_nmt}; l'approccio utilizzato è però leggermente modificato, e utilizza una combinazione di FastText e Word2Vec per trovare le parole semanticamente simili a quelle errate (a differenza del solo Word2Vec come nel paper originale). Per distinguere il metodo sviluppato da quello usato come confronto, si ci riferirà con:
 	\begin{itemize}
 	\item \textbf{Bert} al metodo sviluppato e oggetto di questa tesi.
 	\item \textbf{Ftwv} al metodo appena descritto usato come confronto.
@@ -45,8 +45,8 @@ Dato un dataset $d \in D$, si producono 9 di queste triple per ogni frase $f \in
 La valutazione della correzione avviene attraverso le metriche definite in questa sezione. Le metriche definite sono:
 \begin{enumerate}
 \item Errori corretti per errore presente ($C/P$).
-\item Errori introdotti per frase ($In/Ch$).
-\item Errori introdotti per ogni errore corretto ($I/C$).
+\item Errori introdotti per carattere ($In/Ch$).
+\item Errori introdotti per errore corretto ($I/C$).
 \item Riduzione nella distanza di Levenshtein. ($LDR$).
 \item Distanza di Levenshtein totale ($LDT$).
 \end{enumerate}
@@ -146,7 +146,7 @@ Lo scopo di questa metrica è quello di misurare quanto il processo di correzion
 LDR = \frac{
 \sum_{t \in I}d(t_{or},t_{pe}) - d(t_{or},t_{co})}{\sum_{t \in I}|t_{or}|}
 \end{equation}
-Il valore ottenuto divisa per la somma dei caratteri totali contenuti nell'insieme I. In questo modo la differenza è espressa nel rapporto riduzione su numero di caratteri, consentendo così di confrontare misurazioni su dataset differenti. Per questa metrica valori maggiori indicano migliori performance del sistema di correzione.
+Il valore ottenuto è diviso per la somma dei caratteri totali contenuti nell'insieme I. In questo modo la differenza è espressa nel rapporto riduzione su numero di caratteri, consentendo così di confrontare misurazioni su dataset differenti. Per questa metrica valori maggiori indicano migliori performance del sistema di correzione.
 
 
 \paragraph{Distanza di Levenshtein totale ($LDT$)}
@@ -155,13 +155,13 @@ Lo scopo di questa metrica è quello di misurare la distanza totale fra le frasi
 LDT = \frac{
 \sum_{t \in I}d(t_{or},t_{co})}{\sum_{t \in I}|t_{or}|}
 \end{equation}
-Il valore ottenuto divisa per la somma dei caratteri totali contenuti nell'insieme I. In questo modo la differenza è espressa nel rapporto riduzione su numero di caratteri, consentendo così di confrontare misurazioni su dataset differenti. Per questa metrica valori più bassi indicano migliori performance del sistema di correzione.
+Il valore ottenuto è diviso per la somma dei caratteri totali contenuti nell'insieme I. In questo modo la differenza è espressa nel rapporto riduzione su numero di caratteri, consentendo così di confrontare misurazioni su dataset differenti. Per questa metrica valori più bassi indicano migliori performance del sistema di correzione.
 
 
 \section{Risultati}
 \label{sec:test_risultati}
 
-Lo scopo dei test in questa sezione è quello di valutare le performance del sistema di correzione sviluppato e confrontarle a quelle del sistema Ftwv illustrato precedentemente. Si vuole inoltre misurare l'impatto della lunghezza della frasi da correggere sulle performance di correzione. Per fare ciò, si eseguiranno i test sulle seguenti configurazioni:
+Lo scopo dei test in questa sezione è quello di valutare le performance del sistema di correzione sviluppato e confrontarle a quelle del sistema Ftwv. Si vuole inoltre misurare l'impatto della lunghezza della frasi da correggere sulle performance di correzione. Per fare ciò, si eseguiranno i test sulle seguenti configurazioni:
 \begin{itemize}
 \item \textbf{Bert@50}: sistema di correzione Bert con dataset \dsta.
 \item \textbf{Bert@100}: sistema di correzione Bert con dataset \dstb.
@@ -178,7 +178,7 @@ In \autoref{fig:test_res_cp_gra} e \autoref{fig:test_res_cp} sono riportate le m
 \begin{itemize}
 \item Per ogni superpipeline, le configurazioni che usano frasi più lunghe ottengono risultati migliori rispetto alle controparti che utilizzano frasi da 50 caratteri. Questo fatto supporta l'ipotesi che la presenza di contesto più amplio attorno a un errore possa aiutare durante la correzione.
 
-\item Il sistema di correzione sviluppato ottiene performance significativamente maggiori nelle token superpipeline. Questo era il risultato atteso, in quanto la correzione dei word error è stato il focus principale durante lo sviluppo del sistema. \hl{Possibili altre osservazioni?}
+\item Il sistema di correzione sviluppato ottiene performance significativamente maggiori nelle token superpipeline. Questo era il risultato atteso, in quanto la correzione dei word error è stato il focus principale durante lo sviluppo del sistema.
 
 \end{itemize}
 
@@ -208,12 +208,12 @@ T3& 0.29& 0.17& 0.37& 0.28\\
 \label{fig:test_res_cp}
 \end{figure}
 
-\paragraph{Errori introdotti per frase ($In/Ch$)}
+\paragraph{Errori introdotti per carattere ($In/Ch$)}
 In \autoref{fig:test_res_if_gra} e \autoref{fig:test_res_if} sono riportate le misurazioni per la metrica $In/Ch$. Dati i risultati si possono fare le seguenti osservazioni:
 \begin{itemize}
-\item In questo caso la lunghezza delle frasi non influenza i risultati ottenuti, che sono equiparabili a parità di sistema di perturbazione.
+\item In questo caso la lunghezza delle frasi non influenza i risultati ottenuti, che sono comparabili a parità di sistema di perturbazione.
 
-\item Si nota un amplio scarto fra i due sistemi di correzione: ciò in parte è attribuibile all'efficacia dello stadio di validazione durante la correzione nel sistema bert. Non è però possibile escludere che il sistema Ftwv sia particolarmente prono all'introduzione di errori durante la correzione.
+\item Si nota un amplio scarto fra i due sistemi di correzione: ciò in parte è attribuibile all'efficacia dello stadio di validazione durante la correzione nel sistema Bert. Non è però possibile escludere che il sistema Ftwv sia particolarmente prono all'introduzione di errori durante la correzione.
 \end{itemize}
 
 \begin{table}[H]
@@ -242,17 +242,13 @@ T3& 0.0058& 0.023& 0.0056& 0.0259\\
 \label{fig:test_res_if}
 \end{figure}
 
+\paragraph{Errori introdotti per errore corretto ($I/C$)}
+In \autoref{fig:test_res_ic_gra} e \autoref{fig:test_res_ic} sono riportate le misurazioni per la metrica $I/C$. Dati i risultati si possono fare le seguenti osservazioni:
+\begin{itemize}
+\item Sono confermate le osservazioni fatte in precedenza: il sistema Bert corregge più errori e ne introduce di meno al sistema Ftwv. Con la sola eccezione di S1, il sistema bert ha un $I/C$ ampiamente inferiore a 1 su tutte le superpipeline e su entrambe le lunghezze di frasi. Ciò implica che il sistema corregge più errori di quanti ne introduce.
 
-
-
-
-
-
-
-
-
-\paragraph{Errori introdotti per ogni errore corretto ($I/C$)}
-LOL
+\item Per questa metrica è presente una lieve ma non trascurabile differenza di prestazioni derivante dalla lunghezza delle frasi: frasi più lunghe, anche in questo caso, portano a risultati migliori.
+\end{itemize}
 
 \begin{table}[H]
 \centering
@@ -281,16 +277,17 @@ T3& 0.28& 1.97& 0.22& 1.36\\
 \end{figure}
 
 
-
-
-
-
-
-
-
 \paragraph{Riduzione nella distanza di Levenshtein ($LDR$)}
-LOL
+In \autoref{fig:test_res_ldr_gra} e \autoref{fig:test_res_ldr} sono riportate le misurazioni per la metrica $LDR$. Dati i risultati si possono fare le seguenti osservazioni:
 
+\begin{itemize}
+\item \E\ possibile confermare quanto visto precedenza: il sistema Bert corregge un maggior numero di errori e ne introduce di meno rispetto al sistema Ftwv. Ciò si traduce in una riduzione positiva della distanza di Levenshtein.
+\item Anche in questo caso è presente un delta rilevante fra la prestazioni di entrambi i sistemi con frasi di lunghezza diversa. In questo caso, però, la differenza è più marcata nei risultati del sistema bert.
+
+\item Il sistema Bert presenta una riduzione negativa sulle pipeline S1 e S2, mentre la riduzione positiva è quasi nulla nella pipeline S3. Questo conferma quanto già osservato, ovvero che il sistema di correzione sviluppato non corregge in modo ottimale i word segmentation error. 
+\end{itemize}
+\vfill
+\newpage
 
 \begin{table}[H]
 \centering
@@ -317,17 +314,10 @@ T3& 0.02& -0.04& 0.02& -0.04\\
 \caption{Misurazioni di $LDR$ su tutti gli insiemi di frasi}
 \label{fig:test_res_ldr}
 \end{figure}
-
-
-
-
-
-
-
-
+\vfill
 
 \paragraph{Distanza di Levenshtein totale ($LDT$)}
-LOL
+In \autoref{fig:test_res_ldt_gra} e \autoref{fig:test_res_ldt} sono riportate le misurazioni per la metrica $LDT$. I risultati ottenuti confermano le osservazioni riportate in precedenza.
 
 \begin{table}[H]
 \centering
@@ -349,23 +339,21 @@ T3& 0.08& 0.13& 0.07& 0.13\\
 \end{table}
 
 \begin{figure}[H]
-
-\section{Conclusioni}
 \centering
 \includegraphics[width=\textwidth]{immagini/test/ldt}
 \caption{Misurazioni di $LDT$ su tutti gli insiemi di frasi}
 \label{fig:test_res_ldt}
 \end{figure}
 
+\newpage
 
+\paragraph{Conclusioni}
+Dai risultati ottenuti in questa sezione è possibile trarre le seguenti conclusioni:
+\begin{itemize}
+\item Il sistema Bert ottiene performance migliori rispetto al sistema Ftwv per ogni singola metrica. I risultati mostrano come il sistema Bert corregga più errori rispetto al sistema Ftwv. La differenza più marcata risiede però nell'introduzione di nuovi errori, ambito nel quale il sistema Bert ha prestazioni decisamente migliori.
 
+\item Una lunghezza maggiore della frase da correggere è correlata ad un aumento delle performance di correzione. Ciò è imputabile al funzionamento dei sistemi di correzione testati, che usano il contesto intorno ad un errore per effettuare la correzione. Più ampio è il contesto, migliori sono i risultati.
 
+\item Il sistema Bert ottiene scarsi risultati sulle superpipeline di segmentazione. Ciò è dovuto principalmente al fatto che la correzione è più focalizzata sui word error. La correzione e l'individuazione degli errori di segmentazione, inoltre, è un problema complicato e diverso dalla correzione dei word error: è quindi necessario sviluppare un sistema che riesca ad individuare e correggere più tipi di errori di segmentazione in modo più comprensivo.
+\end{itemize}
 
-
-
-
-
-
-
-
-% Il modello in lab si chiama Ftwv

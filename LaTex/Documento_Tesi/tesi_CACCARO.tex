@@ -58,13 +58,13 @@
 \begin{document}
 
 \newcommand{\E}{È}
-\noindent
-\hl{\textbf{Scadenze:}\\
-\textbf{Presentazione domanda e titolo:} entro il 22 Novembre\\
-\textbf{Consegna riassunto:} dal 22 novembre al 6 dicembre\\
-\textbf{Consegna tesi:} entro il 6 dicembre\\
-\textbf{Seduta laurea:} dal 13 al 17 dicembre (ancora da definire)
-}
+%\noindent
+%\hl{\textbf{Scadenze:}\\
+%\textbf{Presentazione domanda e titolo:} entro il 22 Novembre\\
+%\textbf{Consegna riassunto:} dal 22 novembre al 6 dicembre\\
+%\textbf{Consegna tesi:} entro il 6 dicembre\\
+%\textbf{Seduta laurea:} dal 13 al 17 dicembre (ancora da definire)
+%}
 \title{Uso di un modello BERT per la correzione di errori generati dal processo di OCR su dati testuali}
 \author{Sebastiano Caccaro}
 \dept{Corso di Laurea Magistrale in Informatica} 
@@ -90,31 +90,28 @@
 %
 \beforepreface
 \prefacesection{}
-        {\hfill \Large {\sl dedicato a \dots}}
+\begin{flushright}
+\Large {\sl "Everything's in order in a black hole"}\\
+\sl \large Arctic Monkeys
+\end{flushright}
 % 
 %			PREFAZIONE
 %
-\prefacesection{Abstract}
-hkjafgyruet.
+\prefacesection{Sommario}
+\input{capitoli/sommario}
 %
-%
-%			ORGANIZZAZIONE
-\section*{Organizzazione della tesi}
-\label{organizzazione}
-La tesi \`e organizzata come segue:
-\begin{itemize}
-\item nel Capitolo 1 ....
-\end{itemize}
 %
 %			RINGRAZIAMENTI
 %
 \prefacesection{Ringraziamenti}
-asdjhgftry.
+\input{capitoli/ringraziamenti}
 \afterpreface
 % 
 % 
-\chapter{Introduzione}
+\chapter*{Introduzione}
+\addcontentsline{toc}{chapter}{Introduzione}  
 \label{sec:intro}
+\input{capitoli/introduzione}
 
 \chapter{Stato dell'Arte}
 \label{sec:arte}
@@ -137,10 +134,13 @@ asdjhgftry.
 \input{capitoli/analisi}
 
 \chapter*{Conclusioni}
+\addcontentsline{toc}{chapter}{Conclusioni}  
 \label{sec:conclusioni}
+\input{capitoli/conclusioni}
 
 \bibliographystyle{unsrt}
 \bibliography{../bibliografia}
+\addcontentsline{toc}{chapter}{Bibliografia}
 
 
 \end{document}
