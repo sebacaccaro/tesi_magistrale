@@ -1,0 +1,102 @@
+
+\title{Correttore BERT}
+\author{
+        Riassunto Tesi
+}
+
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[italian]{babel}
+\usepackage{hyperref}
+\usepackage{color,soul}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+
+\lstset{  
+  xleftmargin=0.05\textwidth, xrightmargin=.2\textwidth,
+}
+
+\makeatletter
+\renewcommand\@biblabel[1]{}
+\renewenvironment{thebibliography}[1]
+     {\section*{\refname}%
+      \@mkboth{\MakeUppercase\refname}{\MakeUppercase\refname}%
+      \list{}%
+           {\leftmargin0pt
+            \@openbib@code
+            \usecounter{enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+\makeatother
+
+\begin{document}
+\begin{center}
+ {\Large Uso di un modello BERT per la correzione di errori generati dal processo di OCR su dati testuali}\\ \
+\\ \ 
+{\large Sebastiano Caccaro - Mat. 958683}\\
+A.A 2020/2021
+\end{center}
+
+
+\newcommand{\E}{È}
+
+Ad oggi, sempre più libri cartacei, riviste e giornali presenti in biblioteche e archivi storici stanno venendo trasformati in versioni elettroniche che possono essere manipolate da un computer. A questo scopo, nel corso degli anni sono state sviluppate tecnologie di Optical Character Recognition (comunemente abbreviato con OCR) per tradurre le scansioni e immagini di documenti testuali in testo interpretabile e processabile da un computer. Questi sistemi, però, non sono perfetti e possono introdurre errori nel testo, che possono abbassare drasticamente la precisione di vari task di NLP.\\
+In questa tesi si propone un approccio modulare per la correzione di tali errori basato su BERT, un modello di machine learing finalizzato al NLP rilasciato da Google nel 2018.
+L'approccio proposto è valutato su un dataset creato ad hoc, contenente testi con diverse tipologie e intensità di errore.  
+I risultati sperimentali dimostrano la fattibilità di utilizzare approcci basati su BERT per la correzione di errori in testi acquisiti tramite OCR, mostrando inoltre come ci siano ulteriori margini per migliorare l'approccio proposto.\\
+\noindent
+La tesi è organizzata nei seguenti capitoli:
+
+\begin{enumerate}
+\item \textbf{Stato dell'Arte}: in questo capitolo è definito in modo più preciso il problema dell'OCR post-processing, ed è presentata la discussione della letteratura.
+
+\item \textbf{Dataset e Perturbazione}: in questo capitolo si discutono le ragioni che hanno portato alla creazione di un dataset apposito, e si descrive la metodologia con la quale tale dataset è stato creato.
+
+\item \textbf{Metodologia di correzione}: in questo capitolo si descrive la metodologia implementata dal sistema di correzione sviluppato.
+
+
+\item \textbf{Test e Risultati}: in questo capitolo è descritta la metodologia di test utilizzata, insieme alle metriche definite per la valutazione del sistema di correzione. Sono poi riportati e commentati i risultati dei test eseguiti
+
+
+\item \textbf{Analisi dell'errore}: in questo capitolo si analizzano le performance dei vari stadi del sistema di correzione, con lo scopo di capire quali fasi sono ottimizzate e quali invece hanno margini di miglioramento.
+\end{enumerate}
+\noindent
+Sono inoltre riportate in chiusura le conclusioni tratte dai risultati e dall'analisi dell'errore, insieme ad alcuni possibili sviluppi futuri del sistema di correzione.
+
+
+\nocite{bert}
+\nocite{OCRMaskFilling}
+\nocite{impatto_ocr_1}
+\nocite{ocr_error_analysis}
+\nocite{zhang2020spelling}
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{../bibliografia}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
