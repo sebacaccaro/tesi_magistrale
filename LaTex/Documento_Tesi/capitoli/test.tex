@@ -10,7 +10,7 @@ Inoltre, i test svolti in questo capitolo rendono possibile:
 
 \item Confrontare le performance del sistema di correzione su diverse versioni del dataset. Nel \autoref{sec:dataset} sono infatti state definite due versioni del dataset, \dsta\ e \dstb, che differiscono per la lunghezza delle frasi. Portare a termine i test su entrambe le versioni permette quindi di capire quanto la lunghezza delle frasi influisca sulle prestazioni del sistema di correzione.
 
-\item Confrontare il sistema di correzione sviluppato con altri sistemi di OCR post-processing per avere un riscontro con il quale meglio valutare i risultati ottenuti. A tale scopo, si utilizza come confronto la metodologia di correzione proposta in \cite{hamalainen2019paft}, già illustrata nella \autoref{sec:arte_nmt}; l'approccio utilizzato è però leggermente modificato, e utilizza una combinazione di FastText e Word2Vec per trovare le parole semanticamente simili a quelle errate (a differenza del solo Word2Vec come nel paper originale). Per distinguere il metodo sviluppato da quello usato come confronto, si ci riferirà con:
+\item Confrontare il sistema di correzione sviluppato con altri sistemi di OCR post-processing per avere un riscontro con il quale meglio valutare i risultati ottenuti. A tale scopo, si utilizza come confronto la metodologia di correzione proposta in \cite{hamalainen2019paft}, già illustrata nella \autoref{sec:arte_nmt}; l'approccio utilizzato è però leggermente modificato, e utilizza una combinazione di FastText e Word2Vec per trovare le parole semanticamente simili a quelle errate (a differenza del solo Word2Vec come nel paper originale). In questa sezione ci si riferirà con:
 	\begin{itemize}
 	\item \textbf{Bert} al metodo sviluppato e oggetto di questa tesi.
 	\item \textbf{Ftwv} al metodo appena descritto usato come confronto.
@@ -84,7 +84,7 @@ Ad[c]sso[.] io pr[c]f[c]risc parlare spontaneamente. & 3\\
 \label{tab:test_erroridel}
 \end{table}
 \noindent
-Si noti come ogni errore delimitato contribuisca al conteggio del numeri di errori con un +1 indipendentemente dal numero di caratteri da cui è composto.
+Si noti come ogni errore delimitato contribuisca al conteggio dei numeri di errori con un +1 indipendentemente dal numero di caratteri da cui è composto.
 
 Data quindi una qualsiasi tripla $t$ appartenente a uno dei 9 insieme definiti in precedenza, e formata dai campi $t_{or}$, $t_{pe}$, $t_{co}$, sono date le seguenti definizioni:
 
@@ -161,7 +161,7 @@ Il valore ottenuto è diviso per la somma dei caratteri totali contenuti nell'in
 \section{Risultati}
 \label{sec:test_risultati}
 
-Lo scopo dei test in questa sezione è quello di valutare le performance del sistema di correzione sviluppato e confrontarle a quelle del sistema Ftwv. Si vuole inoltre misurare l'impatto della lunghezza della frasi da correggere sulle performance di correzione. Per fare ciò, si eseguiranno i test sulle seguenti configurazioni:
+Lo scopo dei test in questa sezione è quello di valutare le performance del sistema di correzione sviluppato e confrontarle a quelle del sistema Ftwv. Si vuole inoltre misurare l'impatto della lunghezza delle frasi da correggere sulle performance di correzione. Per fare ciò, si eseguiranno i test sulle seguenti configurazioni:
 \begin{itemize}
 \item \textbf{Bert@50}: sistema di correzione Bert con dataset \dsta.
 \item \textbf{Bert@100}: sistema di correzione Bert con dataset \dstb.
@@ -282,7 +282,7 @@ In \autoref{fig:test_res_ldr_gra} e \autoref{fig:test_res_ldr} sono riportate le
 
 \begin{itemize}
 \item \E\ possibile confermare quanto visto precedenza: il sistema Bert corregge un maggior numero di errori e ne introduce di meno rispetto al sistema Ftwv. Ciò si traduce in una riduzione positiva della distanza di Levenshtein.
-\item Anche in questo caso è presente un delta rilevante fra la prestazioni di entrambi i sistemi con frasi di lunghezza diversa. In questo caso, però, la differenza è più marcata nei risultati del sistema bert.
+\item Anche in questo caso è presente un delta rilevante fra le prestazioni di entrambi i sistemi con frasi di lunghezza diversa. In questo caso, però, la differenza è più marcata nei risultati del sistema bert.
 
 \item Il sistema Bert presenta una riduzione negativa sulle pipeline S1 e S2, mentre la riduzione positiva è quasi nulla nella pipeline S3. Questo conferma quanto già osservato, ovvero che il sistema di correzione sviluppato non corregge in modo ottimale i word segmentation error. 
 \end{itemize}

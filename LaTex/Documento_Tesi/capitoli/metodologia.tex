@@ -195,7 +195,7 @@ fase può quindi essere suddiviso in due stadi:
 
 \begin{enumerate}
 \item \textbf{Sentence pre-processing}: la frase viene tokenizzata, ovvero viene divisa singole parole dette token. Questo stadio è implementato tramite la libreria NLTK\cite{nltk}.
-\item \textbf{Error marking}: ogni token è analizzato singolarmente per determinare se contenga o meno un errore. Un token è considerato errato se sono vere le seguente condizioni:
+\item \textbf{Error marking}: ogni token è analizzato singolarmente per determinare se contenga o meno un errore. Un token è considerato errato se sono vere le seguenti condizioni:
 	\begin{itemize}
 	\item Ha una lunghezza minima di 2 caratteri. Questa condizione è necessaria per evitare di introdurre nuovi errori correggendo inutilmente errori di tipo SP. Ad esempio, sarebbe deleterio provare a correggere le singole lettere di \textit{"Q u a l c h e"}. Ciò è dovuto al fatto che il modulo di correzione token è progettato per correggere singoli token: nell'esempio precedente, si tenterebbe quindi la correzione di tutte le sub-word che compongono il token. Per questo tipo di errori, è stato sviluppato di modulo di correzione Split (\autoref{sec:met_mod_split}).
 	
@@ -308,7 +308,7 @@ Questo approccio comporta però uno svantaggio: se la prima o una della prime co
 Il modulo di correzione Split corregge tutti gli errori di tipo SP.\\
 La fase di error detection si compone di tre stadi:
 \begin{enumerate}
-\item \textbf{Sequences marking}: data un frase contenente errori di tipo SP, sono delimitati i punti di inizio e terminazione delle sequenze contenenti errori. L'individuazione di tali sequenze è eseguita tramite la seguente espressione regolare:
+\item \textbf{Sequences marking}: data una frase contenente errori di tipo SP, sono delimitati i punti di inizio e terminazione delle sequenze contenenti errori. L'individuazione di tali sequenze è eseguita tramite la seguente espressione regolare:
 \begin{lstlisting}[language=Python]
 r'(?:\s|^)(\w(?:\W?\s\w{1,2}){3,})(?:\W|\s|$)'
 \end{lstlisting}
@@ -400,7 +400,7 @@ o& &e& &o&'& &g& &n& &i& &d&o&n&n&a&,&\\
 p& &r& &o& &c& &u& &r& &a& &n& &d& &o&.\\
 \hline
 \end{tabular}
-\caption{Caratteri e indici delle frase esempio}
+\caption{Caratteri e indici della frase di esempio}
 \end{table}
 
 
@@ -433,7 +433,7 @@ La fase di Error Correction mira a correggere gli errori individuati nella fase 
 \begin{equation}
 EC_{split}: (F,L_{seq}) \rightarrow F_{corr}
 \end{equation}
-dove $F_{corr}$ è la frase con le correzione apportate.\\
+dove $F_{corr}$ è la frase con le correzioni apportate.\\
 La fase di Error Correction si compone dei seguenti stadi:
 \begin{enumerate}
 \item \textbf{Compression:} per ogni sequenza $s_i$ individuata da correggere, si rimuovono gli spazi bianchi, in modo da ottenere un'unica parola continua detta $s\prime_i$.

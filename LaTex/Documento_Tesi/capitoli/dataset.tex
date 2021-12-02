@@ -90,8 +90,8 @@ Lo scopo di questa fase è quello di scomporre i paragrafi estratti nella fase p
 \newcommand{\lmin}{$l_{min}$}
 \newcommand{\lmax}{$l_{max}$}
 \begin{itemize}
-\item Ogni frase è disgiunta dalla altre frasi estratte dal medesimo paragrafo.
-\item Ogni frase è compresa fra una lunghezza minima \lmin\ e una lunhezza massima \lmax\ (\autoref{dst:configurazione}).
+\item Ogni frase è disgiunta dalle altre frasi estratte dal medesimo paragrafo.
+\item Ogni frase è compresa fra una lunghezza minima \lmin\ e una lunghezza massima \lmax\ (\autoref{dst:configurazione}).
 \end{itemize}
 
 Dato quindi il testo di un paragrafo $text_p$, la frammentazione avviene secondo la seguente procedura:
@@ -548,7 +548,7 @@ In questa sottosezione sono definite le superpipeline usate per la perturbazione
 \item \textbf{Mixed Pipeline}: sono superpipeline che introducono sia word error che word segmentation error. Le segmentation superpipeline sono identificate dai codici M1, M2, M3, dove M1 e M3 sono rispettivamente la superpipeline che introduce meno errori e quella che ne introduce di più.
 \end{itemize}
 
-In tutto quindi sono definite 9 superpipeline (T1, T2, T3, S1, S2, S3, M1, M2, M3): questo numero permette di avere una buona granularità tenendo comunque contenuti i tempi durante la fase di testing.
+In totale sono definite 9 superpipeline (T1, T2, T3, S1, S2, S3, M1, M2, M3): questo numero permette di avere una buona granularità tenendo comunque contenuti i tempi durante la fase di testing.
 
 \subsubsection{Pipeline}
 Le superpipeline appena descritte sono formate dalla combinazione di più pipeline. Sono definiti tre tipi di pipeline:
@@ -684,7 +684,7 @@ M3	& /	& /	& /	& /	& /	& /	& 1	& 6	& 4 \\
 
 
 \subsection{Dataset}
-In questa sottosezione sono descritte le istanze del dataset create e i loro parametri. Sono ricordati i seguito i parametri configurabili per la creazione di un dataset:
+In questa sottosezione sono descritte le istanze del dataset create e i loro parametri. Sono ricordati in seguito i parametri configurabili per la creazione di un dataset:
 \begin{itemize}
 \item $l_{min}$: lunghezza minima di una frase nel dataset.
 \item $l_{max}$: lunghezza massima di una frase nel dataset.
