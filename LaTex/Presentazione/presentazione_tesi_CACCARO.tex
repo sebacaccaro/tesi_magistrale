@@ -100,64 +100,72 @@ Gli errori presenti nel testo rendono vari task di NLP meno efficaci.
 	
 	
 \end{frame}
-%###########################################################################
-\section{Stato dell'Arte}
-\begin{frame}{Tipi di OCR Post Processing}
-	
-In letteratura sono presenti più tipi di approcci al problema dell'OCR Post Processing:
+
+\begin{frame}{Scopo della tesi}
+Il lavoro svolto in questa testi è consistito nello sviluppo di un sistema automatico di \textbf{OCR Post Processing} basato su \textbf{BERT}. Si sono resi inoltre necessari:
 \begin{itemize}
-\item n-grams: approcci statistici
-\item Neural Machine Translation: correzione affrontata come una traduzione
-\item \textbf{BERT}: tecnica relativamente nuova, non molti approcci in letteratura.
-
+\item La creazione di un \textbf{dataset} apposito
+\item La definizione di metriche di \textbf{test} appropriate
 \end{itemize}
-	
 \end{frame}
+%###########################################################################
+%\section{Stato dell'Arte}
+%\begin{frame}{Tipi di OCR Post Processing}
+%	
+%In letteratura sono presenti più tipi di approcci al problema dell'OCR Post Processing:
+%\begin{itemize}
+%\item n-grams: approcci statistici
+%\item Neural Machine Translation: correzione affrontata come una traduzione
+%\item \textbf{BERT}: tecnica relativamente nuova, non molti approcci in letteratura.
+%
+%\end{itemize}
+%	
+%\end{frame}
 
-\begin{frame}{BERT}
-	
-\textbf{BERT (Bidirectional Encoder Representation from Transformers)} è un'architettura per la costruzione di modelli linguistici sviluppata da Google sulla base dei modelli transformers.
-\newline \newline
-I modelli BERT sono \textbf{pre-allenati} minimizzando la perdita combinata per i task di \textbf{Masked Language Modelling (MLM)} e Next Sentence Prediction (NSP).
-	
-\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Dataset e Perturbazione}
 
 \begin{frame}{Dataset}
-\E\ necessario avere un dataset composto da \textbf{frasi parallele} per la valutazione, ma non è facile da ottenere:
+\E\ necessario avere un dataset composto da \textbf{frasi parallele} per la valutazione. Tali dataset non sono facilmente reperibili:
 \begin{itemize}
 \item Correzione manuale
 \item Lingua italiana
 \end{itemize}\ 
 \newline \newline
-L'approccio scelto introduce artificialmente errori in frasi pulite.\\ \E\ detto \textbf{perturbazione}.
+L'approccio scelto introduce artificialmente errori in frasi pulite, detto \textbf{perturbazione}.
 \end{frame}
 
 \begin{frame}{Perturbazione}
-Creazione di un sistema modulare per introdurre nel testo diversi tipi di errori:
-\begin{itemize}
-\item Word Error (es. risparniio, alrneno) 
-\item Word Segmentation Error (es. n o l l o, t.ut.te)
-\end{itemize}\
-\newline
-Tre diverse categorie di perturbazione, con tre livelli di intensità ciascuna:
-\begin{itemize}
-\item Token: \texttt{T1,T2,T3}
-\item Segmentation: \texttt{S1,S2,S3}
-\item Mixed: \texttt{M1,M2,M3}
+Creazione di un \textbf{sistema modulare} per introdurre nel testo diversi tipi di errore.
+\newline \newline
+Tre categorie di perturbazione, con tre livelli di intensità ciascuna:
+\begin{table}[H]
+\centering
+\begin{tabular}{cc}
+\textbf{Categoria} & \textbf{Livelli} \\ \hline
+Token & \texttt{T1,T2,T3}\\
+Segmentation & \texttt{S1,S2,S3}\\
+Mixed & \texttt{M1,M2,M3}\\
+\end{tabular}
+\end{table}
 
-\end{itemize}
+
+
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Metodologia}
 
 \begin{frame}{Sistema di correzione}
-Sviluppo di un sistema modulare per la correzione:
+Sviluppo di una \textbf{pipeline modulare} per la correzione:
 \begin{itemize}
-\item Ogni modulo individua corregge una categoria di errori
+\item Ogni modulo individua e corregge una categoria di errori
+	\begin{itemize}
+	\item Modulo di correzione token
+	\item Modulo di correzione split
+	\end{itemize}
 \item Moduli ripetibili 
 \end{itemize}
 
@@ -171,19 +179,28 @@ Sviluppo di un sistema modulare per la correzione:
 
 \end{frame}
 
-\begin{frame}{Modulo di correzione Token - 1/2}
-	\begin{figure}[H]	
-	\includegraphics[width=\textwidth]{images/slides/Schema_modulo}
-	\caption{Schema della prima parte del modulo di correzione Token}
-	\end{figure}
+
+\begin{frame}{BERT}
+	
+\textbf{BERT (Bidirectional Encoder Representation from Transformers)} è un'architettura per la costruzione di modelli linguistici sviluppata.
+\newline \newline
+I modelli BERT sono \textbf{pre-allenati} minimizzando la perdita combinata per i task di \textbf{Masked Language Modelling (MLM)} e Next Sentence Prediction (NSP).
+	
 \end{frame}
 
-\begin{frame}{Modulo di correzione Token - 2/2}
-	\begin{figure}[H]	
-	\includegraphics[width=\textwidth]{images/slides/Scelta_candidati}
-	\caption{Schema della seconda parte del modulo di correzione Token}
-	\end{figure}
-\end{frame}
+%\begin{frame}{Modulo di correzione Token - 1/2}
+%	\begin{figure}[H]	
+%	\includegraphics[width=\textwidth]{images/slides/Schema_modulo}
+%	\caption{Schema della prima parte del modulo di correzione Token}
+%	\end{figure}
+%\end{frame}
+
+%\begin{frame}{Modulo di correzione Token - 2/2}
+%	\begin{figure}[H]	
+%	\includegraphics[width=\textwidth]{images/slides/Scelta_candidati}
+%	\caption{Schema della seconda parte del modulo di correzione Token}
+%	\end{figure}
+%\end{frame}
 
 \begin{frame}{Esempio - 1/2}
 
@@ -215,95 +232,92 @@ $\downarrow$\\
 
 
 \section{Test e Risultati}
+
 \begin{frame}{Metodologia di test}
-\E\ stata definita una precisa metodologia di test:
-\begin{itemize}
-\item Test eseguiti su frasi di lunghezza differente
-\item Comparazione con un altro metodo di OCR
-\end{itemize}\ \\ \
-\\
-Cinque metriche diverse diverse, per misurare:
+
+Definizione di cinque metriche per misurare:
 \begin{itemize}
 \item Quantità di errori corretti
 \item Quantità di errori introdotti
 \end{itemize}
+I risultati sono misurati su versioni del dataset con frasi di lunghezza diversa, e confrontanti con un approccio presente in letteratura.
 
 \end{frame}
-
-\begin{frame}{Risultati - 1/5}
+\begin{frame}{Risultati - 1/2}
 \begin{figure}[H]
 \includegraphics[width=.9\textwidth]{images/test/cp}
 \caption{Errori corretti per errore presente (valori più alti = risultati migliori)}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Risultati - 2/5}
+\begin{frame}{Risultati - 2/2}
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/test/if}
 \caption{Errori introdotti per carattere (valori più bassi = risultati migliori)}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Risultati - 3/5}
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{images/test/ic}
-\caption{Errori introdotti per errore corretto (valori più alti = risultati migliori)}
-\end{figure}
-\end{frame}
+%\begin{frame}{Risultati - 3/5}
+%\begin{figure}[H]
+%\includegraphics[width=\textwidth]{images/test/ic}
+%\caption{Errori introdotti per errore corretto (valori più alti = risultati migliori)}
+%\end{figure}
+%\end{frame}
+%
+%\begin{frame}{Risultati - 4/5}
+%\begin{figure}[H]
+%\includegraphics[width=.9\textwidth]{images/test/ldr}
+%\caption{Riduzione nella distanza di Levenshtein (valori più alti = risultati migliori)}
+%\end{figure}
+%\end{frame}
+%
+%\begin{frame}{Risultati - 5/5}
+%\begin{figure}[H]
+%\includegraphics[width=\textwidth]{images/test/ldt}
+%\caption{Distanza di Levenshtein totale valori più bassi = risultati migliori)}
+%\end{figure}
+%\end{frame}
 
-\begin{frame}{Risultati - 4/5}
-\begin{figure}[H]
-\includegraphics[width=.9\textwidth]{images/test/ldr}
-\caption{Riduzione nella distanza di Levenshtein (valori più alti = risultati migliori)}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Risultati - 5/5}
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{images/test/ldt}
-\caption{Distanza di Levenshtein totale valori più bassi = risultati migliori)}
-\end{figure}
-\end{frame}
-
-\section{Analisi dell'errore}
-\begin{frame}{Analisi dell'errore}
-Analisi delle di correzione del modulo di correzione Token:
-\begin{itemize}
-\item Senza error detection
-\item Capire quali fasi sono migliorabili
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Risultati 1/2}
-\begin{figure}[H]
-\centering
-\includegraphics[width=.7\textwidth]{images/slides/overview}
-\caption{Percentuale dei casi in cui BERT produce la soluzione}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Risultati 2/2}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{images/slides/lev_pos_Combinato}
-\caption{Distribuzione della posizione della soluzione all'interno dei risultati ordinati per la distanza di Levenshtein}
-\end{figure}
-\end{frame}
+%\section{Analisi dell'errore}
+%\begin{frame}{Analisi dell'errore}
+%Analisi delle di correzione del modulo di correzione Token:
+%\begin{itemize}
+%\item Senza error detection
+%\item Capire quali fasi sono migliorabili
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Risultati 1/2}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[width=.7\textwidth]{images/slides/overview}
+%\caption{Percentuale dei casi in cui BERT produce la soluzione}
+%\end{figure}
+%\end{frame}
+%
+%\begin{frame}{Risultati 2/2}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[width=\textwidth]{images/slides/lev_pos_Combinato}
+%\caption{Distribuzione della posizione della soluzione all'interno dei risultati ordinati per la distanza di Levenshtein}
+%\end{figure}
+%\end{frame}
 
 \section{Conclusioni}
-\begin{frame}{Conclusioni}
+\begin{frame}{Conclusioni 1/2}
 I risultati sperimentali dimostrano che:
 \begin{itemize}
 	\item Usare \textbf{BERT} è una via percorribile per l'OCR Post Processing
-	\item A seconda del rumore presente nel testo, il sistema sviluppato corregge fra il 25\% e il 40\% degli errori corretti
+	\item A seconda del rumore presente nel testo, il sistema sviluppato corregge fra il 25\% e il 40\% degli errori presenti
 	\item Rispetto agli errori corretti, il sistema sviluppato introduce un numero molto basso di nuovi errori
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Sviluppi futuri}
-I risultati sperimentali dimostrano come il sistema di correzione abbia ampli margini di miglioramento:
+
+\begin{frame}{Conclusioni 2/2}
+Un'ulteriore analisi sui risultati prodotti ha fatto emergere che ci sono ampli margini di miglioramento:
 \begin{itemize}
-\item Applicare soluzioni più complesse per error detection e word segmentation error
+\item Applicare soluzioni più complesse per error detection e errori di segmentazione
 \item Usare un approccio a sliding window per massimizzare la lunghezza delle frasi
 \end{itemize}
 
