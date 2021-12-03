@@ -52,7 +52,7 @@ La creazione del dataset per il testing, descritta nelle prossime sezioni, segue
 \end{enumerate}
 
 \paragraph{Filtraggio lingue}
-In questa fase vengono filtrati tutti i documenti non presenti fra lingue scelte. Dato l'insieme dei documenti $D$ e l'insieme delle lingue consentite $L$, l'insieme filtrato dei documenti $D_{fl}$ si ottiene come segue:
+In questa fase vengono filtrati tutti i documenti la cui lingua non è presente fra le lingue scelte. Dato l'insieme dei documenti $D$ e l'insieme delle lingue consentite $L$, l'insieme filtrato dei documenti $D_{fl}$ si ottiene come segue:
 \begin{equation}
 D_{fl} = \{d\ \forall d \in D\ |\ \textit{language}_d \in L  \} 
 \end{equation}
@@ -103,8 +103,8 @@ Dato quindi il testo di un paragrafo $text_p$, la frammentazione avviene secondo
 \item Se la lunghezza di $text_p$ è minore di \lmax, $text_p$ è aggiunto alle frasi estratte. Altrimenti, si divide $text_p$ in posizione \lmax. La parte a sinistra del punto di divisione è una frase estratta. La parte a destra invece viene riutilizza come input della procedura di frammentazione, tornando al punto 1. 
 \end{enumerate}
 
-La procedura appena descritta fa in modo che i frammenti approssimino il più possibile \lmax, evitando il più possibile introdurre errori. Spezzare un paragrafo nel mezzo di una parola, ad esempio, andrebbe a creare due frammenti contenenti degli errori (uno sulla parola finale del primo, l'altro sulla parola iniziale del secondo.\\
-Durante la frammentazione ogni frammento ritiene i metadati relativi al documento e al paragrafo di appartenenza. In più, si aggiunge un ulteriore campo per tenere traccia della posizione del frammento all'interno del paragrafo di appartenenza. In questo modo, è possibile ricomporre un documento in secondo momento. Ogni frase prodotta rispetta il seguente schema:
+La procedura appena descritta fa in modo che i frammenti approssimino  \lmax, evitando il più possibile introdurre errori. Spezzare un paragrafo nel mezzo di una parola, ad esempio, andrebbe a creare due frammenti contenenti degli errori (uno sulla parola finale del primo, l'altro sulla parola iniziale del secondo).\\
+Durante la frammentazione ogni frammento ritiene i metadati relativi al documento e al paragrafo di appartenenza. In più, si aggiunge un ulteriore campo per tenere traccia della posizione del frammento all'interno del paragrafo di appartenenza. In questo modo, è possibile ricomporre un documento in un secondo momento. Ogni frase prodotta rispetta il seguente schema:
 \begin{table}[H]
 \centering
 \begin{tabular}{ll}
@@ -118,7 +118,7 @@ parPos & Posizione della frase all'interno del paragrafo di provenienza\\
 \label{tab:dst_frasestrut}
 \end{table}
 
-La frase di frammentazione si può quindi formalizzare in due step. Nel primo step, ogni paragrafo viene frammentato nella lista delle sue frasi:
+La fase di frammentazione si può quindi formalizzare in due step. Nel primo step, ogni paragrafo viene frammentato nella lista delle sue frasi:
 \begin{equation}
 D_{fr1} = \{ extr(p)\ \forall p \in D_{es}  \}
 \end{equation}
@@ -128,7 +128,7 @@ D_{fr} = \bigcup\limits_{f \in D_{fr1}} f
 \end{equation}
 
 \paragraph{Filtraggio paragrafi}
-Lo scopo di questa fase è quello di rimuovere dal dataset tutti le frasi che appartengono al primo o all'ultimo paragrafo di un documento. Ciò si rende necessario perchè questi paragrafi spesso contengono intestazioni o piè di pagina ripetitivi andrebbero a sporcare il dataset. Ad esempio, l'ultimo paragrafo contiene spesso una frase simile  a \textit{"© Copyright 2004 - Libreria Editrice Vaticana"}, mentre il primo spesso contiene solamente una data.\\
+Lo scopo di questa fase è quello di rimuovere dal dataset tutte le frasi che appartengono al primo o all'ultimo paragrafo di un documento. Ciò si rende necessario perchè questi paragrafi spesso contengono intestazioni o piè di pagina ripetitivi che andrebbero a sporcare il dataset. Ad esempio, l'ultimo paragrafo contiene spesso una frase simile  a \textit{"© Copyright 2004 - Libreria Editrice Vaticana"}, mentre il primo spesso contiene solamente una data.\\
 \E\ definita la seguente funzione $\textit{maxPar}$ che, data una frase $f \in D_{fr}$, indica se $f$ appartiene all'ultimo paragrafo del documento da cui è stata estratta:
 \begin{equation}
   maxPar(f) =
@@ -183,7 +183,7 @@ D_{pe} = \{applyPert(f)\ \forall f \in D_{fp}\}
 \end{equation}
 
 \paragraph{Riduzione}
-Lo scopo della fase di riduzione è quello di creare una versione ridotta del dataset, ovvero di ridurne il numero di elementi. Ciò è reso necessario dal fatto che il testing può essere significativamente oneroso in termini di tempo e risorse, specialmente su dataset troppo ampi.\\
+Lo scopo della fase di riduzione è quello di creare una versione ridotta del dataset, ovvero quello di ridurne il numero di elementi. Ciò è reso necessario dal fatto che il testing può essere significativamente oneroso in termini di tempo e risorse, specialmente su dataset troppo ampi.\\
 Data quindi la dimensione del dataset ridotto $n$ (i cui valori sono specificati nella \autoref{dst:configurazione}), il dataset $D_{re}$ è un sottoinsieme di $n$ elementi estratti casualmente da $D_{pe}$:
 \begin{equation}
 D_{re} \subset D_{pe} \wedge |D_{re}| = n
@@ -332,7 +332,7 @@ Il modulo di hypen merging modella l'errore in cui due parole consecutive vengon
 f_{hyphen}([t_1,t_2]) = [t_1\frown \textit{"-"} \frown t_2]
 \end{equation}
 
-\paragraph{Esempio} Data la sequenza di gruppi di 2 token \textit{['Nel', 'mezzo'], ['del', 'cammin'], \underline{['di', 'nostra']}, ['vita']}, dove il gruppo sottolineati sono quello da perturbare, si ha che:
+\paragraph{Esempio} Data la sequenza di gruppi di 2 token \textit{['Nel', 'mezzo'], ['del', 'cammin'], \underline{['di', 'nostra']}, ['vita']}, dove il gruppo sottolineato è quello da perturbare, si ha che:
 \begin{equation}
 f_{hyphen}(\textit{["di", "nostra"]}) = \textit{["di-nostra"]}
 \end{equation}
@@ -557,7 +557,7 @@ Le superpipeline appena descritte sono formate dalla combinazione di più pipeli
 \item Segmentation pipeline
 \item Mixed pipeline
 \end{itemize}
-ognuna di queste tipologie di pipeline introduce gli stessi tipi di errore delle omonime superpipeline. Per ogni tipologia di pipeline sono definite 3 pipeline, ognuna della quali ha li stessi moduli con probabilità diverse.
+ognuna di queste tipologie di pipeline introduce gli stessi tipi di errore delle omonime superpipeline. Per ogni tipologia di pipeline sono definite 3 pipeline, ognuna della quali ha gli stessi moduli con probabilità diverse.
 
 \paragraph{Token pipeline} Una token pipeline è formata dai moduli presenti nella seguente \autoref{tab:dst_tkpip}:
 

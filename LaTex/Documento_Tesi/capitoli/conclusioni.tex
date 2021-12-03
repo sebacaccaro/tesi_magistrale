@@ -1,4 +1,4 @@
-In questa tesi è stato sviluppato e proposto un approccio automatico al problema dell'OCR post processing, basato sull'uso di un modello BERT pre-allenato. Il sistema sviluppato è strutturato come una pipeline, nella quale ogni modulo corregge un particolare tipo di errore. Sono stati sviluppati due moduli, denominati modulo di correzione Token e modulo di correzione Split per correggere rispettivamente i non-word error e gli errori di space splitting.
+In questa tesi è stato sviluppato e proposto un approccio automatico al problema dell'OCR post processing, basato sull'uso di un modello BERT pre-allenato. Il sistema sviluppato è strutturato come una pipeline, nella quale ogni modulo corregge un particolare tipo di errore. Sono stati sviluppati due moduli, denominati modulo di correzione Token e modulo di correzione Split per correggere rispettivamente i non-word error e gli space splitting error.
 
 Sono state definite una metodologia di test e delle metriche apposite per valutare le performance del sistema sviluppato. Le metriche definite mirano a valutare il numero di errori corretti e introdotti dal sistema di correzione. La stessa metodologia di test è stata applicata ad un approccio presente in letteratura, in modo tale da poter comparare i risultati ottenuti.
 
@@ -14,11 +14,13 @@ Il lavoro svolto in questa tesi dimostra come l'utilizzo di un modello BERT pre-
 \begin{itemize}
 \item I test hanno dimostrato come all'aumentare della lunghezza del testo in input il sistema produca risultati migliori. Potrebbe quindi essere opportuno usare frasi di 256 caratteri (limite superiore per BERT) e portare avanti la correzione con un approccio a sliding window sul testo. Questo approccio avrebbe il vantaggio di massimizzare la lunghezza delle frasi e di eseguire automaticamente più iterazioni su errori non corretti. Sarebbe però necessario un nuovo metodo per valutare le prestazioni del sistema su segmenti di testo più lunghi.
 
-\item L'analisi dell'errore ha dimostrato come la parte di error correction del sistema agisca correttamente almeno nel 70\% (nel caso del tipo di frase con performance peggiori). Il sistema di correzione, nel migliore dei casi, corregge il 40\% degli errori presenti. Buona parte di questo scarto può essere attribuibile alla fase di error detection, che andrebbe riscritta rimpiazzando l'attuale sistema che fa semplicemente uso di un vocabolario.
+\item L'analisi dell'errore ha dimostrato come la parte di error correction del sistema agisca correttamente almeno nel 70\% dei casi (nel caso del tipo di frase con performance peggiori). Il sistema di correzione, nel migliore dei casi, corregge il 40\% degli errori presenti. Buona parte di questo scarto può essere attribuibile alla fase di error detection, che andrebbe riscritta rimpiazzando l'attuale sistema che fa semplicemente uso di un vocabolario.
 
 \item I test fanno emergere come il sistema di correzione non abbia ottime performance sui word segmetation error. Sarebbe quindi opportuno esplorare altre soluzioni per questo tipo di errori. In questo ambito, l'analisi della letteratura suggerisce come approcci basati su NMT possano ottenere buoni risultati (\autoref{sec:arte_nmt}).
 
 \item Durante l'affinamento del sistema di correzione, si è provato a eseguire il fine-tuning del modello BERT pre-allenato, ri-allenando il modello su una parte del dataset. I test, eseguiti sulla parte rimanente del dataset, hanno prodotto al più risultati lievemente inferiori a quelli del modello pre-allenato. Sarebbe quindi interessante provare a rivedere questo approccio, cercando sia di espandere il dataset ottenuto, sia di allungare le frasi al suo interno per cercare di ottenere risultati migliori.
+
+\item Nel modulo di correzione token, durante la scelta dei candidati, si scarta il valore di probabilità prodotto da BERT in favore della scelta del candidato con la minor distanza di Levenshtein. Si potrebbe invece utilizzare il valore di probabilità in congiunzione con la distanza di Levenshtein per sviluppare dei metodi di scelta e validazione più accurati.
 
 
 

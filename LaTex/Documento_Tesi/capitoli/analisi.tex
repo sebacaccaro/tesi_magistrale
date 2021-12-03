@@ -203,7 +203,7 @@ Quanto appena detto si può notare nel grafico della distribuzione delle soluzio
 \section{Analisi scelta dei candidati}
 \label{sec:ana_cor}
 
-La scelta dei candidati comprende la seconda parte dello stadio candidates generation and picking e lo stadio di validation (\autoref{sec:met_tok_correct}). Data la lista dei $k$ candidati $C = [c_1,...,c_k]$ prodotti da BERT per una frase $f_{mask}$ nel quale la parola $s$ è mascherata, la scelta dei candidati deve:
+La scelta dei candidati comprende la seconda parte dello stadio candidates generation and picking e lo stadio di validation (\autoref{sec:met_tok_correct}). Data la lista dei $k$ candidati $C = [c_1,...,c_k]$ prodotti da BERT per una frase $f_{mask}$ nella quale la parola $s$ è mascherata, la scelta dei candidati deve:
 
 \begin{enumerate}
 \item Scegliere il candidato corretto se $s \in C$, ovvero se la soluzione è presente fra i candidati.
@@ -213,16 +213,16 @@ La scelta dei candidati comprende la seconda parte dello stadio candidates gener
 
 
 \paragraph{Metriche}
-Sulla base di quanto appena esposto, sono definite alcune metriche per analizzare il comportamento del sistema di correzione. Le metriche definiti si dividono in due categorie:
+Sulla base di quanto appena esposto, sono definite alcune metriche per analizzare il comportamento del sistema di correzione. Le metriche definite si dividono in due categorie:
 \begin{itemize}
 \item Metriche misurate nei casi in cui $s \in C$.
 \item Metriche misurate nei casi in cui $s \not\in C$.
 \end{itemize}
 Nel caso in cui $s \in C$ sono definite le seguenti metriche:
 \begin{itemize}
-\item \textbf{Selezioni corrette}: percentuale dei casi in il sistema di correzione sceglie un candidato $c \in C$, e $c$ coincide con $s$. Ovvero, è la percentuale dei casi in cui il sistema seleziona un candidato, e il candidato selezionato è quello corretto.
+\item \textbf{Selezioni corrette}: percentuale dei casi in cui il sistema di correzione sceglie un candidato $c \in C$, e $c$ coincide con $s$. Ovvero, è la percentuale dei casi in cui il sistema seleziona un candidato, e il candidato selezionato è quello corretto.
 
-\item \textbf{Selezioni errate}: percentuale dei casi in il sistema di correzione sceglie un candidato $c \in C$, e $c$ non coincide con $s$. Ovvero, è la percentuale dei casi in cui il sistema seleziona un candidato, e il candidato selezionato non è quello corretto.
+\item \textbf{Selezioni errate}: percentuale dei casi in cui il sistema di correzione sceglie un candidato $c \in C$, e $c$ non coincide con $s$. Ovvero, è la percentuale dei casi in cui il sistema seleziona un candidato, e il candidato selezionato non è quello corretto.
 
 \item \textbf{Selezioni mancate}: percentuale dei casi in cui il sistema di correzione non sceglie alcun candidato, ignorando quindi la presenza della soluzione in $C$.
 
@@ -249,7 +249,7 @@ In \autoref{tab:ana_metinc} sono riportate le misurazioni per le metriche in cui
 
 
 Anche in questo caso, come è lecito aspettarsi, le frasi perturbate con superpipeline che introducono più rumore sono quelle che ottengono risultati peggiori, con una differenza fra i risultati migliori e peggiori contenuta entro l'8\% per quanto riguarda le selezioni corrette.
-Nella discussione dei risultati si farà rifermento solo alla combinazione di tutti i tipi di frase ber brevità. Tutte le considerazioni sono comunque applicabili anche per tutti gli altri tipi di frase, dei quali i risultati differiscono solo sensibilmente.\\
+Nella discussione dei risultati si farà rifermento solo alla combinazione di tutti i tipi di frase per brevità. Tutte le considerazioni sono comunque applicabili anche per tutti gli altri tipi di frase, per i quali i risultati differiscono solo sensibilmente.\\
 Come visibile nel grafico in \autoref{fig:ana_piesinc}, l'euristica di selezione del candidato produce la scelta corretta nell'85,3\% dei casi. Come mostrato in \autoref{fig:ana_levsinc}, infatti, circa l'89\% delle soluzioni si trova nella prima posizione fra i candidati ordinati per la distanza di Levenshtein. Si ricorda che l'euristica illustrata in \autoref{sec:met_errcor} sceglie sempre il candidato in prima posizione per ordinamento secondo la distanza di Levenshtein. Da questo è possibile analizzare in modo più critico i risultanti ottenuti: l'euristica identifica la soluzione nell'89\% dei casi, ma alcune soluzioni (poco più del 3\%) sono scartate dallo stadio di validazione. Il resto della percentuale di errore è dovuto all'11\% di soluzioni che si trovano dalla seconda posizione in poi nell'ordinamento per distanza di Levenshtein.
 
 

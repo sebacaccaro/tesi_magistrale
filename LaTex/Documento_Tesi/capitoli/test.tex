@@ -23,7 +23,7 @@ Inoltre, i test svolti in questo capitolo rendono possibile:
 \item L'insieme $D = \{\textit{\dsta}, \textit{\dstb} \}$ dei dataset
 \item L'insieme $M = \{\textit{Bert}, \textit{Ftwv}\}$ dei metodi di correzione
 \end{itemize}
-Ogni frase $f$ in \dsta\ o \dstb contiene il testo originale (\textit{text}), e le sue versioni perturbate nel campo \textit{perturbed}. Dato il metodo $m \in M$ che si vuole valutare, e data una delle versioni perturbate $v$ della frase nel campo \textit{perturbed}, si produce la tripla in \autoref{tab:test_tripla}.
+Ogni frase $f$ in \dsta\ o \dstb\ contiene il testo originale (\textit{text}), e le sue versioni perturbate nel campo \textit{perturbed}. Dato il metodo $m \in M$ che si vuole valutare, e data una delle versioni perturbate $v$ della frase nel campo \textit{perturbed}, si produce la tripla in \autoref{tab:test_tripla}.
 
 \begin{table}[H]
 \centering
@@ -84,9 +84,9 @@ Ad[c]sso[.] io pr[c]f[c]risc parlare spontaneamente. & 3\\
 \label{tab:test_erroridel}
 \end{table}
 \noindent
-Si noti come ogni errore delimitato contribuisca al conteggio dei numeri di errori con un +1 indipendentemente dal numero di caratteri da cui è composto.
+Si noti come ogni errore delimitato contribuisca al conteggio del numero di errori con un +1 indipendentemente dal numero di caratteri da cui è composto.
 
-Data quindi una qualsiasi tripla $t$ appartenente a uno dei 9 insieme definiti in precedenza, e formata dai campi $t_{or}$, $t_{pe}$, $t_{co}$, sono date le seguenti definizioni:
+Data quindi una qualsiasi tripla $t$ appartenente a uno dei 9 insiemi definiti in precedenza, e formata dai campi $t_{or}$, $t_{pe}$, $t_{co}$, sono date le seguenti definizioni:
 
 \begin{itemize}
 \item \textbf{Errori corretti:} numero di errori delimitati che sono in $t_{pe}$ ma non in $t_{co}$. Più informalmente, è il numero di errori che il sistema di correzione utilizzato è riuscito a correggere.
@@ -94,7 +94,7 @@ Data quindi una qualsiasi tripla $t$ appartenente a uno dei 9 insieme definiti i
 \item \textbf{Errori introdotti:} numero di errori delimitati in $t_{co}$ che non sono né in $t_{pe}$, né in $t_{or}$. Più informalmente, è il numero di errori che il sistema di correzione ha introdotto provando a correggere $t_{pe}$.
 \end{itemize}
 
-Data quindi una qualsiasi tripla $t$ appartenente a uno dei 9 insieme definiti in precedenza, sono definite le seguenti funzioni:
+Data quindi una qualsiasi tripla $t$ appartenente a uno dei 9 insiemi definiti in precedenza, sono definite le seguenti funzioni:
 \begin{itemize}
 \item $f_{co}(t)$: data una tripla $t$, ne restituisce il numero di errori corretti.
 \item $f_{pr}(t)$: data una tripla $t$, ne restituisce il numero di errori presenti.
@@ -176,7 +176,7 @@ Lo scopo dei test in questa sezione è quello di valutare le performance del sis
 \paragraph{Errori corretti per errore presente ($C/P$)}
 In \autoref{fig:test_res_cp_gra} e \autoref{fig:test_res_cp} sono riportate le misurazioni per la metrica $C/P$. Dati i risultati, è possibile fare le seguenti osservazioni:
 \begin{itemize}
-\item Per ogni superpipeline, le configurazioni che usano frasi più lunghe ottengono risultati migliori rispetto alle controparti che utilizzano frasi da 50 caratteri. Questo fatto supporta l'ipotesi che la presenza di contesto più amplio attorno a un errore possa aiutare durante la correzione.
+\item Per ogni superpipeline, le configurazioni che usano frasi più lunghe ottengono risultati migliori rispetto alle controparti che utilizzano frasi da 50 caratteri. Questo fatto supporta l'ipotesi che la presenza di un contesto più amplio attorno a un errore possa aiutare durante la correzione.
 
 \item Il sistema di correzione sviluppato ottiene performance significativamente maggiori nelle token superpipeline. Questo era il risultato atteso, in quanto la correzione dei word error è stato il focus principale durante lo sviluppo del sistema.
 
@@ -245,7 +245,7 @@ T3& 0.0058& 0.023& 0.0056& 0.0259\\
 \paragraph{Errori introdotti per errore corretto ($I/C$)}
 In \autoref{fig:test_res_ic_gra} e \autoref{fig:test_res_ic} sono riportate le misurazioni per la metrica $I/C$. Dati i risultati si possono fare le seguenti osservazioni:
 \begin{itemize}
-\item Sono confermate le osservazioni fatte in precedenza: il sistema Bert corregge più errori e ne introduce di meno al sistema Ftwv. Con la sola eccezione di S1, il sistema bert ha un $I/C$ ampiamente inferiore a 1 su tutte le superpipeline e su entrambe le lunghezze di frasi. Ciò implica che il sistema corregge più errori di quanti ne introduce.
+\item Sono confermate le osservazioni fatte in precedenza: il sistema Bert corregge più errori e ne introduce di meno rispetto al sistema Ftwv. Con la sola eccezione di S1, il sistema bert ha un $I/C$ ampiamente inferiore a 1 su tutte le superpipeline e su entrambe le lunghezze di frasi. Ciò implica che il sistema corregge più errori di quanti ne introduce.
 
 \item Per questa metrica è presente una lieve ma non trascurabile differenza di prestazioni derivante dalla lunghezza delle frasi: frasi più lunghe, anche in questo caso, portano a risultati migliori.
 \end{itemize}

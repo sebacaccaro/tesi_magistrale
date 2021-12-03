@@ -91,7 +91,7 @@ La metodologia sviluppata si propone di correggere gli errori di tipo RW e SP.
 
 \subsection{Panoramica Generale}
 \label{sec:met_panoramica}
-Il sistema di correzione è articolato come una pipeline composta da uno o più moduli 	concatenati. Un modulo è una funzione il cui scopo è correggere una specifica tipologia di errori all'interno di una frase. Un modulo può essere formalmente definito come segue:
+Il sistema di correzione è articolato come una pipeline composta da uno o più moduli 	concatenati. Un modulo è una funzione il cui scopo è correggere una specifica tipologia di errore all'interno di una frase. Un modulo può essere formalmente definito come segue:
 \begin{equation}
 M: F \mapsto F\prime
 \end{equation}
@@ -155,7 +155,7 @@ All'interno della pipeline di correzione possono essere presenti più occorrenze
 \subsection{BERT Masked Language Modeling}
 \label{sec:met_BERT_MLM}
 La fase di error correction di entrambi i moduli implementati fa uso del BERT Masked Language Modeling (da qui in poi riferito come BERT MLM). Data una qualsiasi sequenza $S = [w_1,...,w_n]$ nella quale ogni $w_i$ è una parola, è possibile mascherare una sola parola $w_i$ con la stringa \textit{[MASK]}. Si ottiene così la sequenza con maschera $S\prime = [w_1,...,\text{[MASK]},...,w_n]$.\\
-Dando in input $S\prime$ al modello BERT, esso associa ad ogni parola del proprio lessico la probabilità di corrispondere la parola mascherata. Le prime n parole con la probabilità più alta sono dette candidati.
+Dando in input $S\prime$ al modello BERT, esso associa ad ogni parola del proprio lessico la probabilità di corrispondere alla parola mascherata. Le prime n parole con la probabilità più alta sono dette candidati.
 \E\ quindi formalizzata come segue la funzione del BERT MLM detta "mask-filling":
 \begin{equation} \label{eq:met_BERT}
 B: S\prime \rightarrow [c_1,...,c_n]
@@ -179,7 +179,7 @@ BERT produce quindi una lista di candidati. Sono riportati i risultati impostand
 \item \textit{"disabili"} con probabilità 0.01
 \end{itemize}
 \ \\
-Bisogna sottolineare come la parola originale sia trasparente al modello BERT. Ciò significa che i candidati prodotti dal modello sono del tutto indipendenti dalla parola originale, e sono inferite unicamente dal contesto derivato dal resto della frase.\\
+Bisogna sottolineare come la parola originale sia trasparente al modello BERT. Ciò significa che i candidati prodotti dal modello sono del tutto indipendenti dalla parola originale, e sono inferiti unicamente dal contesto derivato dal resto della frase.\\
 
 
 
@@ -192,14 +192,13 @@ Bisogna sottolineare come la parola originale sia trasparente al modello BERT. C
 Il modulo di correzione token ha lo scopo di individuare e correggere tutti gli errori di tipo NW.  L'individuazione degli errori è effettuata in modo automatico dopo
 una pre-elaborazione (pre-processing) del testo. Il funzionamento di questa
 fase può quindi essere suddiviso in due stadi:
-
 \begin{enumerate}
 \item \textbf{Sentence pre-processing}: la frase viene tokenizzata, ovvero viene divisa singole parole dette token. Questo stadio è implementato tramite la libreria NLTK\cite{nltk}.
 \item \textbf{Error marking}: ogni token è analizzato singolarmente per determinare se contenga o meno un errore. Un token è considerato errato se sono vere le seguenti condizioni:
 	\begin{itemize}
 	\item Ha una lunghezza minima di 2 caratteri. Questa condizione è necessaria per evitare di introdurre nuovi errori correggendo inutilmente errori di tipo SP. Ad esempio, sarebbe deleterio provare a correggere le singole lettere di \textit{"Q u a l c h e"}. Ciò è dovuto al fatto che il modulo di correzione token è progettato per correggere singoli token: nell'esempio precedente, si tenterebbe quindi la correzione di tutte le sub-word che compongono il token. Per questo tipo di errori, è stato sviluppato di modulo di correzione Split (\autoref{sec:met_mod_split}).
 	
-	\item Dato un vocabolario di parole corrette, il token considerato non è presente in tale vocabolario. La ricerca nel vocabolario è eseguita in maniera case-insensitive. Tale approccio, seppur molto semplice ha alcune criticità. Ad esempio, ogni parola non appartenente alla lingua italiana verrà segnalata come errore. \E\ quindi auspicabile disporre di un vocabolario che comprenda anche alcune parole straniere di uso comune.
+	\item Dato un vocabolario di parole corrette, il token considerato non è presente in tale vocabolario. La ricerca nel vocabolario è eseguita in maniera case-insensitive. Tale approccio, seppur molto semplice, ha alcune criticità. Ad esempio, ogni parola non appartenente alla lingua italiana verrà segnalata come errore. \E\ quindi auspicabile disporre di un vocabolario che comprenda anche alcune parole straniere di uso comune.
 	\end{itemize}
 Un'eccezione a quest'ultima condizione è data da tutti i token che precedono un apostrofo. Questi token sono considerati corretti se almeno una fra tutte le combinazioni token + vocale è corretta. Si prenda ad esempio il token \textit{"dell"} non presente nel vocabolario, seguito dal token apostrofo. Vengono generate le 5 combinazioni token-vocale \textit{"della"},\textit{"delle"},\textit{"delli"},\textit{"dello"},\textit{"dellu"}. Siccome almeno una di queste è corretta, il token è considerato corretto.
 \end{enumerate}
@@ -316,7 +315,7 @@ La precedente espressione regolare intercetta tutte le sequenze di almeno tre gr
 
 \item \textbf{Punctuation filtering}: all'interno delle sequenze vengono rimossi tutti i caratteri non alfanumerici o spaziature. Ciò serve e rimuovere eventuali segni di punteggiatura spuri che possono diminuire l'efficacia delle seguenti fasi.
 
-\item \textbf{Error validation:} non tutte le sequenze riconosciute dall'espressione regolare sono degli errori. Si pensi ad esempio ad una serie di preposizioni o congiunzioni, come il quarto esempio in \autoref{table:met_split_esempi}. Si usa quindi un'euristica per scartare le sequenze che si ritenga non contengano errori. Sono considerati errori tutte le sequenze nelle quali il numero di gruppi di 2 caratteri è minore del numero di gruppi di 1 carattere.
+\item \textbf{Error validation:} non tutte le sequenze riconosciute dall'espressione regolare sono degli errori. Si pensi ad esempio ad una serie di preposizioni o congiunzioni, come il quarto esempio in \autoref{table:met_split_esempi}. Si usa quindi un'euristica per scartare le sequenze che si ritiene non contengano errori. Sono considerati errori tutte le sequenze nelle quali il numero di gruppi di 2 caratteri è minore del numero di gruppi di 1 carattere.
 
 \end{enumerate}
 
@@ -437,7 +436,7 @@ dove $F_{corr}$ è la frase con le correzioni apportate.\\
 La fase di Error Correction si compone dei seguenti stadi:
 \begin{enumerate}
 \item \textbf{Compression:} per ogni sequenza $s_i$ individuata da correggere, si rimuovono gli spazi bianchi, in modo da ottenere un'unica parola continua detta $s\prime_i$.
-\item \textbf{Vocabulary correction}: se una sequenza $s\prime_i$ è presente nel vocabolario, allora è $s\prime_i$ viene inserita nella frase al posto della sequenza contenente l'errore.
+\item \textbf{Vocabulary correction}: se una sequenza $s\prime_i$ è presente nel vocabolario, allora $s\prime_i$ viene inserita nella frase al posto della sequenza contenente l'errore.
 \item \textbf{BERT correction:} si fa uso del BERT MLM per trovare una correzione, in modo simile a quanto fatto nel modulo di correzione token. A seconda della tipologia dell' errore sono applicabili due strategie di correzione.
 		\begin{itemize}
 		\item Con sottrazione		
@@ -448,7 +447,7 @@ La fase di Error Correction si compone dei seguenti stadi:
 Ognuno degli stadi appena descritti è applicato in sequenza ad ogni singola tupla prodotta dalla fase precedente.
 
 \paragraph{Funzione di sostituzione}
-Viene introdotta una funzione detta funzione di sostituzione. Data una frase $f \in F$, una sequenza $s \in S$, una valore di inizio $b \in I$ e un valore di fine $e \in E$, la funzione è definita come:
+Viene introdotta una funzione detta funzione di sostituzione. Data una frase $f \in F$, una sequenza $s \in S$, un valore di inizio $b \in I$ e un valore di fine $e \in E$, la funzione è definita come:
 \begin{equation}
 \textit{Sos}: (F,S,I,E) \rightarrow F\prime
 \end{equation}
@@ -472,7 +471,7 @@ Lo stadio di compression rimuove gli spazi da ogni sequenza $s$ individuata come
 \begin{equation}
 \textit{Comp}: T \rightarrow T\prime
 \end{equation}
-dove in cui $T\prime$ è l'insieme di tutte le tuple $(s\prime,b,e)$ in cui $s\prime$ è la sequenza $s$ senza spaziature. Riprendendo l'esempio proposto nella fase di error detection, le tuple prodotte diventano rispettivamente:
+dove $T\prime$ è l'insieme di tutte le tuple $(s\prime,b,e)$ in cui $s\prime$ è la sequenza $s$ senza spaziature. Riprendendo l'esempio proposto nella fase di error detection, le tuple prodotte diventano rispettivamente:
 \begin{table}[H]
 \centering
 \begin{tabular}{cccc}
@@ -504,7 +503,7 @@ Il risulta è la frase $F_{corr}$:
 
 
 \paragraph{BERT correction}
-Per tutte le tuple per le quali non è stato possibile applicare una correzione con vocabolario, si passa allo stadio di BERT correction. Il primo step di questo stadio consiste nel mascheramento della sequenza errata nella fase originale. Data una tupla $(s\prime,b,e)$ prodotta dallo stadio di compressione e una frase $F$, si ottiene la frase mascherata $F_{mask}$ come segue:
+Per tutte le tuple per le quali non è stato possibile applicare una correzione con vocabolario, si passa allo stadio di BERT correction. Il primo step di questo stadio consiste nel mascheramento della sequenza errata nella frase originale. Data una tupla $(s\prime,b,e)$ prodotta dallo stadio di compressione e una frase $F$, si ottiene la frase mascherata $F_{mask}$ come segue:
 \begin{equation}
 F_{mask} = \textit{Sos}(F,\textit{[MASK]},b,e)
 \end{equation}
@@ -548,7 +547,7 @@ La frase corretta $F_{corr}$ è quindi:
 \end{center}
 
 \paragraph{Correzione con rimpiazzo}
-Si applica in caso $c_{corr}$ non coincida con la fine o l'inizio della sequenza compressa $s\prime$. Questo step utilizza un'euristica per validare la correzione prodotta dal BERT MLM. La soluzione prodotta da BERT è valutata ammissibile e solo se $d_{lev}(s\prime,c_{corr}) \leqslant 4$.\\
+Si applica in caso $c_{corr}$ non coincida con la fine o l'inizio della sequenza compressa $s\prime$. Questo step utilizza un'euristica per validare la correzione prodotta dal BERT MLM. La soluzione prodotta da BERT è valutata ammissibile se e solo se $d_{lev}(s\prime,c_{corr}) \leqslant 4$.\\
 In caso la soluzione sia ammissibile, la correzione è applicata tramite la funzione di sostituzione:
 \begin{equation}
 F_{corr} = \textit{Sos}(F,c_{corr},b,r)
